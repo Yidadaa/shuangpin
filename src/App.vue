@@ -1,21 +1,41 @@
 <script setup lang="ts">
 import Keyboard from './components/Keyboard.vue';
-import Displayer from './components/Displayer.vue';
+import Hanzi from './components/Hanzi.vue';
 import Pinyin from './components/Pinyin.vue'
-import Menu from './components/Menu.vue'
-
+import Menu from './components/MenuList.vue'
+import Bg from './components/Background.vue'
+import TypeSummary from './components/TypeSummary.vue'
 </script>
 
 <template>
   <div class="content">
-    <Menu />
-    <Pinyin />
+    <div class="main-menu">
+      <Menu default-show-item />
+    </div>
+
+    <div class="input-area">
+      <Pinyin />
+    </div>
+
+    <div class="hanzi-list">
+      <Hanzi :hanzi-list="'随便打点字'.split('')" />
+    </div>
+
     <Keyboard />
+
+    <div class="summary">
+      <TypeSummary :speed="65" :accuracy="Math.random()" :avgpress="Math.random() * 3" />
+    </div>
+
+    <Bg :left="{ chars: '小鹤', shuangpins: 'XNHE' }" :right="{ chars: '双拼', shuangpins: 'VLPB' }" />
   </div>
 </template>
 
 <style lang="less">
 @import "./app.less";
+@import "./styles/color.less";
+
+@app-padding: 1em;
 
 #app {
   display: flex;
@@ -37,5 +57,33 @@ import Menu from './components/Menu.vue'
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.main-menu {
+  color: @primary-color;
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  .selected-item {
+    background-color: @primary-color;
+    color: white;
+  }
+}
+
+.input-area {
+  margin-bottom: 4em;
+}
+
+.summary {
+  position: absolute;
+  right: @app-padding;
+  bottom: @app-padding;
+}
+
+.hanzi-list {
+  position: absolute;
+  top: @app-padding;
+  right: @app-padding;
 }
 </style>

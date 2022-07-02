@@ -3,7 +3,7 @@ import { ref } from 'vue'
 
 const pinyin = ref({
   lead: "p",
-  follow: "in"
+  follow: "ing"
 })
 </script>
 
