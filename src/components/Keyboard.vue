@@ -14,11 +14,20 @@ const keys = [
   ]
 ]
 
-console.log(pinyinTable, pinyinSummary)
+const pressingKeys = ref(new Set<string>())
 
 onMounted(() => {
-  document.onkeydown = console.log
+  document.onkeydown = e => pressKey(e.key)
+  document.onkeyup = e => releaseKey(e.key)
 })
+
+function pressKey(key: string) {
+  pressingKeys.value.add(key)
+}
+
+function releaseKey(key: string) {
+  pressingKeys.value.delete(key)
+}
 
 const keyLayout = ref(keys.map(line => line.map(keyItem => {
   const [main, follow, lead] = keyItem.split('/')
@@ -56,9 +65,11 @@ function mergeString([a, b]: string[] = []) {
 <template>
   <div class="keyboard">
     <div class="key-row" v-for="(line, li) in keyLayout" key={{li}}>
-      <div class="key-item" v-for="(keyItem, ki) in line" key={{ki}}>
+      <div class="key-item" :class="pressingKeys.has(keyItem.main) && 'pressing'" v-for="(keyItem, ki) in line"
+        @mousedown="pressKey(keyItem.main)" @touchstart="pressKey(keyItem.main)" @mouseup="releaseKey(keyItem.main)"
+        @mouseout="releaseKey(keyItem.main)" @touchend="releaseKey(keyItem.main)" key={{ki}}>
         <div class="main-content">
-          <div class="main-key">{{ keyItem.main.toUpperCase() }}</div>
+          <div class="main-key ">{{ keyItem.main.toUpperCase() }}</div>
           <div class="lead-key" v-if="!!keyItem.lead">{{ keyItem.lead }}</div>
         </div>
         <div class="bottom-content">
@@ -80,6 +91,7 @@ function mergeString([a, b]: string[] = []) {
   display: flex;
   align-items: center;
   justify-content: center;
+  user-select: none;
 
   .key-item {
     margin: 5px;
@@ -96,6 +108,10 @@ function mergeString([a, b]: string[] = []) {
     flex-direction: column;
     justify-content: space-between;
 
+    &.pressing {
+      background-color: rgba(0, 0, 0, 0.1);
+    }
+
     .main-content {
       display: flex;
       justify-content: space-between;
@@ -103,12 +119,12 @@ function mergeString([a, b]: string[] = []) {
 
       .main-key {
         font-size: 14px;
-        font-weight: bolder;
+        font-weight: bold;
       }
 
       .lead-key {
         font-size: 12px;
-        font-weight: bolder;
+        font-weight: bold;
         color: red;
       }
     }

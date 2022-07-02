@@ -12,7 +12,10 @@
     "vue": "^3.2.25"
   },
   "devDependencies": {
+    "@napi-rs/pinyin": "^1.7.0",
+    "@types/node": "^18.0.0",
     "@vitejs/plugin-vue": "^2.3.3",
+    "ts-node": "^10.8.1",
     "typescript": "^4.5.4",
     "vite": "^2.9.9",
     "vue-tsc": "^0.34.7"

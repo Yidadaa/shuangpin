@@ -32,7 +32,9 @@ export const multiFollowKeys =
 
 export const followKeys = singleFollowKeys.concat(multiFollowKeys);
 
-let validCombines = 0;
+export const zeroFollowKeys = "a ai an ang ao e ei en eng er o ou".split(" ");
+
+let validCombines: string[] = [...zeroFollowKeys];
 export const pinyinTable = rawTable
   .split("\n")
   .map((line) => {
@@ -40,7 +42,7 @@ export const pinyinTable = rawTable
     const lead = items[0];
     const follows = items.slice(1).map((v) => v.trim().replace(lead, ""));
 
-    validCombines += follows.length;
+    validCombines = validCombines.concat(follows);
 
     return [lead, follows];
   })
