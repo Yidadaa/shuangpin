@@ -1,31 +1,25 @@
 <script setup lang="ts">
-import Keyboard from './components/Keyboard.vue';
-import Hanzi from './components/Hanzi.vue';
-import Pinyin from './components/Pinyin.vue'
 import Menu from './components/MenuList.vue'
 import Bg from './components/Background.vue'
-import TypeSummary from './components/TypeSummary.vue'
+import { routes } from './router'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const menuItems = routes.map(v => v.name!) as string[]
+
+function onMenuChange(i: number) {
+  router.push(routes[i])
+}
+
 </script>
 
 <template>
   <div class="content">
     <div class="main-menu">
-      <Menu default-show-item />
+      <Menu default-show-item :items="menuItems" v-on:menu-change="onMenuChange" />
     </div>
 
-    <div class="input-area">
-      <Pinyin />
-    </div>
-
-    <div class="hanzi-list">
-      <Hanzi :hanzi-list="'随便打点字'.split('')" />
-    </div>
-
-    <Keyboard />
-
-    <div class="summary">
-      <TypeSummary :speed="65" :accuracy="Math.random()" :avgpress="Math.random() * 3" />
-    </div>
+    <router-view></router-view>
 
     <Bg :left="{ chars: '小鹤', shuangpins: 'XNHE' }" :right="{ chars: '双拼', shuangpins: 'VLPB' }" />
   </div>
@@ -34,8 +28,7 @@ import TypeSummary from './components/TypeSummary.vue'
 <style lang="less">
 @import "./app.less";
 @import "./styles/color.less";
-
-@app-padding: 1em;
+@import "./styles/var.less";
 
 #app {
   display: flex;
@@ -43,6 +36,7 @@ import TypeSummary from './components/TypeSummary.vue'
   width: 100vw;
   align-items: center;
   justify-content: center;
+  user-select: none;
 }
 
 .content {
@@ -71,19 +65,23 @@ import TypeSummary from './components/TypeSummary.vue'
   }
 }
 
-.input-area {
-  margin-bottom: 4em;
+.page {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
 }
 
-.summary {
-  position: absolute;
-  right: @app-padding;
-  bottom: @app-padding;
+*::-webkit-scrollbar {
+  width: 5px;
 }
 
-.hanzi-list {
-  position: absolute;
-  top: @app-padding;
-  right: @app-padding;
+*::-webkit-scrollbar-track {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.03);
 }
 </style>

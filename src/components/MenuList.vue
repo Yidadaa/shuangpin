@@ -1,29 +1,22 @@
 <script lang="ts" setup>
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, readonly } from 'vue'
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void
   index?: number
+  items: string[]
   defaultShowItem?: boolean
 }
 
 const props = defineProps<MenuProps>()
 
-const menuItems = ref([{
-  name: '声母模式',
-}, {
-  name: '韵母模式'
-}, {
-  name: '随机模式'
-}, {
-  name: '设置'
-}])
+const menuItems = readonly(props.items)
 
 const currentIndex = ref(props.index ?? 0)
 
 function shiftItem(deltaIndex: number) {
   currentIndex.value += deltaIndex
-  currentIndex.value = Math.max(0, Math.min(menuItems.value.length - 1, currentIndex.value))
+  currentIndex.value = Math.max(0, Math.min(menuItems.length - 1, currentIndex.value))
 
   if (deltaIndex !== 0) {
     props.onMenuChange?.(currentIndex.value)
@@ -45,9 +38,7 @@ function onItemWheel(e: WheelEvent) {
     <div class="menu-items" :class="props.defaultShowItem && 'show-items'"
       :style="`transform: translateY(${-currentIndex * 2}em)`" @wheel.prevent="onItemWheel">
       <div class="menu-item" @click="shiftItem(i - currentIndex)" :class="buildItemClass(i - currentIndex)"
-        v-for="(item, i) in menuItems">
-        {{ item.name
-        }}</div>
+        v-for="(item, i) in menuItems">{{ item }}</div>
     </div>
   </div>
 </template>

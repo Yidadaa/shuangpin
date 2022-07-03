@@ -7,4 +7,76 @@ declare module "*.vue" {
   export default component;
 }
 
-declare type AppState = {};
+declare type Char =
+  | "a"
+  | "b"
+  | "c"
+  | "d"
+  | "e"
+  | "f"
+  | "g"
+  | "h"
+  | "i"
+  | "j"
+  | "k"
+  | "l"
+  | "m"
+  | "n"
+  | "o"
+  | "p"
+  | "q"
+  | "r"
+  | "s"
+  | "t"
+  | "u"
+  | "v"
+  | "w"
+  | "x"
+  | "y"
+  | "z";
+
+type Pinyin = { lead: string; follow: string };
+
+interface Progress {
+  currentIndex: number;
+  correctCount: number;
+  totalCount: number;
+}
+
+interface Combine {
+  lead: string;
+  follow: string;
+  hanzis: string[];
+  progress: Progress;
+}
+
+interface Article {
+  text: string;
+  name: string;
+  progress: Progress;
+}
+
+interface KeyConfig {
+  main: Char;
+  leads: string[];
+  follows: string[];
+}
+
+interface ShuangpinMode {
+  name: string;
+  keys: Map<Char, KeyConfig>;
+}
+
+interface Settings {
+  enableSeg: boolean; // 分词键
+  enableKeyHint: boolean; // 按键提示
+  enablePinyinHint: boolean; // 拼音提示
+  enableAutoClear: boolean; // 自动清空
+  shuangpinMode: string;
+}
+
+interface AppState {
+  combines: Combine[];
+  artices: Article[];
+  settings: Settings;
+}

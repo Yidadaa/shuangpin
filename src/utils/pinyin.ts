@@ -34,7 +34,10 @@ export const followKeys = singleFollowKeys.concat(multiFollowKeys);
 
 export const zeroFollowKeys = "a ai an ang ao e ei en eng er o ou".split(" ");
 
-let validCombines: string[] = [...zeroFollowKeys];
+let validCombines: Map<string, Pinyin> = new Map();
+
+zeroFollowKeys.forEach((v) => validCombines.set(v, { lead: "", follow: v }));
+
 export const pinyinTable = rawTable
   .split("\n")
   .map((line) => {
@@ -42,7 +45,12 @@ export const pinyinTable = rawTable
     const lead = items[0];
     const follows = items.slice(1).map((v) => v.trim().replace(lead, ""));
 
-    validCombines = validCombines.concat(follows);
+    follows.forEach((follow) => {
+      validCombines.set(lead + follow, {
+        lead,
+        follow,
+      });
+    });
 
     return [lead, follows];
   })
