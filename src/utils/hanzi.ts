@@ -20,6 +20,7 @@ function buildTable({ pinyin, hanzi }: HanziLib) {
 }
 
 export const hanziMap = buildTable(hanziTable.popular);
+export const hanziList = hanziTable.popular;
 
 export function getPinyinOf(hanzi: string) {
   return hanziMap.h2p.get(hanzi);

@@ -11,8 +11,11 @@ const articles = [
 export const useStore = defineStore("app", {
   state: (): AppState => {
     return {
+      currentLeadIndex: 0,
+      currentFollowIndex: 0,
+
       combines: [],
-      artices: [],
+      articles: [],
       settings: {
         enableAutoClear: true,
         enableKeyHint: true,

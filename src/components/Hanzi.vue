@@ -3,28 +3,32 @@ import { effect, ref } from 'vue';
 import { getPinyinOf } from '../utils/hanzi';
 
 const props = defineProps<{
-  hanziList: string[]
+  nextHanzi: () => string
 }>()
 
-const hanziIndex = ref(0)
+const hanziSeq = ref<string[]>([])
 const pinyin = ref('')
-const follows = ref<string[]>([])
+const currentHanzi = ref('')
 
 effect(() => {
-  pinyin.value = getPinyinOf(props.hanziList[hanziIndex.value]) ?? ''
-  follows.value = props.hanziList.slice(hanziIndex.value + 1, hanziIndex.value + 5).reverse()
+  while (hanziSeq.value.length < 4) {
+    hanziSeq.value.unshift(props.nextHanzi())
+  }
+
+  currentHanzi.value = hanziSeq.value.pop()!
+  pinyin.value = getPinyinOf(currentHanzi.value)!
 })
 
 </script>
 
 <template>
   <div class="displayer">
-    <div class="follow-item" v-for="(item, i) in follows" :style="`color: rgba(0, 0, 0, ${i / 4})`">{{ item }}</div>
+    <div class="follow-item" v-for="(item, i) in hanziSeq" :style="`color: rgba(0, 0, 0, ${i / 4})`">{{ item }}</div>
     <div class="current-outset">
       <div class="current-item">
         <img class="mi-bg" src="../assets/mi-bg.svg" />
         <div class="pinyin">{{ pinyin }}</div>
-        <div class="hanzi">{{ hanziList[hanziIndex] }}</div>
+        <div class="hanzi">{{ currentHanzi }}</div>
       </div>
     </div>
   </div>

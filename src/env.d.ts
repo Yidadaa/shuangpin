@@ -77,7 +77,10 @@ interface Settings {
 }
 
 interface AppState {
+  currentLeadIndex: number;
+  currentFollowIndex: number;
+
   combines: Combine[];
-  artices: Article[];
+  articles: Article[];
   settings: Settings;
 }

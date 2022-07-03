@@ -22,8 +22,11 @@ s sa se si sai sao sou san sen sang seng
 y  ya yao you yan yang yu ye yue yuan yi yin yun ying
 w  wa wo wai wei wan wen wang weng wu`;
 
-export const leadKeys =
-  "b p m f d t n l g k h j q x zh ch sh r z c s y w".split(" ");
+export const zeroLeadKeys = "a ai an ang ao e ei en eng er o ou".split(" ");
+
+export const leadKeys = "b p m f d t n l g k h j q x zh ch sh r z c s y w"
+  .split(" ")
+  .concat(zeroLeadKeys);
 
 export const singleFollowKeys = "a o e i u v".split(" ");
 
@@ -32,11 +35,11 @@ export const multiFollowKeys =
 
 export const followKeys = singleFollowKeys.concat(multiFollowKeys);
 
-export const zeroFollowKeys = "a ai an ang ao e ei en eng er o ou".split(" ");
+export let validCombines: Map<string, Pinyin> = new Map();
+export let leadMap: Map<string, Pinyin[]> = new Map();
+export let followMap: Map<string, Pinyin[]> = new Map();
 
-let validCombines: Map<string, Pinyin> = new Map();
-
-zeroFollowKeys.forEach((v) => validCombines.set(v, { lead: "", follow: v }));
+zeroLeadKeys.forEach((v) => validCombines.set(v, { lead: v, follow: "" }));
 
 export const pinyinTable = rawTable
   .split("\n")
@@ -62,10 +65,26 @@ export const pinyinTable = rawTable
     {}
   ) as { [_: string]: string[] };
 
+function pushMap<K, V>(m: Map<K, V[]>, k: K, v: V) {
+  if (!m.has(k)) {
+    m.set(k, []);
+  }
+
+  m.get(k)!.push(v);
+}
+
+validCombines.forEach((v) => {
+  pushMap(leadMap, v.lead, v);
+  pushMap(followMap, v.follow, v);
+});
+
 export const pinyinSummary = {
   leadCount: leadKeys.length,
   followCount: followKeys.length,
   singleFollowCount: singleFollowKeys.length,
   multiFollowCount: multiFollowKeys.length,
-  validCombines,
 };
+
+export function getCombineOf(p: Pinyin) {
+  return p.lead + p.follow;
+}

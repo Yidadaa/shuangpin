@@ -5,7 +5,8 @@ import Pinyin from '../components/Pinyin.vue'
 import TypeSummary from '../components/TypeSummary.vue'
 
 export interface SingleModeProps {
-  chars: string[]
+  nextChar: () => string
+  onValidInput?: (result: boolean) => void
 }
 
 const props = defineProps<SingleModeProps>()
@@ -19,7 +20,7 @@ const props = defineProps<SingleModeProps>()
     </div>
 
     <div class="hanzi-list">
-      <Hanzi :hanzi-list="'随便打点字'.split('')" />
+      <Hanzi :next-hanzi="props.nextChar" />
     </div>
 
     <Keyboard />

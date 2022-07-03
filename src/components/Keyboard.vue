@@ -5,7 +5,12 @@ import { ref, onMounted } from 'vue'
 import { useStore } from '../store';
 import { loadShuangpinConfig, keyboardLayout } from '../utils/keyboard'
 
+const props = defineProps<{
+  onKeySeqChange?: (_: string[]) => void
+}>()
+
 const pressingKeys = ref(new Set<string>())
+const keySeq = ref<string[]>([])
 
 onMounted(() => {
   document.onkeydown = e => pressKey(e.key)
@@ -18,6 +23,11 @@ function pressKey(key: string) {
 
 function releaseKey(key: string) {
   pressingKeys.value.delete(key)
+  keySeq.value.push(key)
+  if (keySeq.value.length > 2) {
+    keySeq.value.shift()
+  }
+  props.onKeySeqChange?.(keySeq.value)
 }
 
 const store = useStore();
