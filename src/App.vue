@@ -3,9 +3,16 @@ import Menu from './components/MenuList.vue'
 import Bg from './components/Background.vue'
 import { routes } from './router'
 import { useRouter } from 'vue-router'
+import { useStore } from './store';
+import { computed } from '@vue/reactivity';
 
+const store = useStore()
 const router = useRouter()
 const menuItems = routes.map(v => v.name!) as string[]
+
+const spMode = computed(() => {
+  return store.settings.shuangpinMode.toString().split('')
+})
 
 function onMenuChange(i: number) {
   router.push(routes[i])
@@ -21,7 +28,8 @@ function onMenuChange(i: number) {
 
     <router-view></router-view>
 
-    <Bg :left="{ chars: '小鹤', shuangpins: 'XNHE' }" :right="{ chars: '双拼', shuangpins: 'VLPB' }" />
+    <Bg :left="{ chars: spMode.slice(0, 2).join(''), shuangpins: 'XNHE' }"
+      :right="{ chars: '双拼', shuangpins: 'VLPB' }" />
   </div>
 </template>
 
@@ -42,6 +50,7 @@ function onMenuChange(i: number) {
 .content {
   width: 90%;
   max-width: 900px;
+  min-height: 30em;
   box-shadow: 10px 20px 60px rgba(0, 0, 0, 0.1);
   padding: 30px;
   border-radius: 0px;

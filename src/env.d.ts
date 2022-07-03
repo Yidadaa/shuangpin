@@ -39,8 +39,9 @@ type Pinyin = { lead: string; follow: string };
 
 interface Progress {
   currentIndex: number;
-  correctCount: number;
-  totalCount: number;
+  total: number;
+  correctTry: number;
+  totalTry: number;
 }
 
 interface Combine {
@@ -63,7 +64,7 @@ interface KeyConfig {
 }
 
 interface ShuangpinMode {
-  name: string;
+  name: ShuangpinType;
   keys: Map<Char, KeyConfig>;
 }
 
@@ -72,7 +73,7 @@ interface Settings {
   enableKeyHint: boolean; // 按键提示
   enablePinyinHint: boolean; // 拼音提示
   enableAutoClear: boolean; // 自动清空
-  shuangpinMode: string;
+  shuangpinMode: ShuangpinType;
 }
 
 interface AppState {

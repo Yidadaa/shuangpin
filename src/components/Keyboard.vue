@@ -1,18 +1,9 @@
 <script setup lang="ts">
+import { computed } from '@vue/reactivity';
+import { storeToRefs } from 'pinia';
 import { ref, onMounted } from 'vue'
-import { pinyinTable, pinyinSummary } from '../utils/pinyin'
-
-const keys = [
-  [
-    'q/iu', 'w/ei', 'e/e', 'r/uan', 't/ue,ve', 'y/un', 'u/u/sh', 'i/i/ch', 'o/uo', 'p/ie'
-  ],
-  [
-    'a/a', 's/ong,iong', 'd/ai', 'f/en', 'g/eng', 'h/ang', 'j/an', 'k/ing,uai', 'l/iang,uang'
-  ],
-  [
-    'z/ou', 'x/ia,ua', 'c/ao', 'v/ui/zh', 'b/in', 'n/iao', 'm/ian'
-  ]
-]
+import { useStore } from '../store';
+import { loadShuangpinConfig, keyboardLayout } from '../utils/keyboard'
 
 const pressingKeys = ref(new Set<string>())
 
@@ -29,12 +20,20 @@ function releaseKey(key: string) {
   pressingKeys.value.delete(key)
 }
 
-const keyLayout = ref(keys.map(line => line.map(keyItem => {
-  const [main, follow, lead] = keyItem.split('/')
-  return {
-    main, follow: follow?.split(','), lead
-  }
-})))
+const store = useStore();
+
+const keyLayout = computed(() => {
+  const config = loadShuangpinConfig(store.settings.shuangpinMode)
+
+  return keyboardLayout.map(v => v.split('').map(key => {
+    const keyConfig = config.get(key as Char)!
+    return {
+      main: keyConfig.main,
+      lead: mergeString(keyConfig.leads.filter(v => v !== keyConfig.main)),
+      follow: mergeString(keyConfig.follows)
+    }
+  }))
+})
 
 function mergeString([a, b]: string[] = []) {
   if (!(a && b && a.length > 2 && b.length > 2)) {
@@ -70,10 +69,10 @@ function mergeString([a, b]: string[] = []) {
         @mouseout="releaseKey(keyItem.main)" @touchend="releaseKey(keyItem.main)" key={{ki}}>
         <div class="main-content">
           <div class="main-key ">{{ keyItem.main.toUpperCase() }}</div>
-          <div class="lead-key" v-if="!!keyItem.lead">{{ keyItem.lead }}</div>
+          <div class="lead-key" v-if="keyItem.lead.length > 0">{{ keyItem.lead }}</div>
         </div>
         <div class="bottom-content">
-          <div class="follow-key">{{ mergeString(keyItem.follow) }}</div>
+          <div class="follow-key">{{ keyItem.follow }}</div>
         </div>
       </div>
     </div>
@@ -81,6 +80,8 @@ function mergeString([a, b]: string[] = []) {
 </template>
 
 <style lang="less">
+@import "../styles/color.less";
+
 .keyboard {
   display: flex;
   justify-content: center;
@@ -125,7 +126,7 @@ function mergeString([a, b]: string[] = []) {
       .lead-key {
         font-size: 12px;
         font-weight: bold;
-        color: red;
+        color: @primary-color;
       }
     }
 

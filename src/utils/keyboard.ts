@@ -1,6 +1,12 @@
 import configs from "./spconfig.json";
 
-function loadShuangpinConfig(name: keyof typeof configs) {
+declare global {
+  type ShuangpinType = keyof typeof configs;
+}
+
+export const shuangpins = Object.keys(configs) as [ShuangpinType];
+
+export function loadShuangpinConfig(name: ShuangpinType) {
   const config = configs[name];
   const keys: ShuangpinMode["keys"] = new Map();
 
@@ -11,10 +17,12 @@ function loadShuangpinConfig(name: keyof typeof configs) {
       keys.set(main as Char, {
         main: main as Char,
         follows: follow.split(","),
-        leads: lead.split(","),
+        leads: lead?.split(","),
       });
     }
   }
+
+  return keys;
 }
 
 export const keyboardLayout = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];

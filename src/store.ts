@@ -9,8 +9,18 @@ const articles = [
 ];
 
 export const useStore = defineStore("app", {
-  state: () => {
-    return {};
+  state: (): AppState => {
+    return {
+      combines: [],
+      artices: [],
+      settings: {
+        enableAutoClear: true,
+        enableKeyHint: true,
+        enablePinyinHint: true,
+        enableSeg: true,
+        shuangpinMode: "小鹤双拼",
+      },
+    };
   },
   persist: true,
 });

@@ -1,36 +1,70 @@
 {
   "小鹤双拼": [
     [
-      "q/iu",
-      "w/ei",
-      "e/e",
-      "r/uan",
-      "t/ue,ve",
-      "y/un",
-      "u/u/sh",
-      "i/i/ch",
-      "o/uo",
-      "p/ie"
+      "q/iu/q",
+      "w/ei/w",
+      "e/e/e",
+      "r/uan/r",
+      "t/ue,ve/t",
+      "y/un/",
+      "u/u/sh,u",
+      "i/i/ch,i",
+      "o/uo/o",
+      "p/ie/p"
     ],
     [
-      "a/a",
-      "s/ong,iong",
-      "d/ai",
-      "f/en",
-      "g/eng",
-      "h/ang",
-      "j/an",
-      "k/ing,uai",
-      "l/iang,uang"
+      "a/a/a",
+      "s/ong,iong/s",
+      "d/ai/d",
+      "f/en/f",
+      "g/eng/g",
+      "h/ang/h",
+      "j/an/j",
+      "k/ing,uai/k",
+      "l/iang,uang/l"
     ],
     [
-      "z/ou",
-      "x/ia,ua",
-      "c/ao",
+      "z/ou/z",
+      "x/ia,ua/x",
+      "c/ao/c",
       "v/ui/zh",
-      "b/in",
-      "n/iao",
-      "m/ian"
+      "b/in/b",
+      "n/iao/n",
+      "m/ian/m"
+    ]
+  ],
+  "自然码": [
+    [
+      "q/i/q",
+      "w/ei/w",
+      "e/e/e",
+      "r/uan/r",
+      "t/ue,ve/t",
+      "y/un/",
+      "u/u/sh,u",
+      "i/i/ch,i",
+      "o/uo/o",
+      "p/ie/p"
+    ],
+    [
+      "a/a/a",
+      "s/ong,iong/s",
+      "d/ai/d",
+      "f/en/f",
+      "g/eng/g",
+      "h/ang/h",
+      "j/an/j",
+      "k/ing,uai/k",
+      "l/iang,uang/l"
+    ],
+    [
+      "z/ou/z",
+      "x/ia,ua/x",
+      "c/ao/c",
+      "v/ui/zh",
+      "b/in/b",
+      "n/iao/n",
+      "m/ian/m"
     ]
   ]
 }
