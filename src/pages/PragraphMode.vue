@@ -24,7 +24,7 @@ onMounted(() => {
   <div class="p-mode">
     <div class="display-area">
       <div class="p-title">
-        <Pinyin />
+        <Pinyin :chars="[]" />
 
         <div class="title-and-count">
           <div class="count">401 字 / 1351 字</div>

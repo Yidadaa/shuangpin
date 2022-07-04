@@ -35,7 +35,7 @@ declare type Char =
   | "y"
   | "z";
 
-type Pinyin = { lead: string; follow: string };
+type Pinyin = { lead: string; follow: string; full: string };
 
 interface Progress {
   currentIndex: number;
@@ -65,7 +65,11 @@ interface KeyConfig {
 
 interface ShuangpinMode {
   name: ShuangpinType;
-  keys: Map<Char, KeyConfig>;
+  groupByKey: Map<Char, KeyConfig>; // 键盘 -> KeyConfig
+  groupByFollow: Map<string, KeyConfig>; // 声母 -> KeyConfig
+  groupByLead: Map<string, KeyConfig>; // 韵母 -> KeyConfig
+  sp2zero: Map<string, string>; // 零声母 -> 双拼
+  zero2sp: Map<string, string>; // 双拼 -> 零声母
 }
 
 interface Settings {

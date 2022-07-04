@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { loadShuangpinConfig } from "./utils/keyboard";
 
 const articles = [
   `燕子去了，有再来的时候；杨柳枯了，有再青的时候；桃花谢了，有再开的时候。但是，聪明的，你告诉我，我们的日子为什么一去不复返呢？——是有人偷了他们罢：那是谁？又藏在何处呢？是他们自己逃走了罢：现在又到了哪里呢？
@@ -24,6 +25,11 @@ export const useStore = defineStore("app", {
         shuangpinMode: "小鹤双拼",
       },
     };
+  },
+  getters: {
+    mode(state) {
+      return loadShuangpinConfig(state.settings.shuangpinMode);
+    },
   },
   persist: true,
 });

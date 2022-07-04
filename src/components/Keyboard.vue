@@ -5,8 +5,11 @@ import { ref, onMounted } from 'vue'
 import { useStore } from '../store';
 import { loadShuangpinConfig, keyboardLayout } from '../utils/keyboard'
 
+const store = useStore();
+const settings = storeToRefs(store).settings;
+
 const props = defineProps<{
-  onKeySeqChange?: (_: string[]) => void
+  validSeq?: (_: [string?, string?]) => boolean
 }>()
 
 const pressingKeys = ref(new Set<string>())
@@ -21,22 +24,45 @@ function pressKey(key: string) {
   pressingKeys.value.add(key)
 }
 
-function releaseKey(key: string) {
-  pressingKeys.value.delete(key)
-  keySeq.value.push(key)
-  if (keySeq.value.length > 2) {
-    keySeq.value.shift()
+function send() {
+  console.log('send', keySeq.value)
+  if (props.validSeq?.([keySeq.value.at(0), keySeq.value.at(1)])) {
+    keySeq.value = []
   }
-  props.onKeySeqChange?.(keySeq.value)
 }
 
-const store = useStore();
+function releaseKey(key: string, shouldSend = true) {
+  pressingKeys.value.delete(key)
+
+  if (key === 'Backspace') {
+    keySeq.value.pop()
+    return send()
+  }
+
+  if (!shouldSend || !store.mode.groupByKey.has(key as Char)) {
+    return
+  }
+
+  if (keySeq.value.length <= 2) {
+    keySeq.value.push(key)
+  }
+
+  if (keySeq.value.length > 2) {
+    if (settings.value.enableAutoClear) {
+      keySeq.value = [key]
+    } else {
+      keySeq.value.pop()
+    }
+  }
+
+  send()
+}
 
 const keyLayout = computed(() => {
-  const config = loadShuangpinConfig(store.settings.shuangpinMode)
+  const config = loadShuangpinConfig(settings.value.shuangpinMode)
 
   return keyboardLayout.map(v => v.split('').map(key => {
-    const keyConfig = config.get(key as Char)!
+    const keyConfig = config.groupByKey.get(key as Char)!
     return {
       main: keyConfig.main,
       lead: mergeString(keyConfig.leads.filter(v => v !== keyConfig.main)),
@@ -76,7 +102,7 @@ function mergeString([a, b]: string[] = []) {
     <div class="key-row" v-for="(line, li) in keyLayout" key={{li}}>
       <div class="key-item" :class="pressingKeys.has(keyItem.main) && 'pressing'" v-for="(keyItem, ki) in line"
         @mousedown="pressKey(keyItem.main)" @touchstart="pressKey(keyItem.main)" @mouseup="releaseKey(keyItem.main)"
-        @mouseout="releaseKey(keyItem.main)" @touchend="releaseKey(keyItem.main)" key={{ki}}>
+        @mouseout="releaseKey(keyItem.main, false)" @touchend="releaseKey(keyItem.main)" key={{ki}}>
         <div class="main-content">
           <div class="main-key ">{{ keyItem.main.toUpperCase() }}</div>
           <div class="lead-key" v-if="keyItem.lead.length > 0">{{ keyItem.lead }}</div>

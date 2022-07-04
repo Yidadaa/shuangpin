@@ -1,21 +1,16 @@
 <script setup lang="ts">
 import { effect, ref } from 'vue';
-import { getPinyinOf } from '../utils/hanzi';
+import { getPinyinOf, hanziList } from '../utils/hanzi';
 
 const props = defineProps<{
-  nextHanzi: () => string
+  hanziSeq: string[]
 }>()
 
-const hanziSeq = ref<string[]>([])
 const pinyin = ref('')
 const currentHanzi = ref('')
 
 effect(() => {
-  while (hanziSeq.value.length < 4) {
-    hanziSeq.value.unshift(props.nextHanzi())
-  }
-
-  currentHanzi.value = hanziSeq.value.pop()!
+  currentHanzi.value = props.hanziSeq.pop() ?? ' '
   pinyin.value = getPinyinOf(currentHanzi.value)!
 })
 

@@ -14,11 +14,10 @@ function convert() {
   for (const name in tasks) {
     const hanziList = tasks[name];
     console.log(`Converting [${name}]...`);
-    const pinyinList = hanziList.map(
-      (x) =>
-        pinyin(x, {
-          style: PINYIN_STYLE.Plain,
-        })[0]
+    const pinyinList = hanziList.map((x) =>
+      pinyin(x, {
+        style: PINYIN_STYLE.Plain,
+      })[0].replace("ü", "v")
     );
     result[name] = {
       hanzi: hanziList,

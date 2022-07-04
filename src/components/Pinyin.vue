@@ -1,16 +1,17 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { computed } from '@vue/reactivity';
+import { defineProps } from 'vue'
 
-const pinyin = ref({
-  lead: "p",
-  follow: "ing"
-})
+const props = defineProps<{
+  chars: string[]
+}>()
+
 </script>
 
 <template>
   <div class="pinyin-input">
-    <div class="lead cursor">{{ pinyin.lead.toUpperCase() }}</div>
-    <div class="follow cursor blink-cursor">{{ pinyin.follow.toUpperCase() }}</div>
+    <div class="cursor" v-for="char in chars">{{ char.toUpperCase() }}</div>
+    <div class="cursor" v-if="chars.length === 0"></div>
   </div>
 </template>
 
@@ -20,28 +21,34 @@ const pinyin = ref({
   font-weight: bold;
   font-size: 72px;
 
-  .lead,
-  .follow {
+  .cursor {
     position: relative;
+    min-height: 82px;
+    min-width: 0.5em;
+    text-align: center;
+    line-height: 1;
+
+    &:first-child {
+      margin-right: 5px;
+    }
+
+    &::after {
+      position: absolute;
+      bottom: 0px;
+      left: 0px;
+      content: "";
+      width: 100%;
+      height: 5px;
+      background-color: black;
+      margin-top: 5px;
+    }
+
+    &:last-child::after {
+      animation: alternate infinite .6s blink;
+    }
   }
 
-  .cursor::after {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-    content: "";
-    width: 100%;
-    height: 5px;
-    background-color: black;
-  }
 
-  .blink-cursor::after {
-    animation: alternate infinite .6s blink;
-  }
-
-  .lead {
-    margin-right: 5px;
-  }
 }
 
 @keyframes blink {

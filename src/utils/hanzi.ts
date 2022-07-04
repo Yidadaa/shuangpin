@@ -4,7 +4,7 @@ type HanziLib = typeof hanziTable.popular;
 
 function buildTable({ pinyin, hanzi }: HanziLib) {
   const h2p = new Map<string, string>;
-  const p2h = new  Map<string, string[]>;
+  const p2h = new Map<string, string[]>;
 
   for (let i = 0; i < pinyin.length; i += 1) {
     const h = hanzi[i];
