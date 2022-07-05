@@ -57,9 +57,9 @@ function onModeChange(i: number) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding-top: 2em;
 
   .settings {
+    padding-top: 2em;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1em 2em;

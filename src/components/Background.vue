@@ -38,6 +38,7 @@ const props = defineProps<BgProps>()
   justify-content: space-between;
   overflow: hidden;
   pointer-events: none;
+  z-index: -1;
 
   .bg-side {
     display: flex;

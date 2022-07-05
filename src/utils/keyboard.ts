@@ -1,5 +1,4 @@
 import { product } from "./number";
-import { validCombines } from "./pinyin";
 import configs from "./spconfig.json";
 
 declare global {
@@ -44,11 +43,11 @@ export function loadShuangpinConfig(name: ShuangpinType): ShuangpinMode {
 
 export const keyboardLayout = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
 
-export function getPinyinOfSp(
+export function matchSpToPinyin(
   mode: ShuangpinMode,
   leadKey: Char,
   followKey: Char,
-  shouldBeValid = false
+  targetPinyin: string
 ) {
   const leads = mode.groupByKey.get(leadKey)?.leads ?? [];
   const follows = mode.groupByKey.get(followKey)?.follows ?? [];
@@ -56,15 +55,46 @@ export function getPinyinOfSp(
     ([a, b]) => !!a || !!b
   );
 
-  if (shouldBeValid) {
-    combines = combines.filter(([a, b]) => validCombines.has(a + b));
-  }
-
   // 匹配零声母
   const zero = (leadKey ?? "") + (followKey ?? "");
   if (mode.zero2sp.has(zero)) {
     combines.push([mode.zero2sp.get(zero) ?? "", ""]);
   }
 
-  return combines;
+  let lead = leadKey as string;
+  let follow = followKey as string;
+
+  // 完全匹配
+  const valid = combines.some(([l, f]) => {
+    if (l + f === targetPinyin) {
+      (lead = l), (follow = f);
+
+      return true;
+    }
+  });
+
+  if (!valid) {
+    // 匹配声母的情况
+    combines.some(([l, f]) => {
+      if (l.length && targetPinyin?.startsWith(l)) {
+        lead = l;
+
+        return true;
+      }
+
+      if (f.length && targetPinyin?.endsWith(f)) {
+        follow = f;
+
+        return true;
+      }
+    });
+  }
+
+  console.log(lead, follow);
+
+  return {
+    valid,
+    lead,
+    follow,
+  };
 }

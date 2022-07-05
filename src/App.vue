@@ -2,13 +2,26 @@
 import Menu from './components/MenuList.vue'
 import Bg from './components/Background.vue'
 import { routes } from './router'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { useStore } from './store';
 import { computed } from '@vue/reactivity';
+import { onMounted, ref, effect } from 'vue';
 
 const store = useStore()
 const router = useRouter()
+const route = useRoute()
 const menuItems = routes.map(v => v.name!) as string[]
+const menuIndex = ref(0)
+
+effect(() => {
+  const index = routes.findIndex(v => v.path === route.path)
+
+  if (index >= 0) {
+    menuIndex.value = index
+  } else {
+    router.replace(routes.at(0)?.path ?? '/')
+  }
+})
 
 const spMode = computed(() => {
   return store.settings.shuangpinMode.toString().split('')
@@ -23,7 +36,7 @@ function onMenuChange(i: number) {
 <template>
   <div class="content">
     <div class="main-menu">
-      <Menu default-show-item :items="menuItems" v-on:menu-change="onMenuChange" />
+      <Menu default-show-item :index="menuIndex" :items="menuItems" v-on:menu-change="onMenuChange" />
     </div>
 
     <router-view></router-view>

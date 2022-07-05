@@ -51,11 +51,16 @@ interface Combine {
   progress: Progress;
 }
 
-interface Article {
-  text: string;
-  name: string;
-  progress: Progress;
-}
+type Article =
+  | {
+      type: RawArticleName;
+      progress: Progress;
+    }
+  | {
+      type: "CUSTOM";
+      name: string;
+      progress: Progress;
+    };
 
 interface KeyConfig {
   main: Char;

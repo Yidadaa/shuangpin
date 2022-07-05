@@ -1,21 +1,103 @@
 <script setup lang="ts">
 import Pinyin from '../components/Pinyin.vue';
 import Keyboard from '../components/Keyboard.vue';
-import { onMounted, ref } from 'vue';
 
-const text = `燕子去了，有再来的时候；杨柳枯了，有再青的时候；桃花谢了，有再开的时候。但是，聪明的，你告诉我，我们的日子为什么一去不复返呢？——是有人偷了他们罢：那是谁？又藏在何处呢？是他们自己逃走了罢：现在又到了哪里呢？
-我不知道他们给了我多少日子；但我的手确乎是渐渐空虚了。在默默里算着，八千多日子已经从我手中溜去；像针尖上一滴水滴在大海里，我的日子滴在时间的流里，没有声音，也没有影子。我不禁头涔涔而泪潸潸了。
-去的尽管去了，来的尽管来着；去来的中间，又怎样地匆匆呢？早上我起来的时候，小屋里射进两三方斜斜的太阳。太阳他有脚啊，轻轻悄悄地挪移了；我也茫茫然跟着旋转。于是——洗手的时候，日子从水盆里过去；吃饭的时候，日子从饭碗里过去；默默时，便从凝然的双眼前过去。我觉察他去的匆匆了，伸出手遮挽时，他又从遮挽着的手边过去，天黑时，我躺在床上，他便伶伶俐俐地从我身上跨过，从我脚边飞去了。等我睁开眼和太阳再见，这算又溜走了一日。我掩着面叹息。但是新来的日子的影儿又开始在叹息里闪过了。
-在逃去如飞的日子里，在千门万户的世界里的我能做些什么呢？只有徘徊罢了，只有匆匆罢了；在八千多日的匆匆里，除徘徊外，又剩些什么呢？过去的日子如轻烟，被微风吹散了，如薄雾，被初阳蒸融了；我留着些什么痕迹呢？我何曾留着像游丝样的痕迹呢？我赤裸裸来到这世界，转眼间也将赤裸裸的回去罢？但不能平的，为什么偏要白白走这一遭啊？
-你聪明的，告诉我，我们的日子为什么一去不复返呢？`
+import { ref, watchPostEffect } from 'vue';
+import { useStore } from '../store'
+import { storeToRefs } from 'pinia';
 
-const cursor = ref<HTMLDivElement>()
+import rawArticles from "../utils/article.json";
+import { computed } from '@vue/reactivity';
+import { getPinyinOf, hanziMap } from '../utils/hanzi';
+import { matchSpToPinyin } from '../utils/keyboard';
 
-onMounted(() => {
-  console.log(cursor)
-  if (cursor.value) {
-    const scrollEl = cursor.value.parentElement;
-    scrollEl?.scrollTo(0, 100)
+const store = useStore()
+const articles = storeToRefs(store).articles
+const settings = storeToRefs(store).settings
+
+if (articles.value.length === 0) {
+  articles.value = Object.keys(rawArticles).map(k => {
+    const name = k as RawArticleName
+    const progress: Progress = {
+      currentIndex: 0,
+      total: rawArticles[name].length,
+      correctTry: 0,
+      totalTry: 0
+    }
+
+    return { progress, type: name }
+  });
+}
+
+function loadArticleText(article: Article) {
+  if (article.type === 'CUSTOM') {
+    const text = localStorage.getItem(article.name) ?? ''
+
+    return {
+      text,
+      name: article.name,
+      progress: article.progress
+    }
+  }
+
+  return {
+    text: rawArticles[article.type] ?? '',
+    name: article.type as string,
+    progress: article.progress
+  }
+}
+
+function jumpToNextValidHanzi(index: number, text: string) {
+  while (index < text.length && !hanziMap.h2p.has(text[index])) {
+    index += 1
+  }
+
+  return index
+}
+
+const index = ref(0)
+const article = computed(() => {
+  const info = loadArticleText(articles.value[index.value])
+
+  info.progress.currentIndex = jumpToNextValidHanzi(info.progress.currentIndex, info.text)
+
+  const finishedText = info.text.slice(0, info.progress.currentIndex)
+  const currentHanzi = info.text[info.progress.currentIndex] ?? ''
+
+  return {
+    text: info.text.split('\n'),
+    finishedText: finishedText.split('\n'),
+    currentHanzi,
+    answer: getPinyinOf(currentHanzi) ?? '',
+    progress: info.progress,
+    name: info.name
+  }
+})
+
+const pinyin = ref<string[]>([])
+
+function onSeq([lead, follow]: [string?, string?]) {
+  const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, article.value.answer)
+  pinyin.value = [res.lead, res.follow].filter(v => !!v)
+
+  return res.valid
+}
+
+watchPostEffect(() => {
+  const cursor = document.getElementById('cursor')
+  if (cursor) {
+    cursor.scrollIntoView({
+      inline: 'center',
+      block: 'center',
+      behavior: 'smooth'
+    })
+  }
+
+  if (pinyin.value.join('') === article.value.answer) {
+    setTimeout(() => {
+      pinyin.value = []
+      article.value.progress.currentIndex += 1
+    }, 100);
   }
 })
 </script>
@@ -24,26 +106,35 @@ onMounted(() => {
   <div class="p-mode">
     <div class="display-area">
       <div class="p-title">
-        <Pinyin :chars="[]" />
+        <div class="pinyin">
+          <Pinyin :chars="pinyin" />
+        </div>
 
-        <div class="title-and-count">
-          <div class="count">401 字 / 1351 字</div>
-          <div class="title">论快乐</div>
+        <div class="title-info">
+          <div class="answer" v-if="settings.enablePinyinHint">{{ article.answer.toUpperCase() }}</div>
+          <div class="title-and-count">
+            <div class="count">{{ article.progress.currentIndex }} 字 / {{ article.progress.total }} 字</div>
+            <div class="title">{{ article.name }}</div>
+          </div>
         </div>
       </div>
       <div class="text-area">
         <div class="scroll-area">
           <div class="bg-text">
-            <p v-for="(p, i) in text.split('\n')">{{ p }}</p>
+            <p v-for="(p, i) in article.text">{{ p }}</p>
           </div>
-          <div class="done-text" ref="cursor">
-            <p v-for="(p, i) in text.slice(0, 100).split('\n')">{{ p }}</p>
+          <div class="done-text">
+            <p v-for="(p, i) in article.finishedText">
+              {{ p }}<span class="current" id="cursor" v-if="i === article.finishedText.length - 1">{{
+                  article.currentHanzi
+              }}</span>
+            </p>
           </div>
         </div>
       </div>
     </div>
 
-    <Keyboard />
+    <Keyboard :valid-seq="onSeq" />
   </div>
 </template>
 
@@ -52,7 +143,7 @@ onMounted(() => {
 
 .p-mode {
   .display-area {
-    margin-bottom: 2em;
+    padding: 0 4em 2em 2em;
 
     display: flex;
     align-items: center;
@@ -60,22 +151,48 @@ onMounted(() => {
 
     .p-title {
       margin-right: 2em;
+      width: 16em;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+
+      .pinyin {
+        font-size: 12px;
+      }
+
+      .title-info {
+        display: flex;
+        align-items: center;
+        margin-top: 0.5em;
+
+        .answer {
+          font-size: 1.2em;
+          margin-right: 1em;
+          font-weight: bold;
+
+          @border: 1px solid black;
+          border-top: @border;
+          border-bottom: @border;
+        }
+      }
 
       .title-and-count {
         display: flex;
         flex-direction: column;
         align-items: flex-end;
         font-weight: bold;
+        font-size: 0.8em;
 
-        .count {
-          margin-top: 0.5em;
+        .title {
+          width: 6em;
+          text-align: right;
         }
       }
     }
 
     .text-area {
-      max-width: 50%;
       position: relative;
+      flex: 1;
 
       &:before {
         content: '';
@@ -85,7 +202,7 @@ onMounted(() => {
         left: 0;
         top: 0;
         background: rgb(0, 0, 0);
-        background: linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 20%, rgba(255, 255, 255, 0) 80%, rgba(255, 255, 255, 1) 100%);
+        background: linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 1) 100%);
         pointer-events: none;
         z-index: 999;
       }
@@ -99,15 +216,15 @@ onMounted(() => {
           position: absolute;
           top: 0;
 
-          p:last-child:after {
-            content: '哪';
+          .current {
             text-decoration: underline;
             text-underline-offset: 2px;
+            opacity: 0.3;
           }
         }
 
         .bg-text {
-          opacity: 0.5;
+          opacity: 0.2;
         }
       }
     }

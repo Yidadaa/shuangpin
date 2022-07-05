@@ -19,11 +19,11 @@ const props = defineProps<{
 .pinyin-input {
   display: flex;
   font-weight: bold;
-  font-size: 72px;
+  font-size: 5em;
 
   .cursor {
     position: relative;
-    min-height: 82px;
+    min-height: 1.1em;
     min-width: 0.5em;
     text-align: center;
     line-height: 1;

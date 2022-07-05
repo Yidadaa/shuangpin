@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineProps, readonly } from 'vue'
+import { ref, defineProps, readonly, computed } from 'vue'
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void
@@ -13,8 +13,10 @@ const props = defineProps<MenuProps>()
 const menuItems = readonly(props.items)
 
 const currentIndex = ref(props.index ?? 0)
+const index = computed(() => props.index ?? currentIndex.value)
 
 function shiftItem(deltaIndex: number) {
+  currentIndex.value = props.index ?? currentIndex.value
   currentIndex.value += deltaIndex
   currentIndex.value = Math.max(0, Math.min(menuItems.length - 1, currentIndex.value))
 
@@ -36,8 +38,8 @@ function onItemWheel(e: WheelEvent) {
 <template>
   <div class="menu">
     <div class="menu-items" :class="props.defaultShowItem && 'show-items'"
-      :style="`transform: translateY(${-currentIndex * 2}em)`" @wheel.prevent="onItemWheel">
-      <div class="menu-item" @click="shiftItem(i - currentIndex)" :class="buildItemClass(i - currentIndex)"
+      :style="`transform: translateY(${-index * 2}em)`" @wheel.prevent="onItemWheel">
+      <div class="menu-item" @click="shiftItem(i - index)" :class="buildItemClass(i - index)"
         v-for="(item, i) in menuItems">{{ item }}</div>
     </div>
   </div>

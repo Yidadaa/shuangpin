@@ -144,6 +144,7 @@ function mergeString([a, b]: string[] = []) {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    backdrop-filter: blur(5px);
 
     &.pressing {
       background-color: rgba(0, 0, 0, 0.1);
