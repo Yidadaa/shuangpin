@@ -14,22 +14,6 @@ const route = useRoute()
 const menuItems = routes.map(v => v.name!) as string[]
 const menuIndex = ref(0)
 
-function arrawChangeMenu(e: KeyboardEvent) {
-  if (e.key === 'ArrowUp') {
-    menuIndex.value = Math.max(0, menuIndex.value - 1)
-  } else if (e.key === 'ArrowDown') {
-    menuIndex.value = Math.max(0, menuIndex.value + 1)
-  }
-}
-
-onMounted(() => {
-  document.addEventListener('keydown', arrawChangeMenu)
-})
-
-onUnmounted(() => {
-  document.removeEventListener('keydown', arrawChangeMenu)
-})
-
 effect(() => {
   const index = routes.findIndex(v => v.path === route.path)
 
@@ -71,7 +55,7 @@ function onMenuChange(i: number) {
 <template>
   <div class="content">
     <div class="main-menu">
-      <Menu default-show-item :index="menuIndex" :items="menuItems" v-on:menu-change="onMenuChange" />
+      <Menu default-show-item enable-arrow :index="menuIndex" :items="menuItems" v-on:menu-change="onMenuChange" />
     </div>
 
     <router-view v-slot="{ Component }">

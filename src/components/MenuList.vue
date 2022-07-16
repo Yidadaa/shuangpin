@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { ref, defineProps, readonly, computed } from 'vue'
+import { ref, defineProps, readonly, computed, onMounted, onUnmounted } from 'vue'
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void
   index?: number
   items: string[]
   defaultShowItem?: boolean
+  enableArrow?: boolean
 }
 
 const props = defineProps<MenuProps>()
@@ -32,6 +33,23 @@ function buildItemClass(deltaIndex: number) {
 function onItemWheel(e: WheelEvent) {
   shiftItem(e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0)
 }
+
+function arrawChangeMenu(e: KeyboardEvent) {
+  if (!props.enableArrow) return
+  if (e.key === 'ArrowUp') {
+    shiftItem(-1)
+  } else if (e.key === 'ArrowDown') {
+    shiftItem(1)
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', arrawChangeMenu)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', arrawChangeMenu)
+})
 
 </script>
 
