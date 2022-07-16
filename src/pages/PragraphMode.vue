@@ -244,8 +244,9 @@ watchPostEffect(() => {
 
       .scroll-area {
         overflow-y: scroll;
-        height: 10em;
+        height: 9em;
         position: relative;
+        margin: 0.5em 0;
 
         .done-text {
           position: absolute;

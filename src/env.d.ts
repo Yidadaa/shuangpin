@@ -33,7 +33,8 @@ declare type Char =
   | "w"
   | "x"
   | "y"
-  | "z";
+  | "z"
+  | ";";
 
 type Pinyin = { lead: string; follow: string; full: string };
 

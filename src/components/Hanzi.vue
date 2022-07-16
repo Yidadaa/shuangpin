@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { effect, ref } from 'vue';
-import { getPinyinOf, hanziList } from '../utils/hanzi';
+import { useStore } from '../store';
+import { getPinyinOf } from '../utils/hanzi';
 
 const props = defineProps<{
   hanziSeq: string[]
@@ -8,10 +9,13 @@ const props = defineProps<{
 
 const pinyin = ref('')
 const currentHanzi = ref('')
+const settings = useStore().settings
 
 effect(() => {
   currentHanzi.value = props.hanziSeq.pop() ?? ' '
-  pinyin.value = getPinyinOf(currentHanzi.value)!
+  if (settings.enablePinyinHint) {
+    pinyin.value = getPinyinOf(currentHanzi.value)!
+  }
 })
 
 </script>

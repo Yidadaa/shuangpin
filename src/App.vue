@@ -6,6 +6,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useStore } from './store';
 import { computed } from '@vue/reactivity';
 import { ref, effect, onMounted, onUnmounted } from 'vue';
+import { getPinyinOf } from './utils/hanzi';
 
 const store = useStore()
 const router = useRouter()
@@ -40,7 +41,25 @@ effect(() => {
 })
 
 const spMode = computed(() => {
-  return store.settings.shuangpinMode.toString().split('')
+  const mode = store.mode
+  const name = store.settings.shuangpinMode.toString().split('').slice(0, 2)
+  const full = name.concat(['双', '拼']).map(v => {
+    const pinyin = getPinyinOf(v) ?? ''
+    const sp = mode.py2sp.get(pinyin) ?? ''
+    return [v, sp]
+  })
+
+  const left = full.slice(0, 2)
+  const right = full.slice(2, 4)
+  const getBgItem = (item: typeof left) => ({
+    chars: item.map(v => v[0]).join(''),
+    shuangpins: item.map(v => v[1]).join('').toUpperCase()
+  })
+
+  return {
+    left: getBgItem(left),
+    right: getBgItem(right)
+  }
 })
 
 function onMenuChange(i: number) {
@@ -61,8 +80,7 @@ function onMenuChange(i: number) {
       </keep-alive>
     </router-view>
 
-    <Bg :left="{ chars: spMode.slice(0, 2).join(''), shuangpins: 'XNHE' }"
-      :right="{ chars: '双拼', shuangpins: 'VLPB' }" />
+    <Bg :left="spMode.left" :right="spMode.right" />
   </div>
 </template>
 

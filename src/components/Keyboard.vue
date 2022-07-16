@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from '@vue/reactivity';
 import { storeToRefs } from 'pinia';
-import { ref, onMounted, onUnmounted, onActivated, onDeactivated } from 'vue'
+import { ref, onActivated, onDeactivated } from 'vue'
 import { useStore } from '../store';
 import { loadShuangpinConfig, keyboardLayout } from '../utils/keyboard'
 
@@ -69,7 +69,11 @@ const keyLayout = computed(() => {
   const config = loadShuangpinConfig(settings.value.shuangpinMode)
 
   return keyboardLayout.map(v => v.split('').map(key => {
-    const keyConfig = config.groupByKey.get(key as Char)!
+    const keyConfig = config.groupByKey.get(key as Char) ?? {
+      main: key,
+      leads: [],
+      follows: []
+    }
     return {
       main: keyConfig.main,
       lead: mergeString(keyConfig.leads.filter(v => v !== keyConfig.main)),

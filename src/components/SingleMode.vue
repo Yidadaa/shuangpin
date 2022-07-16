@@ -44,8 +44,6 @@ const answer = computed(() => {
 function onSeq([lead, follow]: [string?, string?]) {
   const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, answer.value)
 
-  console.log(res, lead, follow)
-
   props.onValidInput?.(res.valid)
 
   const fullInput = !!lead && !!follow;
@@ -61,7 +59,6 @@ function onSeq([lead, follow]: [string?, string?]) {
 }
 
 watchPostEffect(() => {
-  console.log('effect')
   if (isValid.value) {
     setTimeout(() => {
       hanziSeq.value.unshift(props.nextChar())

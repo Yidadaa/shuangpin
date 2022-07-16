@@ -44,14 +44,15 @@ export function loadShuangpinConfig(name: ShuangpinType): ShuangpinMode {
   }
 
   const allCombs = product(
-    [...mode.groupByLead.keys()],
-    [...mode.groupByFollow.keys()]
+    [...mode.groupByKey.keys()],
+    [...mode.groupByKey.keys()]
   );
   for (const [lead, follow] of allCombs) {
     const sp = lead + follow;
-    const leads = mode.groupByLead.get(lead)!.leads;
-    const follows = mode.groupByLead.get(lead)!.follows;
-    for (const [l, f] of product(leads, follows)) {
+    const leads = mode.groupByKey.get(lead)!.leads;
+    const follows = mode.groupByKey.get(follow)!.follows;
+    const pinyins = product(leads, follows);
+    for (const [l, f] of pinyins) {
       const pinyin = l + f;
       if (validCombines.has(pinyin)) {
         mode.py2sp.set(pinyin, sp);
@@ -63,7 +64,7 @@ export function loadShuangpinConfig(name: ShuangpinType): ShuangpinMode {
   return mode;
 }
 
-export const keyboardLayout = ["qwertyuiop", "asdfghjkl", "zxcvbnm"];
+export const keyboardLayout = ["qwertyuiop", " asdfghjkl;", "zxcvbnm"];
 
 export function matchSpToPinyin(
   mode: ShuangpinMode,
@@ -81,24 +82,13 @@ export function matchSpToPinyin(
   let lead = leadKey as string;
   let follow = followKey as string;
 
-  // 匹配零声母
-  const zero = (leadKey ?? "") + (followKey ?? "");
-  if (mode.sp2zero.has(zero)) {
-    const valid = mode.sp2zero.get(zero) === targetPinyin;
-    return {
-      valid,
-      lead,
-      follow,
-    };
-  }
-  // 完全匹配
-  const valid = combines.some(([l, f]) => {
-    if (l + f === targetPinyin) {
-      (lead = l), (follow = f);
+  const sp = (lead ?? "") + (follow ?? "");
+  const valid = mode.sp2py.get(sp) === targetPinyin;
 
-      return true;
-    }
-  });
+  if (valid) {
+    lead = validCombines.get(targetPinyin)!.lead;
+    follow = validCombines.get(targetPinyin)!.follow;
+  }
 
   if (!valid) {
     // 匹配声母的情况
