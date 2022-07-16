@@ -8,7 +8,7 @@
 可能是最好用的双拼练习工具。
 
 
-[开始使用](https://yidadaa.github.io/shuangpin-practice) / [反馈问题](https://github.com/yidadaa/shuangpin-practice/issues)
+[开始使用](https://yidadaa.github.io/shuangpin) / [反馈问题](https://github.com/yidadaa/shuangpin/issues)
 </div>
 
 ## 主要功能
