@@ -208,6 +208,10 @@ watchPostEffect(() => {
           @border: 1px solid black;
           border-top: @border;
           border-bottom: @border;
+
+          @media (prefers-color-scheme: dark) {
+            border-color: #aaa;
+          }
         }
       }
 
@@ -236,10 +240,15 @@ watchPostEffect(() => {
         height: 100%;
         left: 0;
         top: 0;
-        background: rgb(0, 0, 0);
         background: linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 1) 100%);
         pointer-events: none;
         z-index: 999;
+      }
+
+      @media (prefers-color-scheme: dark) {
+        &:before {
+          background: linear-gradient(0deg, rgba(34, 34, 34, 1) 0%, rgba(34, 34, 34, 0) 30%, rgba(34, 34, 34, 0) 70%, rgba(34, 34, 34, 1) 100%);
+        }
       }
 
       .scroll-area {

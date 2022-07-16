@@ -157,8 +157,18 @@ function mergeString([a, b]: string[] = []) {
     justify-content: space-between;
     backdrop-filter: blur(5px);
 
+    @media (prefers-color-scheme: dark) {
+      & {
+        box-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
+      }
+    }
+
     &.pressing {
       background-color: rgba(0, 0, 0, 0.1);
+
+      @media (prefers-color-scheme: dark) {
+        background-color: rgba(255, 255, 255, 0.2);
+      }
     }
 
     .main-content {

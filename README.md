@@ -9,6 +9,8 @@
 
 
 [开始使用](https://yidadaa.github.io/shuangpin) / [反馈问题](https://github.com/yidadaa/shuangpin/issues)
+
+<img src="./screenshots/cover.jpg" alt="预览" width=500/>
 </div>
 
 ## 主要功能

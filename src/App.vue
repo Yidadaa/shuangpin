@@ -113,6 +113,8 @@ function onMenuChange(i: number) {
   align-items: center;
 }
 
+
+
 .main-menu {
   color: @primary-color;
   position: absolute;
@@ -143,5 +145,20 @@ function onMenuChange(i: number) {
 
 *::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.03);
+}
+
+@media (prefers-color-scheme: dark) {
+  .content {
+    color: #aaa;
+    border-color: #444;
+  }
+
+  *::-webkit-scrollbar-track {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.03);
+  }
 }
 </style>
