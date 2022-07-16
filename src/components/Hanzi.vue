@@ -22,12 +22,15 @@ effect(() => {
 
 <template>
   <div class="displayer">
-    <div class="follow-item" v-for="(item, i) in hanziSeq" :style="`opacity: ${i / 4}`">{{ item }}</div>
+    <div class="follow-item" v-for="(item, i) in hanziSeq" v-bind:key="item"
+      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`">
+      {{ item }}
+    </div>
     <div class="current-outset">
       <div class="current-item">
         <img class="mi-bg" src="../assets/mi-bg.svg" />
         <div class="pinyin">{{ pinyin }}</div>
-        <div class="hanzi">{{ currentHanzi }}</div>
+        <div class="hanzi" :key="currentHanzi">{{ currentHanzi }}</div>
       </div>
     </div>
   </div>
@@ -48,6 +51,7 @@ effect(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
 
   .current-outset {
     border: 1px solid black;
@@ -62,6 +66,9 @@ effect(() => {
     font-size: 36px;
     font-weight: bold;
     margin-right: 0.8rem;
+    position: absolute;
+    right: 0;
+    transition: all ease .3s;
   }
 
   .current-item {
