@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import Pinyin from '../components/Pinyin.vue';
 import Keyboard from '../components/Keyboard.vue';
+import TypeSummary from '../components/TypeSummary.vue';
 
-import { ref, watchPostEffect } from 'vue';
+import { ref, watchPostEffect, onActivated, onDeactivated } from 'vue';
 import { useStore } from '../store'
 import { storeToRefs } from 'pinia';
 
@@ -10,10 +11,26 @@ import rawArticles from "../utils/article.json";
 import { computed } from '@vue/reactivity';
 import { getPinyinOf, hanziMap } from '../utils/hanzi';
 import { matchSpToPinyin } from '../utils/keyboard';
+import { TypingSummary } from '../utils/summary';
 
 const store = useStore()
 const articles = storeToRefs(store).articles
 const settings = storeToRefs(store).settings
+
+const summary = ref(new TypingSummary())
+
+function onKeyPressed() {
+  summary.value.onKeyPressed()
+}
+
+onActivated(() => {
+  document.addEventListener('keypress', onKeyPressed)
+})
+
+onDeactivated(() => {
+  document.removeEventListener('keypress', onKeyPressed)
+})
+
 
 if (articles.value.length === 0) {
   articles.value = Object.keys(rawArticles).map(k => {
@@ -80,10 +97,15 @@ function onSeq([lead, follow]: [string?, string?]) {
   const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, article.value.answer)
   pinyin.value = [res.lead, res.follow].filter(v => !!v)
 
+  const fullInput = !!lead && !!follow;
+  if (fullInput) {
+    summary.value.onValid(res.valid)
+  }
+
   return res.valid
 }
 
-watchPostEffect(() => {
+function scrollToFocus() {
   const cursor = document.getElementById('cursor')
   if (cursor) {
     cursor.scrollIntoView({
@@ -92,11 +114,19 @@ watchPostEffect(() => {
       behavior: 'smooth'
     })
   }
+}
+
+onActivated(() => scrollToFocus())
+
+watchPostEffect(() => {
+  scrollToFocus()
 
   if (pinyin.value.join('') === article.value.answer) {
     setTimeout(() => {
       pinyin.value = []
-      article.value.progress.currentIndex += 1
+      if (article.value.progress.currentIndex < article.value.progress.total) {
+        article.value.progress.currentIndex += 1
+      }
     }, 100);
   }
 })
@@ -135,11 +165,16 @@ watchPostEffect(() => {
     </div>
 
     <Keyboard :valid-seq="onSeq" />
+
+    <div class="summary">
+      <TypeSummary :speed="summary.hanziPerMinutes" :accuracy="summary.accuracy" :avgpress="summary.pressPerHanzi" />
+    </div>
   </div>
 </template>
 
 <style lang="less" scoped>
 @import '../styles/color.less';
+@import '../styles/var.less';
 
 .p-mode {
   .display-area {
@@ -228,6 +263,12 @@ watchPostEffect(() => {
         }
       }
     }
+  }
+
+  .summary {
+    position: absolute;
+    right: @app-padding;
+    bottom: @app-padding;
   }
 }
 </style>

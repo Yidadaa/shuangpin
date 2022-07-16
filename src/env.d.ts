@@ -75,6 +75,8 @@ interface ShuangpinMode {
   groupByLead: Map<string, KeyConfig>; // 韵母 -> KeyConfig
   sp2zero: Map<string, string>; // 零声母 -> 双拼
   zero2sp: Map<string, string>; // 双拼 -> 零声母
+  sp2py: Map<string, string>; // 双拼 -> 拼音
+  py2sp: Map<string, string>; // 拼音 -> 双拼
 }
 
 interface Settings {

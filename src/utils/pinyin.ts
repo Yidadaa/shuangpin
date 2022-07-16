@@ -36,8 +36,6 @@ product(leadKeys.concat(""), followKeys).forEach(([lead, follow]) => {
   }
 });
 
-console.log(validCombines);
-
 function pushMap<K, V>(m: Map<K, V[]>, k: K, v: V) {
   if (!m.has(k)) {
     m.set(k, []);

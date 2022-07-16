@@ -1,4 +1,5 @@
 import { product } from "./number";
+import { validCombines } from "./pinyin";
 import configs from "./spconfig.json";
 
 declare global {
@@ -16,6 +17,8 @@ export function loadShuangpinConfig(name: ShuangpinType): ShuangpinMode {
     groupByFollow: new Map(),
     sp2zero: new Map(),
     zero2sp: new Map(),
+    sp2py: new Map(),
+    py2sp: new Map(),
   };
 
   for (const line of config["keyMap"]) {
@@ -36,6 +39,25 @@ export function loadShuangpinConfig(name: ShuangpinType): ShuangpinMode {
     const [sp, zero] = line.split("/");
     mode.sp2zero.set(sp, zero);
     mode.zero2sp.set(zero, sp);
+    mode.py2sp.set(zero, sp);
+    mode.sp2py.set(sp, zero);
+  }
+
+  const allCombs = product(
+    [...mode.groupByLead.keys()],
+    [...mode.groupByFollow.keys()]
+  );
+  for (const [lead, follow] of allCombs) {
+    const sp = lead + follow;
+    const leads = mode.groupByLead.get(lead)!.leads;
+    const follows = mode.groupByLead.get(lead)!.follows;
+    for (const [l, f] of product(leads, follows)) {
+      const pinyin = l + f;
+      if (validCombines.has(pinyin)) {
+        mode.py2sp.set(pinyin, sp);
+        mode.sp2py.set(sp, pinyin);
+      }
+    }
   }
 
   return mode;
@@ -49,21 +71,26 @@ export function matchSpToPinyin(
   followKey: Char,
   targetPinyin: string
 ) {
+  const allMatched = !!leadKey && !!followKey;
   const leads = mode.groupByKey.get(leadKey)?.leads ?? [];
   const follows = mode.groupByKey.get(followKey)?.follows ?? [];
   let combines = product(leads.concat(""), follows.concat("")).filter(
     ([a, b]) => !!a || !!b
   );
 
-  // 匹配零声母
-  const zero = (leadKey ?? "") + (followKey ?? "");
-  if (mode.zero2sp.has(zero)) {
-    combines.push([mode.zero2sp.get(zero) ?? "", ""]);
-  }
-
   let lead = leadKey as string;
   let follow = followKey as string;
 
+  // 匹配零声母
+  const zero = (leadKey ?? "") + (followKey ?? "");
+  if (mode.sp2zero.has(zero)) {
+    const valid = mode.sp2zero.get(zero) === targetPinyin;
+    return {
+      valid,
+      lead,
+      follow,
+    };
+  }
   // 完全匹配
   const valid = combines.some(([l, f]) => {
     if (l + f === targetPinyin) {
@@ -90,10 +117,8 @@ export function matchSpToPinyin(
     });
   }
 
-  console.log(lead, follow);
-
   return {
-    valid,
+    valid: valid && allMatched,
     lead,
     follow,
   };

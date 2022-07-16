@@ -3,7 +3,7 @@ import Keyboard from '../components/Keyboard.vue';
 import Hanzi from '../components/Hanzi.vue';
 import Pinyin from '../components/Pinyin.vue'
 import TypeSummary from '../components/TypeSummary.vue'
-import { onMounted, onUnmounted, ref, watchPostEffect } from 'vue';
+import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watchPostEffect } from 'vue';
 import { matchSpToPinyin } from '../utils/keyboard';
 import { useStore } from '../store'
 import { computed } from '@vue/reactivity';
@@ -21,15 +21,20 @@ const store = useStore();
 const props = defineProps<SingleModeProps>()
 const initSeq = new Array(4).fill(0).map(() => props.nextChar())
 const hanziSeq = ref(initSeq)
+const isValid = ref(false)
 
 const summary = ref(new TypingSummary())
 
-onMounted(() => {
-  document.addEventListener('keypress', summary.value.onKeyPressed.bind(summary.value))
+function onKeyPressed() {
+  summary.value.onKeyPressed()
+}
+
+onActivated(() => {
+  document.addEventListener('keypress', onKeyPressed)
 })
 
-onUnmounted(() => {
-  document.removeEventListener('keypress', summary.value.onKeyPressed.bind(summary.value))
+onDeactivated(() => {
+  document.removeEventListener('keypress', onKeyPressed)
 })
 
 const answer = computed(() => {
@@ -39,25 +44,30 @@ const answer = computed(() => {
 function onSeq([lead, follow]: [string?, string?]) {
   const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, answer.value)
 
+  console.log(res, lead, follow)
+
   props.onValidInput?.(res.valid)
 
-  if (!!lead && !!follow) {
+  const fullInput = !!lead && !!follow;
+  if (fullInput) {
     summary.value.onValid(res.valid)
   }
 
-  console.log(summary.value)
-
   pinyin.value = [res.lead, res.follow].filter(v => !!v) as string[]
+
+  isValid.value = res.valid
 
   return res.valid
 }
 
 watchPostEffect(() => {
-  if (pinyin.value.join('') === answer.value) {
+  console.log('effect')
+  if (isValid.value) {
     setTimeout(() => {
       hanziSeq.value.unshift(props.nextChar())
       hanziSeq.value.pop()
       pinyin.value = []
+      isValid.value = false
     }, 100)
   }
 })

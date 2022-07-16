@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import SingleMode from '../components/SingleMode.vue';
-import { followMap, followKeys, getCombineOf } from '../utils/pinyin'
+import { followMap, followKeys } from '../utils/pinyin'
 import { useStore } from '../store'
 import { computed, ref } from '@vue/reactivity';
 import { hanziMap } from '../utils/hanzi';
+import { randInt } from '../utils/number';
 
 const store = useStore()
 const followList = computed(() => {
@@ -11,20 +12,19 @@ const followList = computed(() => {
     return []
   }
 
-  return followMap.get(followKeys[store.currentFollowIndex]) ?? []
+  return followMap.get(followKeys[store.currentLeadIndex]) ?? []
 })
-const currentIndex = ref(0)
-const hanziList = computed(() => {
-  const pinyin = getCombineOf(followList.value[currentIndex.value])
 
-  return hanziMap.p2h.get(pinyin) ?? []
+const hanziList = computed(() => {
+  return followList.value.reduce((pre, cur) => pre.concat(hanziMap.p2h.get(cur.full) ?? []), [] as string[])
 })
+
 const currentHanziIndex = ref(0)
 
 function nextChar() {
-  return hanziList.value[++currentHanziIndex.value]
+  currentHanziIndex.value = randInt(hanziList.value.length)
+  return hanziList.value[currentHanziIndex.value] ?? ''
 }
-
 </script>
 
 <template>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from '@vue/reactivity';
 import { storeToRefs } from 'pinia';
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, onActivated, onDeactivated } from 'vue'
 import { useStore } from '../store';
 import { loadShuangpinConfig, keyboardLayout } from '../utils/keyboard'
 
@@ -18,12 +18,12 @@ const keySeq = ref<string[]>([])
 const onPressKey = (e: KeyboardEvent) => pressKey(e.key)
 const onReleaseKey = (e: KeyboardEvent) => releaseKey(e.key)
 
-onMounted(() => {
+onActivated(() => {
   document.addEventListener('keydown', onPressKey)
   document.addEventListener('keyup', onReleaseKey)
 })
 
-onUnmounted(() => {
+onDeactivated(() => {
   document.removeEventListener('keydown', onPressKey)
   document.removeEventListener('keyup', onReleaseKey)
 })

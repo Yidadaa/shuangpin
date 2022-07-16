@@ -5,13 +5,29 @@ import { routes } from './router'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from './store';
 import { computed } from '@vue/reactivity';
-import { ref, effect } from 'vue';
+import { ref, effect, onMounted, onUnmounted } from 'vue';
 
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
 const menuItems = routes.map(v => v.name!) as string[]
 const menuIndex = ref(0)
+
+function arrawChangeMenu(e: KeyboardEvent) {
+  if (e.key === 'ArrowUp') {
+    menuIndex.value = Math.max(0, menuIndex.value - 1)
+  } else if (e.key === 'ArrowDown') {
+    menuIndex.value = Math.max(0, menuIndex.value + 1)
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('keydown', arrawChangeMenu)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', arrawChangeMenu)
+})
 
 effect(() => {
   const index = routes.findIndex(v => v.path === route.path)
