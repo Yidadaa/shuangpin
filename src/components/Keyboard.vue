@@ -112,8 +112,9 @@ function mergeString([a, b]: string[] = []) {
   <div class="keyboard">
     <div class="key-row" v-for="(line, li) in keyLayout" key={{li}}>
       <div class="key-item" :class="pressingKeys.has(keyItem.main) && 'pressing'" v-for="(keyItem, ki) in line"
-        @mousedown="pressKey(keyItem.main)" @touchstart="pressKey(keyItem.main)" @mouseup="releaseKey(keyItem.main)"
-        @mouseout="releaseKey(keyItem.main, false)" @touchend="releaseKey(keyItem.main)" key={{ki}}>
+        @mousedown="pressKey(keyItem.main)" @touchstart.stop.prevent="pressKey(keyItem.main)"
+        @mouseup="releaseKey(keyItem.main)" @mouseout="releaseKey(keyItem.main, false)"
+        @touchend.stop.prevent="releaseKey(keyItem.main)" key={{ki}}>
         <div class="main-content">
           <div class="main-key ">{{ keyItem.main.toUpperCase() }}</div>
           <div class="lead-key" v-if="keyItem.lead.length > 0">{{ keyItem.lead }}</div>
