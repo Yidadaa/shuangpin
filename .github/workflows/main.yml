@@ -1,10 +1,9 @@
 name: Build and Deploy
-on:
-  push:
-    branches:
-      - main
+on: [push]
+
 permissions:
   contents: write
+
 jobs:
   build-and-deploy:
     concurrency: ci-${{ github.ref }}
