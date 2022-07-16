@@ -3,11 +3,12 @@ import Keyboard from '../components/Keyboard.vue';
 import Hanzi from '../components/Hanzi.vue';
 import Pinyin from '../components/Pinyin.vue'
 import TypeSummary from '../components/TypeSummary.vue'
-import { ref, watchPostEffect } from 'vue';
+import { onMounted, onUnmounted, ref, watchPostEffect } from 'vue';
 import { matchSpToPinyin } from '../utils/keyboard';
 import { useStore } from '../store'
 import { computed } from '@vue/reactivity';
 import { getPinyinOf } from '../utils/hanzi';
+import { TypingSummary } from '../utils/summary'
 
 export interface SingleModeProps {
   nextChar: () => string
@@ -21,6 +22,16 @@ const props = defineProps<SingleModeProps>()
 const initSeq = new Array(4).fill(0).map(() => props.nextChar())
 const hanziSeq = ref(initSeq)
 
+const summary = ref(new TypingSummary())
+
+onMounted(() => {
+  document.addEventListener('keypress', summary.value.onKeyPressed.bind(summary.value))
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keypress', summary.value.onKeyPressed.bind(summary.value))
+})
+
 const answer = computed(() => {
   return getPinyinOf(hanziSeq.value.at(-1) ?? '') ?? ''
 })
@@ -29,6 +40,12 @@ function onSeq([lead, follow]: [string?, string?]) {
   const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, answer.value)
 
   props.onValidInput?.(res.valid)
+
+  if (!!lead && !!follow) {
+    summary.value.onValid(res.valid)
+  }
+
+  console.log(summary.value)
 
   pinyin.value = [res.lead, res.follow].filter(v => !!v) as string[]
 
@@ -60,7 +77,7 @@ watchPostEffect(() => {
     <Keyboard :valid-seq="onSeq" />
 
     <div class="summary">
-      <TypeSummary :speed="65" :accuracy="Math.random()" :avgpress="Math.random() * 3" />
+      <TypeSummary :speed="summary.hanziPerMinutes" :accuracy="summary.accuracy" :avgpress="summary.pressPerHanzi" />
     </div>
 
   </div>

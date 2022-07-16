@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from '@vue/reactivity';
 import { storeToRefs } from 'pinia';
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { useStore } from '../store';
 import { loadShuangpinConfig, keyboardLayout } from '../utils/keyboard'
 
@@ -15,9 +15,17 @@ const props = defineProps<{
 const pressingKeys = ref(new Set<string>())
 const keySeq = ref<string[]>([])
 
+const onPressKey = (e: KeyboardEvent) => pressKey(e.key)
+const onReleaseKey = (e: KeyboardEvent) => releaseKey(e.key)
+
 onMounted(() => {
-  document.onkeydown = e => pressKey(e.key)
-  document.onkeyup = e => releaseKey(e.key)
+  document.addEventListener('keydown', onPressKey)
+  document.addEventListener('keyup', onReleaseKey)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('keydown', onPressKey)
+  document.removeEventListener('keyup', onReleaseKey)
 })
 
 function pressKey(key: string) {
@@ -25,7 +33,6 @@ function pressKey(key: string) {
 }
 
 function send() {
-  console.log('send', keySeq.value)
   if (props.validSeq?.([keySeq.value.at(0), keySeq.value.at(1)])) {
     keySeq.value = []
   }

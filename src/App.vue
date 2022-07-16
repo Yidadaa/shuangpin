@@ -5,7 +5,7 @@ import { routes } from './router'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from './store';
 import { computed } from '@vue/reactivity';
-import { onMounted, ref, effect } from 'vue';
+import { ref, effect } from 'vue';
 
 const store = useStore()
 const router = useRouter()
@@ -39,7 +39,11 @@ function onMenuChange(i: number) {
       <Menu default-show-item :index="menuIndex" :items="menuItems" v-on:menu-change="onMenuChange" />
     </div>
 
-    <router-view></router-view>
+    <router-view v-slot="{ Component }">
+      <keep-alive>
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
 
     <Bg :left="{ chars: spMode.slice(0, 2).join(''), shuangpins: 'XNHE' }"
       :right="{ chars: '双拼', shuangpins: 'VLPB' }" />
