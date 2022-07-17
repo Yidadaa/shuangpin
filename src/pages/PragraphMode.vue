@@ -452,8 +452,9 @@ function deleteArticle() {
         padding: 0.5em;
         height: 25em;
         resize: none;
-        border: 4px double #000;
+        border: 3px double #000;
         background-color: transparent;
+        padding-left: calc(0.5em + 1px);
 
         @media (prefers-color-scheme: dark) {
           border-color: #666;
