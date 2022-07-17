@@ -407,8 +407,6 @@ function deleteArticle() {
       }
     }
 
-
-
     .editing-text-area {
       display: flex;
       flex-direction: column;
@@ -431,6 +429,7 @@ function deleteArticle() {
           color: @primary-color;
           border-left: 5px solid @primary-color;
           flex: 1;
+          background-color: transparent;
         }
 
         .save-btn {
@@ -454,6 +453,12 @@ function deleteArticle() {
         height: 25em;
         resize: none;
         border: 4px double #000;
+        background-color: transparent;
+
+        @media (prefers-color-scheme: dark) {
+          border-color: #666;
+          color: #999;
+        }
       }
     }
   }
