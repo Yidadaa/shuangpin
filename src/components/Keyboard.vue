@@ -9,6 +9,7 @@ const store = useStore();
 const settings = storeToRefs(store).settings;
 
 const props = defineProps<{
+  hints?: string[]
   validSeq?: (_: [string?, string?]) => boolean
 }>()
 
@@ -106,12 +107,26 @@ function mergeString([a, b]: string[] = []) {
 
   return `(${prefix})${suffix}`
 }
+
+function keyItemClass(key: string) {
+  let classNames = []
+
+  if (pressingKeys.value.has(key)) {
+    classNames.push('pressing')
+  }
+
+  if (props.hints?.includes(key) && settings.value.enableKeyHint) {
+    classNames.push('hint-key')
+  }
+
+  return classNames.join(' ')
+}
 </script>
 
 <template>
   <div class="keyboard">
     <div class="key-row" v-for="(line, li) in keyLayout" key={{li}}>
-      <div class="key-item" :class="pressingKeys.has(keyItem.main) && 'pressing'" v-for="(keyItem, ki) in line"
+      <div class="key-item" :class="keyItemClass(keyItem.main)" v-for="(keyItem, ki) in line"
         @mousedown="pressKey(keyItem.main)" @touchstart.stop.prevent="pressKey(keyItem.main)"
         @mouseup="releaseKey(keyItem.main)" @mouseout="releaseKey(keyItem.main, false)"
         @touchend.stop.prevent="releaseKey(keyItem.main)" key={{ki}}>
@@ -122,6 +137,18 @@ function mergeString([a, b]: string[] = []) {
         <div class="bottom-content">
           <div class="follow-key">{{ keyItem.follow }}</div>
         </div>
+      </div>
+
+      <div v-if="li === keyLayout.length - 1" class="key-item backspace" :class="keyItemClass('Backspace')"
+        @mousedown="pressKey('Backspace')" @touchstart.stop.prevent="pressKey('Backspace')"
+        @mouseup="releaseKey('Backspace')" @mouseout="releaseKey('Backspace', false)"
+        @touchend.stop.prevent="releaseKey('Backspace')">
+        <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
+          <path d="M14 11L4 24L14 37H44V11H14Z" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M21 19L31 29" stroke="#333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M31 19L21 29" stroke="#333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
       </div>
     </div>
   </div>
@@ -157,6 +184,11 @@ function mergeString([a, b]: string[] = []) {
     flex-direction: column;
     justify-content: space-between;
     backdrop-filter: blur(5px);
+    border: 1px solid rgba(0, 0, 0, 0.01);
+
+    &.hint-key {
+      border: 1px solid @primary-color;
+    }
 
     @media (prefers-color-scheme: dark) {
       & {
@@ -198,6 +230,11 @@ function mergeString([a, b]: string[] = []) {
         margin-right: 3px;
       }
     }
+  }
+
+  .backspace {
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>

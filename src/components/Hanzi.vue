@@ -22,7 +22,7 @@ effect(() => {
 
 <template>
   <div class="displayer">
-    <div class="follow-item" v-for="(item, i) in hanziSeq" v-bind:key="item"
+    <div class="follow-item" v-for="(item, i) in hanziSeq"
       :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`">
       {{ item }}
     </div>
@@ -66,6 +66,7 @@ effect(() => {
     font-size: 36px;
     font-weight: bold;
     margin-right: 0.8rem;
+    margin-top: 0.1rem;
     position: absolute;
     right: 0;
     transition: all ease .3s;

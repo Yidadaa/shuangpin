@@ -41,6 +41,10 @@ const answer = computed(() => {
   return getPinyinOf(hanziSeq.value.at(-1) ?? '') ?? ''
 })
 
+const hints = computed(() => {
+  return (store.mode.py2sp.get(answer.value) ?? '').split('')
+})
+
 function onSeq([lead, follow]: [string?, string?]) {
   const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, answer.value)
 
@@ -81,7 +85,7 @@ watchPostEffect(() => {
       <Hanzi :hanzi-seq="[...hanziSeq]" />
     </div>
 
-    <Keyboard :valid-seq="onSeq" />
+    <Keyboard :valid-seq="onSeq" :hints="hints" />
 
     <div class="summary">
       <TypeSummary :speed="summary.hanziPerMinutes" :accuracy="summary.accuracy" :avgpress="summary.pressPerHanzi" />

@@ -80,12 +80,14 @@ const article = computed(() => {
 
   const finishedText = info.text.slice(0, info.progress.currentIndex)
   const currentHanzi = info.text[info.progress.currentIndex] ?? ''
+  const pinyin = getPinyinOf(currentHanzi) ?? ''
 
   return {
     text: info.text.split('\n'),
     finishedText: finishedText.split('\n'),
     currentHanzi,
-    answer: getPinyinOf(currentHanzi) ?? '',
+    answer: pinyin,
+    spHints: (store.mode.py2sp.get(pinyin) ?? '').split(''),
     progress: info.progress,
     name: info.name
   }
@@ -164,7 +166,7 @@ watchPostEffect(() => {
       </div>
     </div>
 
-    <Keyboard :valid-seq="onSeq" />
+    <Keyboard :valid-seq="onSeq" :hints="article.spHints" />
 
     <div class="summary">
       <TypeSummary :speed="summary.hanziPerMinutes" :accuracy="summary.accuracy" :avgpress="summary.pressPerHanzi" />

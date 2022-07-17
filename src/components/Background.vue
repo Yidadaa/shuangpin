@@ -54,17 +54,28 @@ const props = defineProps<BgProps>()
     .shuangpin {
       padding: 0.2em 0;
       font-size: 3.5em;
+      width: 3.5em;
     }
   }
 
   .left {
-    transform: translateX(-40%);
+    transform: translateX(-60%);
     justify-content: flex-end;
+    align-items: flex-end;
+
+    .shuangpin {
+      text-align: right;
+    }
   }
 
   .right {
-    transform: translateX(40%);
+    transform: translateX(60%);
     justify-content: flex-start;
+    align-items: flex-start;
+
+    .shuangpin {
+      text-align: left;
+    }
   }
 }
 </style>

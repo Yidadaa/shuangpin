@@ -26,7 +26,8 @@ export class TypingSummary {
   }
 
   get hanziPerMinutes() {
-    return (this.totalCorrect / (this.totalTime + 1e-6)) * 1000 * 60;
+    if (this.totalTime === 0) return 0;
+    return (this.totalCorrect / this.totalTime) * 1000 * 60;
   }
 
   get pressPerHanzi() {
