@@ -91,6 +91,7 @@ interface Settings {
 interface AppState {
   currentLeadIndex: number;
   currentFollowIndex: number;
+  currentArticleIndex: number;
 
   combines: Combine[];
   articles: Article[];

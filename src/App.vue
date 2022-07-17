@@ -83,9 +83,9 @@ function onMenuChange(i: number) {
 }
 
 .content {
-  width: 90%;
-  max-width: 900px;
-  min-height: 30em;
+  width: @page-width;
+  max-width: @page-max-width;
+  height: @page-height;
   box-shadow: 10px 20px 60px rgba(0, 0, 0, 0.1);
   padding: 30px;
   border-radius: 0px;

@@ -4,7 +4,7 @@ const fs = require("fs");
 function convert() {
   const tasks = {
     popular: fs
-      .readFileSync("./hanzi/3500.txt", "utf8")
+      .readFileSync("./hanzi/7000.txt", "utf8")
       .split(/\s/)
       .filter((v) => v.length > 0),
   };

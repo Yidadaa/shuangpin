@@ -11,7 +11,7 @@ export interface MenuProps {
 
 const props = defineProps<MenuProps>()
 
-const menuItems = readonly(props.items)
+const menuItems = computed(() => props.items)
 
 const currentIndex = ref(props.index ?? 0)
 const index = computed(() => props.index ?? currentIndex.value)
@@ -19,7 +19,7 @@ const index = computed(() => props.index ?? currentIndex.value)
 function shiftItem(deltaIndex: number) {
   currentIndex.value = props.index ?? currentIndex.value
   currentIndex.value += deltaIndex
-  currentIndex.value = Math.max(0, Math.min(menuItems.length - 1, currentIndex.value))
+  currentIndex.value = Math.max(0, Math.min(menuItems.value.length - 1, currentIndex.value))
 
   if (deltaIndex !== 0) {
     props.onMenuChange?.(currentIndex.value)
@@ -86,7 +86,7 @@ onUnmounted(() => {
     }
 
     .menu-item:hover {
-      opacity: 1;
+      opacity: 0.8;
     }
 
     .selected-item {
