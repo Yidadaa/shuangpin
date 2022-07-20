@@ -4,31 +4,26 @@ import { followMap, followKeys } from '../utils/pinyin'
 import { useStore } from '../store'
 import { computed, ref } from '@vue/reactivity';
 import { hanziMap } from '../utils/hanzi';
-import { randInt } from '../utils/number';
+import { storeToRefs } from 'pinia';
 
 const store = useStore()
+const currentFollowIndex = storeToRefs(store).currentFollowIndex
 const followList = computed(() => {
-  if (store.currentFollowIndex < 0 || store.currentFollowIndex >= followKeys.length) {
+  if (currentFollowIndex.value < 0 || currentFollowIndex.value >= followKeys.length) {
     return []
   }
 
-  return followMap.get(followKeys[store.currentLeadIndex]) ?? []
+  return followMap.get(followKeys[currentFollowIndex.value]) ?? []
 })
 
 const hanziList = computed(() => {
   return followList.value.reduce((pre, cur) => pre.concat(hanziMap.p2h.get(cur.full) ?? []), [] as string[])
 })
 
-const currentHanziIndex = ref(0)
-
-function nextChar() {
-  currentHanziIndex.value = randInt(hanziList.value.length)
-  return hanziList.value[currentHanziIndex.value] ?? ''
-}
 </script>
 
 <template>
-  <single-mode :next-char="nextChar"></single-mode>
+  <single-mode :hanzi-list="hanziList" mode="Follow"></single-mode>
 </template>
 
 <style lang="less">

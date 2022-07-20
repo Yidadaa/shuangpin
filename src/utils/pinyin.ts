@@ -3,9 +3,8 @@ import { product } from "./number";
 
 export const zeroLeadKeys = "a ai an ang ao e ei en eng er o ou".split(" ");
 
-export const leadKeys = "b p m f d t n l g k h j q x zh ch sh r z c s y w"
-  .split(" ")
-  .concat(zeroLeadKeys);
+export const leadKeys =
+  "b p m f d t n l g k h j q x zh ch sh r z c s y w".split(" ");
 
 export const singleFollowKeys = "a o e i u v".split(" ");
 

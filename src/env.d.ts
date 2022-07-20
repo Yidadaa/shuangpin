@@ -39,10 +39,10 @@ declare type Char =
 type Pinyin = { lead: string; follow: string; full: string };
 
 interface Progress {
-  currentIndex: number;
-  total: number;
-  correctTry: number;
-  totalTry: number;
+  currentIndex: number = 0;
+  total: number = 0;
+  correctTry: number = 0;
+  totalTry: number = 0;
 }
 
 interface Combine {
@@ -92,6 +92,7 @@ interface AppState {
   currentLeadIndex: number;
   currentFollowIndex: number;
   currentArticleIndex: number;
+  progresses: Record<string, Progress>;
 
   combines: Combine[];
   articles: Article[];

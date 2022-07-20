@@ -50,8 +50,6 @@ onMounted(() => {
 
     articles.value.push({ progress, type: name })
   })
-
-  console.log(rawNames)
 })
 
 
@@ -106,7 +104,6 @@ const article = computed(() => {
 })
 
 const articleMenuItems = computed(() => {
-  console.log('changed', articles.value)
   return articles.value.map(v => {
     if (v.type === 'CUSTOM') {
       return v.name

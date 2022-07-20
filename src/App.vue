@@ -95,6 +95,7 @@ function onMenuChange(i: number) {
   display: flex;
   flex-direction: column;
   align-items: center;
+  overflow: hidden;
 }
 
 
