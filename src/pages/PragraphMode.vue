@@ -83,7 +83,7 @@ function jumpToNextValidHanzi(index: number, text: string) {
 
 const index = storeToRefs(store).currentArticleIndex
 const article = computed(() => {
-  const info = loadArticleText(articles.value[index.value])
+  const info = loadArticleText(articles.value[index.value % articles.value.length])
 
   info.progress.currentIndex = jumpToNextValidHanzi(info.progress.currentIndex, info.text)
 
@@ -120,13 +120,8 @@ const validInput = computed(() => {
 })
 
 function onAriticleChange(i: number) {
-  if (i < articles.value.length) {
-    index.value = i
-    isEditing.value = false
-  } else {
-    index.value = 0
-    isEditing.value = true
-  }
+  index.value = i
+  isEditing.value = i >= articles.value.length
 }
 
 const pinyin = ref<string[]>([])
@@ -136,7 +131,7 @@ function onSeq([lead, follow]: [string?, string?]) {
   pinyin.value = [res.lead, res.follow].filter(v => !!v)
 
   if (!!lead && !!follow) {
-    store.updateProgressOnValid(res.lead!, res.follow!, res.valid)
+    store.updateProgressOnValid(res.lead, res.follow, res.valid)
   }
 
   const fullInput = !!lead && !!follow;

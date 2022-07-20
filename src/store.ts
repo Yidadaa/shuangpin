@@ -47,7 +47,6 @@ export const useStore = defineStore("app", {
     },
     updateProgressOnValid(lead: string, follow: string, isValid: boolean) {
       for (const name of [lead, follow, lead + follow]) {
-        console.log(name);
         const progress = this.getProgress(name);
         progress.correctTry += Number(isValid);
         progress.totalTry += 1;
