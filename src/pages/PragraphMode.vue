@@ -228,7 +228,7 @@ function deleteArticle() {
         </div>
 
         <div class="article-menu" :title="isEditing ? '' : article.name">
-          <MenuList :items="articleMenuItems" :on-menu-change="onAriticleChange" />
+          <MenuList :items="articleMenuItems" :index="index" :on-menu-change="onAriticleChange" />
 
           <div class="delete-btn" v-if="article.type === 'CUSTOM'" @click="deleteArticle">删除文章</div>
         </div>
