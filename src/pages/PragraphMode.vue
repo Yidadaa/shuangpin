@@ -135,6 +135,10 @@ function onSeq([lead, follow]: [string?, string?]) {
   const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, article.value.answer)
   pinyin.value = [res.lead, res.follow].filter(v => !!v)
 
+  if (!!lead && !!follow) {
+    store.updateProgressOnValid(res.lead!, res.follow!, res.valid)
+  }
+
   const fullInput = !!lead && !!follow;
   if (fullInput) {
     summary.value.onValid(res.valid)

@@ -77,14 +77,6 @@ watchPostEffect(() => {
   }
 })
 
-function onValid(result: boolean) {
-  if (!props.mode) return
-  const progress = progresses.value[menuIndex.value!].progress
-  progress.correctTry += Number(result)
-  progress.totalTry += 1
-  store.updateProgress(keys[menuIndex.value!], progress)
-}
-
 function onKeyPressed() {
   summary.value.onKeyPressed()
 }
@@ -110,7 +102,7 @@ function onSeq([lead, follow]: [string?, string?]) {
 
   if (!!lead && !!follow) {
     props.onValidInput?.(res.valid)
-    onValid(res.valid)
+    store.updateProgressOnValid(res.lead, res.follow, res.valid)
   }
 
   const fullInput = !!lead && !!follow;

@@ -45,6 +45,15 @@ export const useStore = defineStore("app", {
     updateProgress(name: string, progress: Progress) {
       this.progresses[name] = progress;
     },
+    updateProgressOnValid(lead: string, follow: string, isValid: boolean) {
+      for (const name of [lead, follow, lead + follow]) {
+        console.log(name);
+        const progress = this.getProgress(name);
+        progress.correctTry += Number(isValid);
+        progress.totalTry += 1;
+        this.updateProgress(name, progress);
+      }
+    },
     getAccuracy(name: string) {
       const progress = this.getProgress(name);
       if (progress.correctTry === 0) return 0;
