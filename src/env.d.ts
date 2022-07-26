@@ -81,7 +81,7 @@ interface ShuangpinMode {
 }
 
 interface Settings {
-  enableSeg: boolean; // 分词键
+  enableForceDark: boolean; // 强制深色
   enableKeyHint: boolean; // 按键提示
   enablePinyinHint: boolean; // 拼音提示
   enableAutoClear: boolean; // 自动清空

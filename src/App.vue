@@ -89,8 +89,9 @@ function onMenuChange(i: number) {
   box-shadow: 10px 20px 60px rgba(0, 0, 0, 0.1);
   padding: 30px;
   border-radius: 0px;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--gray-010);
   position: relative;
+  color: var(--black);
 
   display: flex;
   flex-direction: column;
@@ -125,25 +126,10 @@ function onMenuChange(i: number) {
 }
 
 *::-webkit-scrollbar-track {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: var(--gray-002);
 }
 
 *::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 0, 0, 0.03);
-}
-
-@media (prefers-color-scheme: dark) {
-  .content {
-    color: #aaa;
-    border-color: #444;
-  }
-
-  *::-webkit-scrollbar-track {
-    background-color: rgba(255, 255, 255, 0.02);
-  }
-
-  *::-webkit-scrollbar-thumb {
-    background-color: rgba(255, 255, 255, 0.03);
-  }
+  background-color: var(--gray-003);
 }
 </style>

@@ -54,12 +54,8 @@ effect(() => {
   position: relative;
 
   .current-outset {
-    border: 1px solid black;
+    border: 1px solid var(--black);
     padding: 0.3em;
-
-    @media (prefers-color-scheme: dark) {
-      border-color: #aaa;
-    }
   }
 
   .follow-item {
@@ -91,10 +87,6 @@ effect(() => {
       width: 100%;
       top: 0;
       opacity: 0.2;
-
-      @media (prefers-color-scheme: dark) {
-        filter: invert(1);
-      }
     }
 
     .pinyin {

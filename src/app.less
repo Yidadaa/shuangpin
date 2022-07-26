@@ -1,27 +1,27 @@
 @font-face {
-  font-family: 'song';
-  src: url("SourceHanSerifCN-Regular.subset.ttf") format('truetype');
+  font-family: "song";
+  src: url("SourceHanSerifCN-Regular.subset.ttf") format("truetype");
   font-style: normal;
   font-weight: normal;
 }
 
 @font-face {
-  font-family: 'song';
-  src: url("SourceHanSerifCN-Bold.subset.ttf") format('truetype');
+  font-family: "song";
+  src: url("SourceHanSerifCN-Bold.subset.ttf") format("truetype");
   font-style: normal;
   font-weight: bold;
 }
 
 @font-face {
-  font-family: 'songbuild';
-  src: url("/shuangpin/SourceHanSerifCN-Regular.subset.ttf") format('truetype');
+  font-family: "songbuild";
+  src: url("/shuangpin/SourceHanSerifCN-Regular.subset.ttf") format("truetype");
   font-style: normal;
   font-weight: normal;
 }
 
 @font-face {
-  font-family: 'songbuild';
-  src: url("/shuangpin/SourceHanSerifCN-Bold.subset.ttf") format('truetype');
+  font-family: "songbuild";
+  src: url("/shuangpin/SourceHanSerifCN-Bold.subset.ttf") format("truetype");
   font-style: normal;
   font-weight: bold;
 }
@@ -29,13 +29,9 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: song, songbuild, 'Noto Serif SC', STSong, "Times New Roman", Times, serif;
+  font-family: song, songbuild, "Noto Serif SC", STSong, "Times New Roman",
+    Times, serif;
   -webkit-font-smoothing: antialiased;
-  -webkit-tap-highlight-color: rgba(0,0,0,0);
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #222;
-  }
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+  background-color: var(--white);
 }

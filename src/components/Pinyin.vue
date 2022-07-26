@@ -39,12 +39,8 @@ const props = defineProps<{
       content: "";
       width: 100%;
       height: 5px;
-      background-color: black;
+      background-color: var(--black);
       margin-top: 5px;
-
-      @media (prefers-color-scheme: dark) {
-        background-color: #aaa;
-      }
     }
 
     &:last-child::after {

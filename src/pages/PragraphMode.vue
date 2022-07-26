@@ -297,13 +297,9 @@ function deleteArticle() {
           margin-right: 1em;
           font-weight: bold;
 
-          @border: 1px solid black;
+          @border: 1px solid var(--black);
           border-top: @border;
           border-bottom: @border;
-
-          @media (prefers-color-scheme: dark) {
-            border-color: #aaa;
-          }
         }
       }
 
@@ -369,15 +365,9 @@ function deleteArticle() {
         height: 100%;
         left: 0;
         top: 0;
-        background: linear-gradient(0deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0) 70%, rgba(255, 255, 255, 1) 100%);
+        background: linear-gradient(0deg, var(--white) 0%, transparent 30%, transparent 70%, var(--white) 100%);
         pointer-events: none;
         z-index: 999;
-      }
-
-      @media (prefers-color-scheme: dark) {
-        &:before {
-          background: linear-gradient(0deg, rgba(34, 34, 34, 1) 0%, rgba(34, 34, 34, 0) 30%, rgba(34, 34, 34, 0) 70%, rgba(34, 34, 34, 1) 100%);
-        }
       }
 
       .scroll-area {
@@ -434,7 +424,7 @@ function deleteArticle() {
           cursor: pointer;
 
           &.disable {
-            color: #aaa;
+            color: var(--gray-a);
           }
         }
       }
@@ -448,14 +438,10 @@ function deleteArticle() {
         padding: 0.5em;
         height: 25em;
         resize: none;
-        border: 3px double #000;
+        border: 3px double var(--gray-6);
+        color: var(--black);
         background-color: transparent;
         padding-left: calc(0.5em + 1px);
-
-        @media (prefers-color-scheme: dark) {
-          border-color: #666;
-          color: #999;
-        }
       }
     }
   }

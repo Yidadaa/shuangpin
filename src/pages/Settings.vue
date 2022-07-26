@@ -5,6 +5,7 @@ import Keyboard from '../components/Keyboard.vue';
 import { useStore } from '../store'
 import { shuangpins } from '../utils/keyboard'
 import MenuList from '../components/MenuList.vue';
+import { watchPostEffect } from 'vue';
 
 const store = useStore()
 const settings = storeToRefs(store).settings
@@ -13,8 +14,16 @@ const buildSettingItem = (name: keyof Omit<Settings, 'shuangpinMode'>) => {
   return [settings.value[name] ? '启用' : '关闭', () => settings.value[name] = !settings.value[name]]
 }
 
+watchPostEffect(() => {
+  if (settings.value.enableForceDark) {
+    document.body.classList.add('dark')
+  } else {
+    document.body.classList.remove('dark')
+  }
+})
+
 const settingItems = computed(() => [
-  ['分词按键', ...buildSettingItem('enableSeg')],
+  ['强制深色', ...buildSettingItem('enableForceDark')],
   ['键位提示', ...buildSettingItem('enableKeyHint')],
   ['拼音提示', ...buildSettingItem('enablePinyinHint')],
   ['自动清空', ...buildSettingItem('enableAutoClear')]

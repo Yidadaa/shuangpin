@@ -171,9 +171,9 @@ function keyItemClass(key: string) {
 
   .key-item {
     margin: 5px;
-    background-color: rgba(0, 0, 0, 0.01);
+    background-color: var(--gray-001);
     border-radius: 5px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 2px var(--gray-010);
     text-align: center;
     padding: 10px;
 
@@ -184,24 +184,14 @@ function keyItemClass(key: string) {
     flex-direction: column;
     justify-content: space-between;
     backdrop-filter: blur(5px);
-    border: 1px solid rgba(0, 0, 0, 0.01);
+    border: 1px solid var(--gray-001);
 
     &.hint-key {
       border: 1px solid @primary-color;
     }
 
-    @media (prefers-color-scheme: dark) {
-      & {
-        box-shadow: 0 1px 2px rgba(255, 255, 255, 0.2);
-      }
-    }
-
     &.pressing {
-      background-color: rgba(0, 0, 0, 0.1);
-
-      @media (prefers-color-scheme: dark) {
-        background-color: rgba(255, 255, 255, 0.2);
-      }
+      background-color: var(--gray-010);
     }
 
     .main-content {
