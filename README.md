@@ -8,15 +8,20 @@
 可能是最好用的双拼练习工具。
 
 
-[开始使用](https://yidadaa.github.io/shuangpin) / [反馈问题](https://github.com/yidadaa/shuangpin/issues)
+[开始使用](https://blog.simplenaive.cn/shuangpin) / [反馈问题](https://github.com/yidadaa/shuangpin/issues)
 
 <img src="./screenshots/cover.jpg" alt="预览" width=500/>
 </div>
 
 ## 主要功能
 - 多种模式：随机模式、声母模式、韵母模式、长句模式
-- 支持自定义双拼模式、自定义输入文章
-- 一目了然的进度统计、持续激励的成就系统
+- 支持自定义双拼模式 [WIP]
+- 自定义输入文章
+- 一目了然的进度统计
+- 持续激励的成就系统 [WIP]
+
+## 已知问题
+- https://github.com/Yidadaa/shuangpin/issues/1 多音字匹配不准确，会导致长文模式下的输入体验较差。
 
 ## 截图
 
