@@ -11,7 +11,7 @@ function nextChar() {
 </script>
 
 <template>
-  <single-mode :next-char="nextChar"></single-mode>
+  <single-mode :next-char="nextChar" />
 </template>
 
 <style>

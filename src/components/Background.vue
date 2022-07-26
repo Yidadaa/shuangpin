@@ -1,24 +1,24 @@
 <script setup lang="ts">
-
 export type BgSideItem = {
-  chars: string,
-  shuangpins: string
-}
+  chars: string;
+  shuangpins: string;
+};
 
 export interface BgProps {
-  left: BgSideItem
-  right: BgSideItem
+  left: BgSideItem;
+  right: BgSideItem;
 }
 
-const props = defineProps<BgProps>()
-
+const props = defineProps<BgProps>();
 </script>
 
 <template>
   <div class="background">
-    <div :class="name" class="bg-side" v-for="([name, item], i) in Object.entries(props)">
+    <div v-for="([name, item], i) in Object.entries(props)" :key="i" :class="name" class="bg-side">
       <div class="chars">
-        <div class="char" v-for="(char, i) in item.chars">{{ char }}</div>
+        <div v-for="(char, ci) in item.chars" :key="ci" class="char">
+          {{ char }}
+        </div>
       </div>
       <div class="shuangpin">
         {{ item.shuangpins }}

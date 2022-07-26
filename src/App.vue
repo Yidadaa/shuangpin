@@ -4,14 +4,14 @@ import Bg from './components/Background.vue'
 import { routes } from './router'
 import { useRoute, useRouter } from 'vue-router'
 import { useStore } from './store';
-import { computed } from '@vue/reactivity';
-import { ref, effect, onMounted, onUnmounted } from 'vue';
+import { computed } from 'vue';
+import { ref, effect } from 'vue';
 import { getPinyinOf } from './utils/hanzi';
 
 const store = useStore()
 const router = useRouter()
 const route = useRoute()
-const menuItems = routes.map(v => v.name!) as string[]
+const menuItems = routes.map(v => (v.name as string))
 const menuIndex = ref(0)
 
 effect(() => {
@@ -55,7 +55,7 @@ function onMenuChange(i: number) {
 <template>
   <div class="content">
     <div class="main-menu">
-      <Menu default-show-item enable-arrow :index="menuIndex" :items="menuItems" v-on:menu-change="onMenuChange" />
+      <Menu default-show-item enable-arrow :index="menuIndex" :items="menuItems" @menu-change="onMenuChange" />
     </div>
 
     <router-view v-slot="{ Component }">

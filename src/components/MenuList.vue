@@ -55,10 +55,16 @@ onUnmounted(() => {
 
 <template>
   <div class="menu">
-    <div class="menu-items" :class="props.defaultShowItem && 'show-items'"
-      :style="`transform: translateY(${-index * 2}em)`" @wheel.prevent="onItemWheel">
-      <div class="menu-item" @click="shiftItem(i - index)" :class="buildItemClass(i - index)"
-        v-for="(item, i) in menuItems">{{ item }}</div>
+    <div
+      class="menu-items" :class="props.defaultShowItem && 'show-items'"
+      :style="`transform: translateY(${-index * 2}em)`" @wheel.prevent="onItemWheel"
+    >
+      <div
+        v-for="(item, i) in menuItems" :key="i" class="menu-item" :class="buildItemClass(i - index)"
+        @click="shiftItem(i - index)"
+      >
+        {{ item }}
+      </div>
     </div>
   </div>
 </template>

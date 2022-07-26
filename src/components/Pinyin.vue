@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { defineProps } from 'vue'
 
 const props = defineProps<{
@@ -10,8 +10,10 @@ const props = defineProps<{
 
 <template>
   <div class="pinyin-input">
-    <div class="cursor" v-for="char in chars">{{ char.toUpperCase() }}</div>
-    <div class="cursor" v-if="chars.length === 0"></div>
+    <div v-for="(char, ci) in chars" :key="ci" class="cursor">
+      {{ char.toUpperCase() }}
+    </div>
+    <div v-if="chars.length === 0" class="cursor" />
   </div>
 </template>
 

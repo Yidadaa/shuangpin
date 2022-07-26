@@ -8,7 +8,7 @@ import MenuList from '../components/MenuList.vue';
 import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watchPostEffect } from 'vue';
 import { matchSpToPinyin } from '../utils/keyboard';
 import { useStore } from '../store'
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { getPinyinOf } from '../utils/hanzi';
 import { TypingSummary } from '../utils/summary'
 import { followKeys, leadKeys } from '../utils/pinyin';
@@ -60,6 +60,7 @@ const menuIndex = computed(() => {
   } else if (props.mode === 'Follow') {
     return store.currentFollowIndex
   }
+  return -1;
 })
 
 function onMenuChange(i: number) {
@@ -133,7 +134,7 @@ watchPostEffect(() => {
 <template>
   <div class="home-page">
     <div class="single-menu">
-      <menu-list :items="listMenuItems" :index="menuIndex" v-on:menu-change="onMenuChange" />
+      <menu-list :items="listMenuItems" :index="menuIndex" @menu-change="onMenuChange" />
     </div>
 
     <div class="input-area">
@@ -149,7 +150,6 @@ watchPostEffect(() => {
     <div class="summary">
       <TypeSummary :speed="summary.hanziPerMinutes" :accuracy="summary.accuracy" :avgpress="summary.pressPerHanzi" />
     </div>
-
   </div>
 </template>
 

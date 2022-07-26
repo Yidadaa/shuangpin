@@ -8,7 +8,7 @@ import { useStore } from '../store'
 import { storeToRefs } from 'pinia';
 
 import rawArticles from "../utils/article.json";
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { getPinyinOf, hanziMap } from '../utils/hanzi';
 import { matchSpToPinyin } from '../utils/keyboard';
 import { TypingSummary } from '../utils/summary';
@@ -180,7 +180,7 @@ function getShortName(s: string, n = 10) {
 }
 
 function saveArticle() {
-  if (!validInput) return
+  if (!validInput.value) return
   localStorage.setItem(editingTitle.value, editingContent.value)
   isEditing.value = false
 
@@ -216,45 +216,57 @@ function deleteArticle() {
         </div>
 
         <div class="title-info">
-          <div class="answer" v-if="settings.enablePinyinHint">{{ article.answer.toUpperCase() }}</div>
+          <div v-if="settings.enablePinyinHint" class="answer">
+            {{ article.answer.toUpperCase() }}
+          </div>
           <div class="title-and-count">
-            <div class="count">{{ article.progress.currentIndex }} 字 / {{ article.progress.total }} 字</div>
-            <div class="title">{{ getShortName(article.name) }}</div>
+            <div class="count">
+              {{ article.progress.currentIndex }} 字 / {{ article.progress.total }} 字
+            </div>
+            <div class="title">
+              {{ getShortName(article.name) }}
+            </div>
           </div>
         </div>
 
         <div class="article-menu" :title="isEditing ? '' : article.name">
           <MenuList :items="articleMenuItems" :index="index" :on-menu-change="onAriticleChange" />
 
-          <div class="delete-btn" v-if="article.type === 'CUSTOM'" @click="deleteArticle">删除文章</div>
+          <div v-if="article.type === 'CUSTOM'" class="delete-btn" @click="deleteArticle">
+            删除文章
+          </div>
         </div>
       </div>
-      <div class="text-area" v-if="!isEditing">
+      <div v-if="!isEditing" class="text-area">
         <div class="scroll-area">
           <div class="bg-text">
-            <p v-for="(p, i) in article.text">{{ p }}</p>
+            <p v-for="(p, i) in article.text" :key="i">
+              {{ p }}
+            </p>
           </div>
           <div class="done-text">
-            <p v-for="(p, i) in article.finishedText">
-              {{ p }}<span class="current" id="cursor" v-if="i === article.finishedText.length - 1">{{
-                  article.currentHanzi
+            <p v-for="(p, i) in article.finishedText" :key="i">
+              {{ p }}<span v-if="i === article.finishedText.length - 1" id="cursor" class="current">{{
+                article.currentHanzi
               }}</span>
             </p>
           </div>
         </div>
       </div>
-      <div class="editing-text-area" v-else>
+      <div v-else class="editing-text-area">
         <div class="editing-bar">
-          <input class="editing-title" placeholder="键入标题" v-model="editingTitle" />
-          <div class="save-btn" :class="!validInput && 'disable'" @click="saveArticle">保存文章</div>
+          <input v-model="editingTitle" class="editing-title" placeholder="键入标题">
+          <div class="save-btn" :class="!validInput && 'disable'" @click="saveArticle">
+            保存文章
+          </div>
         </div>
-        <textarea class="editing-text" placeholder="键入范文……" v-model="editingContent"></textarea>
+        <textarea v-model="editingContent" class="editing-text" placeholder="键入范文……" />
       </div>
     </div>
 
-    <Keyboard :valid-seq="onSeq" :hints="article.spHints" v-if="!isEditing" />
+    <Keyboard v-if="!isEditing" :valid-seq="onSeq" :hints="article.spHints" />
 
-    <div class="summary" v-if="!isEditing">
+    <div v-if="!isEditing" class="summary">
       <TypeSummary :speed="summary.hanziPerMinutes" :accuracy="summary.accuracy" :avgpress="summary.pressPerHanzi" />
     </div>
   </div>

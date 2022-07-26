@@ -75,7 +75,7 @@ export function matchSpToPinyin(
   const allMatched = !!leadKey && !!followKey;
   const leads = mode.groupByKey.get(leadKey)?.leads ?? [];
   const follows = mode.groupByKey.get(followKey)?.follows ?? [];
-  let combines = product(leads.concat(""), follows.concat("")).filter(
+  const combines = product(leads.concat(""), follows.concat("")).filter(
     ([a, b]) => !!a || !!b
   );
 

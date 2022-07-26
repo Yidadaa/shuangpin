@@ -15,9 +15,9 @@ export const multiFollowKeys =
 
 export const followKeys = singleFollowKeys.concat(multiFollowKeys);
 
-export let validCombines: Map<string, Pinyin> = new Map();
-export let leadMap: Map<string, Pinyin[]> = new Map();
-export let followMap: Map<string, Pinyin[]> = new Map();
+export const validCombines: Map<string, Pinyin> = new Map();
+export const leadMap: Map<string, Pinyin[]> = new Map();
+export const followMap: Map<string, Pinyin[]> = new Map();
 
 product(leadKeys.concat(""), followKeys).forEach(([lead, follow]) => {
   const pinyin = {

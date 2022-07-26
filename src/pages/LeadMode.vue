@@ -2,7 +2,7 @@
 import SingleMode from '../components/SingleMode.vue';
 import { leadMap, leadKeys } from '../utils/pinyin'
 import { useStore } from '../store'
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { hanziMap } from '../utils/hanzi';
 import { storeToRefs } from 'pinia';
 
@@ -24,7 +24,10 @@ const hanziList = computed(() => {
 </script>
 
 <template>
-  <single-mode :hanzi-list="hanziList" mode="Lead"></single-mode>
+  <single-mode
+    :hanzi-list="hanziList"
+    mode="Lead"
+  />
 </template>
 
 <style lang="less">

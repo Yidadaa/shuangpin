@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from 'vue';
 import { effect, ref } from 'vue';
 import { useStore } from '../store';
 import { getPinyinOf } from '../utils/hanzi';
@@ -8,11 +9,12 @@ const props = defineProps<{
 }>()
 
 const pinyin = ref('')
-const currentHanzi = ref('')
+const hanziSeq = ref(props.hanziSeq)
+const currentHanzi = ref()
 const settings = useStore().settings
 
 effect(() => {
-  currentHanzi.value = props.hanziSeq.pop() ?? ' '
+  currentHanzi.value = hanziSeq.value.pop()
   if (settings.enablePinyinHint) {
     pinyin.value = getPinyinOf(currentHanzi.value)!
   }
@@ -22,15 +24,21 @@ effect(() => {
 
 <template>
   <div class="displayer">
-    <div class="follow-item" v-for="(item, i) in hanziSeq"
-      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`">
+    <div
+      v-for="(item, i) in hanziSeq" :key="i" class="follow-item"
+      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`"
+    >
       {{ item }}
     </div>
     <div class="current-outset">
       <div class="current-item">
-        <img class="mi-bg" src="../assets/mi-bg.svg" />
-        <div class="pinyin">{{ pinyin }}</div>
-        <div class="hanzi" :key="currentHanzi">{{ currentHanzi }}</div>
+        <img class="mi-bg" src="../assets/mi-bg.svg">
+        <div class="pinyin">
+          {{ pinyin }}
+        </div>
+        <div :key="currentHanzi" class="hanzi">
+          {{ currentHanzi }}
+        </div>
       </div>
     </div>
   </div>

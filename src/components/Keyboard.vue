@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from '@vue/reactivity';
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { ref, onActivated, onDeactivated } from 'vue'
 import { useStore } from '../store';
@@ -125,29 +125,78 @@ function keyItemClass(key: string) {
 
 <template>
   <div class="keyboard">
-    <div class="key-row" v-for="(line, li) in keyLayout" key={{li}}>
-      <div class="key-item" :class="keyItemClass(keyItem.main)" v-for="(keyItem, ki) in line"
-        @mousedown="pressKey(keyItem.main)" @touchstart.stop.prevent="pressKey(keyItem.main)"
-        @mouseup="releaseKey(keyItem.main)" @mouseout="releaseKey(keyItem.main, false)"
-        @touchend.stop.prevent="releaseKey(keyItem.main)" key={{ki}}>
+    <div
+      v-for="(line, li) in keyLayout"
+      :key="li"
+      class="key-row"
+    >
+      <div
+        v-for="(keyItem, ki) in line"
+        :key="ki"
+        class="key-item"
+        :class="keyItemClass(keyItem.main)"
+        @mousedown="pressKey(keyItem.main)"
+        @touchstart.stop.prevent="pressKey(keyItem.main)"
+        @mouseup="releaseKey(keyItem.main)"
+        @mouseout="releaseKey(keyItem.main, false)"
+        @touchend.stop.prevent="releaseKey(keyItem.main)"
+      >
         <div class="main-content">
-          <div class="main-key ">{{ keyItem.main.toUpperCase() }}</div>
-          <div class="lead-key" v-if="keyItem.lead.length > 0">{{ keyItem.lead }}</div>
+          <div class="main-key ">
+            {{ keyItem.main.toUpperCase() }}
+          </div>
+          <div
+            v-if="keyItem.lead.length > 0"
+            class="lead-key"
+          >
+            {{ keyItem.lead }}
+          </div>
         </div>
         <div class="bottom-content">
-          <div class="follow-key">{{ keyItem.follow }}</div>
+          <div class="follow-key">
+            {{ keyItem.follow }}
+          </div>
         </div>
       </div>
 
-      <div v-if="li === keyLayout.length - 1" class="key-item backspace" :class="keyItemClass('Backspace')"
-        @mousedown="pressKey('Backspace')" @touchstart.stop.prevent="pressKey('Backspace')"
-        @mouseup="releaseKey('Backspace')" @mouseout="releaseKey('Backspace', false)"
-        @touchend.stop.prevent="releaseKey('Backspace')">
-        <svg width="16" height="16" viewBox="0 0 48 48" fill="none">
-          <path d="M14 11L4 24L14 37H44V11H14Z" fill="none" stroke="#333" stroke-width="3" stroke-linecap="round"
-            stroke-linejoin="round" />
-          <path d="M21 19L31 29" stroke="#333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-          <path d="M31 19L21 29" stroke="#333" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+      <div
+        v-if="li === keyLayout.length - 1"
+        class="key-item backspace"
+        :class="keyItemClass('Backspace')"
+        @mousedown="pressKey('Backspace')"
+        @touchstart.stop.prevent="pressKey('Backspace')"
+        @mouseup="releaseKey('Backspace')"
+        @mouseout="releaseKey('Backspace', false)"
+        @touchend.stop.prevent="releaseKey('Backspace')"
+      >
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 48 48"
+          fill="none"
+        >
+          <path
+            d="M14 11L4 24L14 37H44V11H14Z"
+            fill="none"
+            stroke="#333"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M21 19L31 29"
+            stroke="#333"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M31 19L21 29"
+            stroke="#333"
+            stroke-width="3"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
         </svg>
       </div>
     </div>

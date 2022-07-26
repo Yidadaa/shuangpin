@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from '@vue/reactivity';
+import { computed, ComputedRef } from 'vue';
 import { storeToRefs } from 'pinia';
 import Keyboard from '../components/Keyboard.vue';
 import { useStore } from '../store'
@@ -42,14 +42,20 @@ function onModeChange(i: number) {
 <template>
   <div class="settings-page">
     <div class="settings">
-      <div class="setting-item" v-for="([name, value, toggleValue], i) in settingItems" @click="toggleValue">
-        <div class="setting-name">{{ name }}</div>
-        <div class="setting-value">{{ value }}</div>
+      <div v-for="([name, value, toggleValue], i) in settingItems" :key="i" class="setting-item" @click="toggleValue">
+        <div class="setting-name">
+          {{ name }}
+        </div>
+        <div class="setting-value">
+          {{ value }}
+        </div>
       </div>
     </div>
 
     <div class="mode-setting setting-item">
-      <div class="setting-name">当前模式</div>
+      <div class="setting-name">
+        当前模式
+      </div>
       <div class="setting-value">
         <MenuList :items="shuangpins" :on-menu-change="onModeChange" :index="currentIndex" />
       </div>
