@@ -10,12 +10,12 @@ const props = defineProps<{
 }>()
 
 const pinyin = ref('')
-const hanziSeq = ref(props.hanziSeq)
 const currentHanzi = ref()
 const settings = useStore().settings
 
 effect(() => {
-  currentHanzi.value = hanziSeq.value.pop()
+  // eslint-disable-next-line vue/no-mutating-props
+  currentHanzi.value = props.hanziSeq.pop()
   if (settings.enablePinyinHint) {
     pinyin.value = randomChoice(getPinyinOf(currentHanzi.value)) ?? ''
   }
@@ -25,10 +25,8 @@ effect(() => {
 
 <template>
   <div class="displayer">
-    <div
-      v-for="(item, i) in hanziSeq" :key="i" class="follow-item"
-      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`"
-    >
+    <div v-for="(item, i) in hanziSeq" :key="i" class="follow-item"
+      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`">
       {{ item }}
     </div>
     <div class="current-outset">
