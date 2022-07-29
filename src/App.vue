@@ -28,7 +28,7 @@ const spMode = computed(() => {
   const mode = store.mode
   const name = store.settings.shuangpinMode.toString().split('').slice(0, 2)
   const full = name.concat(['双', '拼']).map(v => {
-    const pinyin = getPinyinOf(v) ?? ''
+    const pinyin = getPinyinOf(v).at(0) ?? ''
     const sp = mode.py2sp.get(pinyin) ?? ''
     return [v, sp]
   })
