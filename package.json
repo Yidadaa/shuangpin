@@ -6,7 +6,8 @@
     "dev": "vite",
     "build": "vue-tsc --noEmit && vite build --base=/shuangpin",
     "preview": "vite preview",
-    "lint": "eslint --fix --ext .ts,.vue src",
+    "lint": "eslint --ext .ts,.vue src",
+    "fix": "yarn lint --fix",
     "prepare": "husky install"
   },
   "dependencies": {
