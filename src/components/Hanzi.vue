@@ -25,8 +25,10 @@ effect(() => {
 
 <template>
   <div class="displayer">
-    <div v-for="(item, i) in hanziSeq" :key="i" class="follow-item"
-      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`">
+    <div
+      v-for="(item, i) in hanziSeq" :key="i" class="follow-item"
+      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`"
+    >
       {{ item }}
     </div>
     <div class="current-outset">
