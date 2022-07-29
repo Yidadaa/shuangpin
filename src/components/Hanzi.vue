@@ -3,6 +3,7 @@ import { computed } from 'vue';
 import { effect, ref } from 'vue';
 import { useStore } from '../store';
 import { getPinyinOf } from '../utils/hanzi';
+import { randomChoice } from '../utils/number'
 
 const props = defineProps<{
   hanziSeq: string[]
@@ -16,7 +17,7 @@ const settings = useStore().settings
 effect(() => {
   currentHanzi.value = hanziSeq.value.pop()
   if (settings.enablePinyinHint) {
-    pinyin.value = getPinyinOf(currentHanzi.value)!
+    pinyin.value = randomChoice(getPinyinOf(currentHanzi.value)) ?? ''
   }
 })
 
@@ -24,10 +25,8 @@ effect(() => {
 
 <template>
   <div class="displayer">
-    <div
-      v-for="(item, i) in hanziSeq" :key="i" class="follow-item"
-      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`"
-    >
+    <div v-for="(item, i) in hanziSeq" :key="i" class="follow-item"
+      :style="`opacity: ${i / 4};transform: translateX(-${(hanziSeq.length - i + 1) * 120}%);`">
       {{ item }}
     </div>
     <div class="current-outset">

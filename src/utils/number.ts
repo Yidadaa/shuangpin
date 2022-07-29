@@ -12,3 +12,8 @@ export function product<T, K>(a: T[], b: K[]) {
 
   return ret;
 }
+
+export function randomChoice<T>(arr: T[]) {
+  if (arr.length == 0) return undefined
+  return arr[randInt(arr.length)]
+}

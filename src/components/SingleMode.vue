@@ -12,7 +12,7 @@ import { computed } from 'vue';
 import { getPinyinOf } from '../utils/hanzi';
 import { TypingSummary } from '../utils/summary'
 import { followKeys, leadKeys } from '../utils/pinyin';
-import { randInt } from '../utils/number';
+import { randInt, randomChoice } from '../utils/number';
 
 export interface SingleModeProps {
   nextChar?: () => string
@@ -91,7 +91,8 @@ onDeactivated(() => {
 })
 
 const answer = computed(() => {
-  return getPinyinOf(hanziSeq.value.at(-1) ?? '') ?? ''
+  const pys = getPinyinOf(hanziSeq.value.at(-1) ?? '')
+  return randomChoice(pys) ?? ''
 })
 
 const hints = computed(() => {

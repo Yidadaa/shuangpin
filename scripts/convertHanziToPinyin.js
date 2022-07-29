@@ -17,7 +17,8 @@ function convert() {
     const pinyinList = hanziList.map((x) =>
       pinyin(x, {
         style: PINYIN_STYLE.Plain,
-      })[0].replace("ü", "v")
+        heteronym: true,
+      })[0].map((v) => v.replace("ü", "v"))
     );
     result[name] = {
       hanzi: hanziList,
