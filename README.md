@@ -41,4 +41,9 @@
 当某些文字的多音字列表过长时，会进行截断处理，此时虽然提示列表中没有展示，但是依然可以正常判定。
 
 ## 说明
-- 本项目灵感来源自：[双拼练习](https://github.com/BlueSky-07/Shuang)，感谢作者 [@BlueSky-07](https://github.com/BlueSky-07) 制作的工具帮助我入门双拼。
+- 本项目灵感来源自：[双拼练习](https://github.com/BlueSky-07/Shuang)，感谢作者 [@BlueSky-07](https://github.com/BlueSky-07) 制作的工具帮助我入门双拼；
+- 如果本项目帮到了你，请将节省的时间用于享受生活，善待自己。
+
+## LICENSE
+- 本项目使用 [MIT License](https://en.wikipedia.org/wiki/MIT_License) 开源协议；
+- 本项目使用 [Anti 996 License](https://github.com/kattgu7/Anti-996-License/blob/master/LICENSE_CN_EN) 作为补充开源协议，**消灭 996，胜利属于人民**。
