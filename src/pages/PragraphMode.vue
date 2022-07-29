@@ -13,6 +13,7 @@ import { getPinyinOf, hanziMap } from '../utils/hanzi';
 import { matchSpToPinyin } from '../utils/keyboard';
 import { TypingSummary } from '../utils/summary';
 import MenuList from '../components/MenuList.vue';
+import { randomChoice } from '../utils/number';
 
 const store = useStore()
 const articles = storeToRefs(store).articles
@@ -89,15 +90,15 @@ const article = computed(() => {
 
   const finishedText = info.text.slice(0, info.progress.currentIndex)
   const currentHanzi = info.text[info.progress.currentIndex] ?? ''
-  const pinyin = getPinyinOf(currentHanzi) ?? ''
+  const pinyin = getPinyinOf(currentHanzi)
 
   return {
     type: info.type,
     text: info.text.split('\n'),
     finishedText: finishedText.split('\n'),
     currentHanzi,
-    answer: pinyin,
-    spHints: (store.mode.py2sp.get(pinyin) ?? '').split(''),
+    answer: [...new Set(pinyin)],
+    spHints: (store.mode.py2sp.get(pinyin.at(0) ?? '') ?? '').split(''),
     progress: info.progress,
     name: info.name
   }
@@ -127,19 +128,26 @@ function onAriticleChange(i: number) {
 const pinyin = ref<string[]>([])
 
 function onSeq([lead, follow]: [string?, string?]) {
-  const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, article.value.answer)
-  pinyin.value = [res.lead, res.follow].filter(v => !!v)
+  let valid = false
+  for (const answer of article.value.answer) {
+    const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, answer)
+    pinyin.value = [res.lead, res.follow].filter(v => !!v)
 
-  if (!!lead && !!follow) {
-    store.updateProgressOnValid(res.lead, res.follow, res.valid)
+    if (!!lead && !!follow) {
+      store.updateProgressOnValid(res.lead, res.follow, res.valid)
+    }
+
+    const fullInput = !!lead && !!follow;
+    if (fullInput) {
+      summary.value.onValid(res.valid)
+    }
+
+    valid ||= res.valid;
+
+    if (valid) break;
   }
 
-  const fullInput = !!lead && !!follow;
-  if (fullInput) {
-    summary.value.onValid(res.valid)
-  }
-
-  return res.valid
+  return valid
 }
 
 function scrollToFocus() {
@@ -158,15 +166,19 @@ onActivated(() => scrollToFocus())
 watchPostEffect(() => {
   scrollToFocus()
 
-  if (pinyin.value.join('') === article.value.answer) {
+  const input = pinyin.value.join('')
+
+  if (article.value.answer.includes(input)) {
     setTimeout(() => {
       pinyin.value = []
-      if (article.value.progress.currentIndex < article.value.progress.total) {
-        article.value.progress.currentIndex += 1
-      } else {
-        article.value.progress.currentIndex = 0
-      }
+      article.value.progress.currentIndex += 1
     }, 100);
+  }
+})
+
+watchEffect(() => {
+  if (article.value.progress.currentIndex >= article.value.progress.total) {
+    article.value.progress.currentIndex = 0
   }
 })
 
@@ -205,6 +217,18 @@ function deleteArticle() {
   onAriticleChange(index.value)
 }
 
+function shortPinyin(pinyins: string[]) {
+  let ret = []
+  let count = 0
+  for (const py of pinyins) {
+    if (count + py.length <= 12) {
+      count += py.length
+      ret.push(py.toUpperCase())
+    }
+  }
+  return ret.join('/')
+}
+
 </script>
 
 <template>
@@ -217,7 +241,7 @@ function deleteArticle() {
 
         <div class="title-info">
           <div v-if="settings.enablePinyinHint" class="answer">
-            {{ article.answer.toUpperCase() }}
+            {{ shortPinyin(article.answer) }}
           </div>
           <div class="title-and-count">
             <div class="count">
@@ -247,7 +271,7 @@ function deleteArticle() {
           <div class="done-text">
             <p v-for="(p, i) in article.finishedText" :key="i">
               {{ p }}<span v-if="i === article.finishedText.length - 1" id="cursor" class="current">{{
-                article.currentHanzi
+                  article.currentHanzi
               }}</span>
             </p>
           </div>

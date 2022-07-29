@@ -92,7 +92,7 @@ onDeactivated(() => {
 
 const answer = computed(() => {
   const pys = getPinyinOf(hanziSeq.value.at(-1) ?? '')
-  return randomChoice(pys) ?? ''
+  return pys.at(0) ?? ''
 })
 
 const hints = computed(() => {
