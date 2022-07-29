@@ -271,7 +271,7 @@ function shortPinyin(pinyins: string[]) {
           <div class="done-text">
             <p v-for="(p, i) in article.finishedText" :key="i">
               {{ p }}<span v-if="i === article.finishedText.length - 1" id="cursor" class="current">{{
-                  article.currentHanzi
+                article.currentHanzi
               }}</span>
             </p>
           </div>
