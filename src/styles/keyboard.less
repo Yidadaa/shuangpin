@@ -1,0 +1,72 @@
+@import "./color.less";
+
+.keyboard {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.key-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+
+  .key-item {
+    margin: 5px;
+    background-color: var(--gray-001);
+    border-radius: 5px;
+    box-shadow: 0 1px 2px var(--gray-010);
+    text-align: center;
+    padding: 10px;
+
+    height: 45px;
+    width: 45px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    backdrop-filter: blur(5px);
+    border: 1px solid var(--gray-001);
+
+    &.hint-key {
+      border: 1px solid @primary-color;
+    }
+
+    &.pressing {
+      background-color: var(--gray-010);
+    }
+
+    .main-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .main-key {
+        font-size: 14px;
+        font-weight: bold;
+      }
+
+      .lead-key {
+        font-size: 12px;
+        font-weight: bold;
+        color: @primary-color;
+      }
+    }
+
+    .bottom-content {
+      display: flex;
+      justify-content: center;
+
+      .follow-key {
+        font-size: 12px;
+        margin-right: 3px;
+      }
+    }
+  }
+
+  .backspace {
+    align-items: center;
+    justify-content: center;
+  }
+}

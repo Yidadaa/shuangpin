@@ -66,6 +66,56 @@ export function loadShuangpinConfig(name: ShuangpinType): ShuangpinMode {
 
 export const keyboardLayout = ["qwertyuiop", " asdfghjkl;", "zxcvbnm"];
 
+export function mergeString([a, b]: string[] = []) {
+  if (!(a && b && a.length > 2 && b.length > 2)) {
+    return [a, b].join(" ");
+  }
+  const aChars = a.split("");
+  const bChars = b.split("");
+  const commonSuffix = [];
+
+  while (
+    aChars.length &&
+    bChars.length &&
+    aChars[aChars.length - 1] === bChars[bChars.length - 1]
+  ) {
+    commonSuffix.push(aChars.pop());
+    bChars.pop();
+  }
+
+  const prefixs = [aChars.join(""), bChars.join("")].filter(
+    (v) => v.length > 0
+  );
+
+  if (commonSuffix.length === 0) {
+    return prefixs.join(" ");
+  }
+
+  const prefix = prefixs.join("/");
+  const suffix = commonSuffix.reverse().join("");
+
+  return `(${prefix})${suffix}`;
+}
+
+export function mapConfigToLayout(config: ShuangpinMode) {
+  return keyboardLayout.map((v) =>
+    v.split("").map((key) => {
+      const keyConfig = config.groupByKey.get(key as Char) ?? {
+        main: key,
+        leads: [],
+        follows: [],
+      };
+      return {
+        main: keyConfig.main,
+        lead: mergeString(keyConfig.leads.filter((v) => v !== keyConfig.main)),
+        follow: mergeString(keyConfig.follows),
+        leads: keyConfig.leads,
+        follows: keyConfig.follows,
+      };
+    })
+  );
+}
+
 export function matchSpToPinyin(
   mode: ShuangpinMode,
   leadKey: Char,

@@ -2,6 +2,7 @@
 
 // css 原生变量
 .light {
+  --primary-color: @primary-color;
   --black: #000;
   --gray-2: #222;
   --gray-4: #444;
@@ -16,6 +17,7 @@
 }
 
 .dark {
+  --primary-color: @primary-color;
   --black: #aaa;
   --gray-2: #222;
   --gray-4: #444;
@@ -28,7 +30,8 @@
   --gray-003: rgba(255, 255, 255, 0.03);
   --gray-010: rgba(255, 255, 255, 0.1);
 
-  img {
+  img,
+  svg {
     filter: invert(1);
   }
 }

@@ -1,48 +1,69 @@
 <script setup lang="ts">
-import { computed, ComputedRef } from 'vue';
-import { storeToRefs } from 'pinia';
-import Keyboard from '../components/Keyboard.vue';
-import { useStore } from '../store'
-import { shuangpins } from '../utils/keyboard'
-import MenuList from '../components/MenuList.vue';
-import { watchPostEffect } from 'vue';
+import { computed, ref, ssrContextKey } from "vue";
+import { storeToRefs } from "pinia";
+import { useStore } from "../store";
+import { shuangpins as sps } from "../utils/keyboard";
+import MenuList from "../components/MenuList.vue";
+import { watchPostEffect } from "vue";
 
-const store = useStore()
-const settings = storeToRefs(store).settings
+import ModeConfig from "../components/ModeConfig.vue";
 
-const buildSettingItem = (name: keyof Omit<Settings, 'shuangpinMode'>) => {
-  return [settings.value[name] ? '启用' : '关闭', () => settings.value[name] = !settings.value[name]]
-}
+const store = useStore();
+const settings = storeToRefs(store).settings;
+
+const buildSettingItem = (name: keyof Omit<Settings, "shuangpinMode">) => {
+  return [
+    settings.value[name] ? "启用" : "关闭",
+    () => (settings.value[name] = !settings.value[name]),
+  ];
+};
 
 watchPostEffect(() => {
   if (settings.value.enableForceDark) {
-    document.body.classList.add('dark')
+    document.body.classList.add("dark");
   } else {
-    document.body.classList.remove('dark')
+    document.body.classList.remove("dark");
   }
-})
+});
 
-const settingItems = computed(() => [
-  ['强制深色', ...buildSettingItem('enableForceDark')],
-  ['键位提示', ...buildSettingItem('enableKeyHint')],
-  ['拼音提示', ...buildSettingItem('enablePinyinHint')],
-  ['自动清空', ...buildSettingItem('enableAutoClear')]
-] as [string, string, () => void][])
+const settingItems = computed(
+  () =>
+    [
+      ["强制深色", ...buildSettingItem("enableForceDark")],
+      ["键位提示", ...buildSettingItem("enableKeyHint")],
+      ["拼音提示", ...buildSettingItem("enablePinyinHint")],
+      ["自动清空", ...buildSettingItem("enableAutoClear")],
+    ] as [string, string, () => void][]
+);
+
+const shuangpins = computed(() => (sps as string[]).concat("新建双拼"));
+const spName = ref(settings.value.shuangpinMode as string);
+const isEditing = computed(() => !(sps as string[]).includes(spName.value));
 
 const currentIndex = computed(() => {
-  return shuangpins.indexOf(settings.value.shuangpinMode)
-})
+  return shuangpins.value.indexOf(spName.value);
+});
 
 function onModeChange(i: number) {
-  settings.value.shuangpinMode = shuangpins[i]
-}
+  spName.value = shuangpins.value[i];
 
+  if (i < shuangpins.value.length - 1) {
+    settings.value.shuangpinMode = shuangpins.value[
+      i
+    ] as unknown as ShuangpinType;
+  }
+}
 </script>
 
 <template>
   <div class="settings-page">
     <div class="settings">
-      <div v-for="([name, value, toggleValue], i) in settingItems" :key="i" class="setting-item" @click="toggleValue">
+      <div
+        v-for="([name, value, toggleValue], i) in settingItems"
+        :key="i"
+        class="setting-item"
+        @click="toggleValue"
+      >
         <div class="setting-name">
           {{ name }}
         </div>
@@ -53,20 +74,22 @@ function onModeChange(i: number) {
     </div>
 
     <div class="mode-setting setting-item">
-      <div class="setting-name">
-        当前模式
-      </div>
+      <div class="setting-name">当前模式</div>
       <div class="setting-value">
-        <MenuList :items="shuangpins" :on-menu-change="onModeChange" :index="currentIndex" />
+        <MenuList
+          :items="shuangpins"
+          :on-menu-change="onModeChange"
+          :index="currentIndex"
+        />
       </div>
     </div>
 
-    <Keyboard />
+    <ModeConfig :is-editing="isEditing" />
   </div>
 </template>
 
 <style lang="less" scoped>
-@import '../styles/color.less';
+@import "../styles/color.less";
 
 .settings-page {
   display: flex;
@@ -93,6 +116,11 @@ function onModeChange(i: number) {
 
   .mode-setting {
     align-items: baseline;
+    max-height: 6em;
+
+    .setting-name {
+      height: 2em;
+    }
   }
 }
 </style>
