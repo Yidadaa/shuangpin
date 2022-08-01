@@ -239,7 +239,7 @@ function shortPinyin(pinyins: string[]) {
   let ret = [];
   let count = 0;
   for (const py of pinyins) {
-    if (count + py.length <= 12) {
+    if (count + py.length <= 10) {
       count += py.length;
       ret.push(py.toUpperCase());
     }
