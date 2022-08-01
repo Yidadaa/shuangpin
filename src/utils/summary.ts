@@ -36,7 +36,8 @@ export class TypingSummary {
   }
 
   get accuracy() {
-    return this.totalCorrect / (this.totalValid + 1e-6);
+    if (this.totalValid === 0) return 0;
+    return this.totalCorrect / this.totalValid;
   }
 
   private lastTime = 0;

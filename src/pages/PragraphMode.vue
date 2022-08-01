@@ -1,145 +1,158 @@
 <script setup lang="ts">
-import Pinyin from '../components/Pinyin.vue';
-import Keyboard from '../components/Keyboard.vue';
-import TypeSummary from '../components/TypeSummary.vue';
+import Pinyin from "../components/Pinyin.vue";
+import Keyboard from "../components/Keyboard.vue";
+import TypeSummary from "../components/TypeSummary.vue";
 
-import { ref, watchPostEffect, onActivated, onDeactivated, onMounted, watchEffect } from 'vue';
-import { useStore } from '../store'
-import { storeToRefs } from 'pinia';
+import {
+  ref,
+  watchPostEffect,
+  onActivated,
+  onDeactivated,
+  onMounted,
+  watchEffect,
+} from "vue";
+import { useStore } from "../store";
+import { storeToRefs } from "pinia";
 
 import rawArticles from "../utils/article.json";
-import { computed } from 'vue';
-import { getPinyinOf, hanziMap } from '../utils/hanzi';
-import { matchSpToPinyin } from '../utils/keyboard';
-import { TypingSummary } from '../utils/summary';
-import MenuList from '../components/MenuList.vue';
-import { randomChoice } from '../utils/number';
+import { computed } from "vue";
+import { getPinyinOf, hanziMap } from "../utils/hanzi";
+import { matchSpToPinyin } from "../utils/keyboard";
+import { TypingSummary } from "../utils/summary";
+import MenuList from "../components/MenuList.vue";
+import { randomChoice } from "../utils/number";
 
-const store = useStore()
-const articles = storeToRefs(store).articles
-const settings = storeToRefs(store).settings
+const store = useStore();
+const articles = storeToRefs(store).articles;
+const settings = storeToRefs(store).settings;
 
-const summary = ref(new TypingSummary())
+const summary = ref(new TypingSummary());
 
 function onKeyPressed() {
-  summary.value.onKeyPressed()
+  summary.value.onKeyPressed();
 }
 
 onActivated(() => {
-  document.addEventListener('keypress', onKeyPressed)
-})
+  document.addEventListener("keypress", onKeyPressed);
+});
 
 onDeactivated(() => {
-  document.removeEventListener('keypress', onKeyPressed)
-})
-
+  document.removeEventListener("keypress", onKeyPressed);
+});
 
 onMounted(() => {
-  const rawNames = new Set([...Object.keys(rawArticles)])
-  articles.value.forEach(v => {
-    rawNames.delete(v.type)
-  })
+  const rawNames = new Set([...Object.keys(rawArticles)]);
+  articles.value.forEach((v) => {
+    rawNames.delete(v.type);
+  });
 
-  rawNames.forEach(v => {
-    const name = v as RawArticleName
+  rawNames.forEach((v) => {
+    const name = v as RawArticleName;
     const progress: Progress = {
       currentIndex: 0,
       total: rawArticles[name].length,
       correctTry: 0,
-      totalTry: 0
-    }
+      totalTry: 0,
+    };
 
-    articles.value.push({ progress, type: name })
-  })
-})
-
+    articles.value.push({ progress, type: name });
+  });
+});
 
 function loadArticleText(article: Article) {
-  if (article.type === 'CUSTOM') {
-    const text = localStorage.getItem(article.name) ?? ''
+  if (article.type === "CUSTOM") {
+    const text = localStorage.getItem(article.name) ?? "";
 
     return {
       type: article.type,
       text,
       name: article.name,
-      progress: article.progress
-    }
+      progress: article.progress,
+    };
   }
 
   return {
     type: article.type,
-    text: rawArticles[article.type] ?? '',
+    text: rawArticles[article.type] ?? "",
     name: article.type as string,
-    progress: article.progress
-  }
+    progress: article.progress,
+  };
 }
 
 function jumpToNextValidHanzi(index: number, text: string) {
   while (index < text.length && !hanziMap.h2p.has(text[index])) {
-    index += 1
+    index += 1;
   }
 
-  return index
+  return index;
 }
 
-const index = storeToRefs(store).currentArticleIndex
+const index = storeToRefs(store).currentArticleIndex;
 const article = computed(() => {
-  const info = loadArticleText(articles.value[index.value % articles.value.length])
+  const info = loadArticleText(
+    articles.value[index.value % articles.value.length]
+  );
 
-  info.progress.currentIndex = jumpToNextValidHanzi(info.progress.currentIndex, info.text)
+  info.progress.currentIndex = jumpToNextValidHanzi(
+    info.progress.currentIndex,
+    info.text
+  );
 
-  const finishedText = info.text.slice(0, info.progress.currentIndex)
-  const currentHanzi = info.text[info.progress.currentIndex] ?? ''
-  const pinyin = getPinyinOf(currentHanzi)
+  const finishedText = info.text.slice(0, info.progress.currentIndex);
+  const currentHanzi = info.text[info.progress.currentIndex] ?? "";
+  const pinyin = getPinyinOf(currentHanzi);
 
   return {
     type: info.type,
-    text: info.text.split('\n'),
-    finishedText: finishedText.split('\n'),
+    text: info.text.split("\n"),
+    finishedText: finishedText.split("\n"),
     currentHanzi,
     answer: [...new Set(pinyin)],
-    spHints: (store.mode.py2sp.get(pinyin.at(0) ?? '') ?? '').split(''),
+    spHints: (store.mode.py2sp.get(pinyin.at(0) ?? "") ?? "").split(""),
     progress: info.progress,
-    name: info.name
-  }
-})
+    name: info.name,
+  };
+});
 
 const articleMenuItems = computed(() => {
-  return articles.value.map(v => {
-    if (v.type === 'CUSTOM') {
-      return v.name
-    }
-    return v.type
-  }).map(x => getShortName(x)).concat('新建文章')
-})
+  return articles.value
+    .map((v) => {
+      if (v.type === "CUSTOM") {
+        return v.name;
+      }
+      return v.type;
+    })
+    .map((x) => getShortName(x))
+    .concat("新建文章");
+});
 
-const isEditing = ref(false)
-const editingTitle = ref('')
-const editingContent = ref('')
+const isEditing = ref(false);
+const editingTitle = ref("");
+const editingContent = ref("");
 const validInput = computed(() => {
-  return editingTitle.value.length > 0 && editingContent.value.length > 0
-})
+  return editingTitle.value.length > 0 && editingContent.value.length > 0;
+});
 
 function onAriticleChange(i: number) {
-  index.value = i
-  isEditing.value = i >= articles.value.length
+  index.value = i;
+  isEditing.value = i >= articles.value.length;
 }
 
-const pinyin = ref<string[]>([])
+const pinyin = ref<string[]>([]);
 
 function onSeq([lead, follow]: [string?, string?]) {
-  let valid = false
+  let valid = false;
   for (const answer of article.value.answer) {
-    const res = matchSpToPinyin(store.mode, lead as Char, follow as Char, answer)
-    pinyin.value = [res.lead, res.follow].filter(v => !!v)
+    const res = matchSpToPinyin(
+      store.mode,
+      lead as Char,
+      follow as Char,
+      answer
+    );
+    pinyin.value = [res.lead, res.follow].filter((v) => !!v);
 
     if (!!lead && !!follow) {
-      store.updateProgressOnValid(res.lead, res.follow, res.valid)
-    }
-
-    const fullInput = !!lead && !!follow;
-    if (fullInput) {
-      summary.value.onValid(res.valid)
+      store.updateProgressOnValid(res.lead, res.follow, res.valid);
     }
 
     valid ||= res.valid;
@@ -147,88 +160,92 @@ function onSeq([lead, follow]: [string?, string?]) {
     if (valid) break;
   }
 
-  return valid
+  const fullInput = !!lead && !!follow;
+  if (fullInput) {
+    summary.value.onValid(valid);
+  }
+
+  return valid;
 }
 
 function scrollToFocus() {
-  const cursor = document.getElementById('cursor')
+  const cursor = document.getElementById("cursor");
   if (cursor) {
     cursor.scrollIntoView({
-      inline: 'nearest',
-      block: 'center',
-      behavior: 'smooth'
-    })
+      inline: "nearest",
+      block: "center",
+      behavior: "smooth",
+    });
   }
 }
 
-onActivated(() => scrollToFocus())
+onActivated(() => scrollToFocus());
 
 watchPostEffect(() => {
-  scrollToFocus()
+  scrollToFocus();
 
-  const input = pinyin.value.join('')
+  const input = pinyin.value.join("");
 
   if (article.value.answer.includes(input)) {
     setTimeout(() => {
-      pinyin.value = []
-      article.value.progress.currentIndex += 1
+      pinyin.value = [];
+      article.value.progress.currentIndex += 1;
     }, 100);
   }
-})
+});
 
 watchEffect(() => {
   if (article.value.progress.currentIndex >= article.value.progress.total) {
-    article.value.progress.currentIndex = 0
+    article.value.progress.currentIndex = 0;
   }
-})
+});
 
 function getShortName(s: string, n = 10) {
-  let ret = s.slice(0, n)
+  let ret = s.slice(0, n);
   if (s.length > n) {
-    ret = ret.slice(0, n - 2) + '...'
+    ret = ret.slice(0, n - 2) + "...";
   }
 
-  return ret
+  return ret;
 }
 
 function saveArticle() {
-  if (!validInput.value) return
-  localStorage.setItem(editingTitle.value, editingContent.value)
-  isEditing.value = false
+  if (!validInput.value) return;
+  localStorage.setItem(editingTitle.value, editingContent.value);
+  isEditing.value = false;
 
   articles.value.push({
-    type: 'CUSTOM',
+    type: "CUSTOM",
     name: editingTitle.value,
     progress: {
       currentIndex: 0,
       total: editingContent.value.length,
       correctTry: 0,
-      totalTry: 0
-    }
-  })
+      totalTry: 0,
+    },
+  });
 
-  editingTitle.value = ''
-  editingContent.value = ''
-  index.value = articles.value.length - 1
+  editingTitle.value = "";
+  editingContent.value = "";
+  index.value = articles.value.length - 1;
 }
 
 function deleteArticle() {
-  articles.value.splice(index.value, 1)
-  onAriticleChange(index.value)
+  articles.value.splice(index.value, 1);
+  onAriticleChange(index.value);
 }
 
 function shortPinyin(pinyins: string[]) {
-  let ret = []
-  let count = 0
+  let ret = [];
+  let count = 0;
   for (const py of pinyins) {
     if (count + py.length <= 12) {
-      count += py.length
-      ret.push(py.toUpperCase())
+      count += py.length;
+      ret.push(py.toUpperCase());
     }
   }
-  return ret.join('/')
+  return ret.join("/");
 }
-
 </script>
 
 <template>
@@ -245,7 +262,8 @@ function shortPinyin(pinyins: string[]) {
           </div>
           <div class="title-and-count">
             <div class="count">
-              {{ article.progress.currentIndex }} 字 / {{ article.progress.total }} 字
+              {{ article.progress.currentIndex }} 字 /
+              {{ article.progress.total }} 字
             </div>
             <div class="title">
               {{ getShortName(article.name) }}
@@ -254,9 +272,17 @@ function shortPinyin(pinyins: string[]) {
         </div>
 
         <div class="article-menu" :title="isEditing ? '' : article.name">
-          <MenuList :items="articleMenuItems" :index="index" :on-menu-change="onAriticleChange" />
+          <MenuList
+            :items="articleMenuItems"
+            :index="index"
+            :on-menu-change="onAriticleChange"
+          />
 
-          <div v-if="article.type === 'CUSTOM'" class="delete-btn" @click="deleteArticle">
+          <div
+            v-if="article.type === 'CUSTOM'"
+            class="delete-btn"
+            @click="deleteArticle"
+          >
             删除文章
           </div>
         </div>
@@ -270,35 +296,55 @@ function shortPinyin(pinyins: string[]) {
           </div>
           <div class="done-text">
             <p v-for="(p, i) in article.finishedText" :key="i">
-              {{ p }}<span v-if="i === article.finishedText.length - 1" id="cursor" class="current">{{
-                  article.currentHanzi
-              }}</span>
+              {{ p
+              }}<span
+                v-if="i === article.finishedText.length - 1"
+                id="cursor"
+                class="current"
+                >{{ article.currentHanzi }}</span
+              >
             </p>
           </div>
         </div>
       </div>
       <div v-else class="editing-text-area">
         <div class="editing-bar">
-          <input v-model="editingTitle" class="editing-title" placeholder="键入标题">
-          <div class="save-btn" :class="!validInput && 'disable'" @click="saveArticle">
+          <input
+            v-model="editingTitle"
+            class="editing-title"
+            placeholder="键入标题"
+          />
+          <div
+            class="save-btn"
+            :class="!validInput && 'disable'"
+            @click="saveArticle"
+          >
             保存文章
           </div>
         </div>
-        <textarea v-model="editingContent" class="editing-text" placeholder="键入范文……" />
+        <textarea
+          v-model="editingContent"
+          class="editing-text"
+          placeholder="键入范文……"
+        />
       </div>
     </div>
 
     <Keyboard v-if="!isEditing" :valid-seq="onSeq" :hints="article.spHints" />
 
     <div v-if="!isEditing" class="summary">
-      <TypeSummary :speed="summary.hanziPerMinutes" :accuracy="summary.accuracy" :avgpress="summary.pressPerHanzi" />
+      <TypeSummary
+        :speed="summary.hanziPerMinutes"
+        :accuracy="summary.accuracy"
+        :avgpress="summary.pressPerHanzi"
+      />
     </div>
   </div>
 </template>
 
 <style lang="less" scoped>
-@import '../styles/color.less';
-@import '../styles/var.less';
+@import "../styles/color.less";
+@import "../styles/var.less";
 
 .p-mode {
   .display-area {
@@ -378,7 +424,7 @@ function shortPinyin(pinyins: string[]) {
           font-size: 14px;
           cursor: pointer;
           font-weight: bold;
-          transition: all ease .3s;
+          transition: all ease 0.3s;
           margin-top: 1em;
           text-align: center;
 
@@ -395,13 +441,19 @@ function shortPinyin(pinyins: string[]) {
       max-width: 0.6 * @page-max-width;
 
       &:before {
-        content: '';
+        content: "";
         position: absolute;
         width: 100%;
         height: 100%;
         left: 0;
         top: 0;
-        background: linear-gradient(0deg, var(--white) 0%, transparent 30%, transparent 70%, var(--white) 100%);
+        background: linear-gradient(
+          0deg,
+          var(--white) 0%,
+          transparent 30%,
+          transparent 70%,
+          var(--white) 100%
+        );
         pointer-events: none;
         z-index: 999;
       }
