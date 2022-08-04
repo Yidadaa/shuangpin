@@ -20,7 +20,6 @@ import { getPinyinOf, hanziMap } from "../utils/hanzi";
 import { matchSpToPinyin } from "../utils/keyboard";
 import { TypingSummary } from "../utils/summary";
 import MenuList from "../components/MenuList.vue";
-import { randomChoice } from "../utils/number";
 
 const store = useStore();
 const articles = storeToRefs(store).articles;
@@ -98,14 +97,23 @@ const article = computed(() => {
     info.text
   );
 
-  const finishedText = info.text.slice(0, info.progress.currentIndex);
   const currentHanzi = info.text[info.progress.currentIndex] ?? "";
   const pinyin = getPinyinOf(currentHanzi);
 
+  // 分段
+  let text: [[string, number][]] = [[]];
+  for (let i = 0; i < info.text.length; ++i) {
+    const char = info.text[i];
+    if (char === "\n") {
+      text.push([]);
+    } else {
+      text.at(-1)?.push([char, i - info.progress.currentIndex]);
+    }
+  }
+
   return {
     type: info.type,
-    text: info.text.split("\n"),
-    finishedText: finishedText.split("\n"),
+    text,
     currentHanzi,
     answer: [...new Set(pinyin)],
     spHints: (store.mode.py2sp.get(pinyin.at(0) ?? "") ?? "").split(""),
@@ -288,22 +296,17 @@ function shortPinyin(pinyins: string[]) {
       </div>
       <div v-if="!isEditing" class="text-area">
         <div class="scroll-area">
-          <div class="bg-text">
-            <p v-for="(p, i) in article.text" :key="i">
-              {{ p }}
-            </p>
-          </div>
-          <div class="done-text">
-            <p v-for="(p, i) in article.finishedText" :key="i">
-              {{ p
-              }}<span
-                v-if="i === article.finishedText.length - 1"
-                id="cursor"
-                class="current"
-                >{{ article.currentHanzi }}</span
-              >
-            </p>
-          </div>
+          <p v-for="(p, i) in article.text" :key="i">
+            <span
+              v-for="([s, t], si) in p"
+              :key="si"
+              class="bg-text"
+              :class="t < 0 ? 'done-text' : t === 0 ? 'current-text' : ''"
+              :id="t === 0 ? 'cursor' : ''"
+            >
+              {{ s }}
+            </span>
+          </p>
         </div>
       </div>
       <div v-else class="editing-text-area">
@@ -463,19 +466,18 @@ function shortPinyin(pinyins: string[]) {
         position: relative;
         margin: 0.5em 0;
 
-        .done-text {
-          position: absolute;
-          top: 0;
-
-          .current {
-            text-decoration: underline;
-            text-underline-offset: 2px;
-            opacity: 0.8;
-          }
-        }
-
         .bg-text {
           opacity: 0.6;
+        }
+
+        .done-text {
+          opacity: 1;
+        }
+
+        .current-text {
+          text-decoration: underline;
+          text-underline-offset: 2px;
+          opacity: 0.8;
         }
       }
     }
