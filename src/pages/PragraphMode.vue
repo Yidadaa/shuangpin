@@ -139,9 +139,9 @@ function onAriticleChange(i: number) {
 }
 
 const pinyin = ref<string[]>([]);
+const isValidPinyin = ref(false);
 
 function onSeq([lead, follow]: [string?, string?]) {
-  let valid = false;
   for (const answer of article.value.answer) {
     const res = matchSpToPinyin(
       store.mode,
@@ -155,17 +155,17 @@ function onSeq([lead, follow]: [string?, string?]) {
       store.updateProgressOnValid(res.lead, res.follow, res.valid);
     }
 
-    valid ||= res.valid;
+    isValidPinyin.value ||= res.valid;
 
-    if (valid) break;
+    if (isValidPinyin.value) break;
   }
 
   const fullInput = !!lead && !!follow;
   if (fullInput) {
-    summary.value.onValid(valid);
+    summary.value.onValid(isValidPinyin.value);
   }
 
-  return valid;
+  return isValidPinyin.value;
 }
 
 function scrollToFocus() {
@@ -184,12 +184,11 @@ onActivated(() => scrollToFocus());
 watchPostEffect(() => {
   scrollToFocus();
 
-  const input = pinyin.value.join("");
-
-  if (article.value.answer.includes(input)) {
+  if (isValidPinyin.value) {
     setTimeout(() => {
       pinyin.value = [];
       article.value.progress.currentIndex += 1;
+      isValidPinyin.value = false;
     }, 100);
   }
 });
