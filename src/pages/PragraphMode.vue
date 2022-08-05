@@ -39,7 +39,7 @@ onDeactivated(() => {
   document.removeEventListener("keypress", onKeyPressed);
 });
 
-onMounted(() => {
+(function checkArticles() {
   const rawNames = new Set([...Object.keys(rawArticles)]);
   articles.value.forEach((v) => {
     rawNames.delete(v.type);
@@ -56,7 +56,7 @@ onMounted(() => {
 
     articles.value.push({ progress, type: name });
   });
-});
+})();
 
 function loadArticleText(article: Article) {
   if (article.type === "CUSTOM") {
@@ -88,9 +88,9 @@ function jumpToNextValidHanzi(index: number, text: string) {
 
 const index = storeToRefs(store).currentArticleIndex;
 const article = computed(() => {
-  const info = loadArticleText(
-    articles.value[index.value % articles.value.length]
-  );
+  const articleIndex = index.value % articles.value.length;
+
+  const info = loadArticleText(articles.value[articleIndex]);
 
   info.progress.currentIndex = jumpToNextValidHanzi(
     info.progress.currentIndex,
@@ -467,7 +467,7 @@ function shortPinyin(pinyins: string[]) {
         margin: 0.5em 0;
 
         .bg-text {
-          opacity: 0.6;
+          opacity: 0.4;
         }
 
         .done-text {
