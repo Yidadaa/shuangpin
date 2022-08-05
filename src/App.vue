@@ -1,61 +1,69 @@
 <script setup lang="ts">
-import Menu from './components/MenuList.vue'
-import Bg from './components/Background.vue'
-import { routes } from './router'
-import { useRoute, useRouter } from 'vue-router'
-import { useStore } from './store';
-import { computed } from 'vue';
-import { ref, effect } from 'vue';
-import { getPinyinOf } from './utils/hanzi';
+import Menu from "./components/MenuList.vue";
+import Bg from "./components/Background.vue";
+import { routes } from "./router";
+import { useRoute, useRouter } from "vue-router";
+import { useStore } from "./store";
+import { computed } from "vue";
+import { ref, effect } from "vue";
+import { getPinyinOf } from "./utils/hanzi";
 
-const store = useStore()
-const router = useRouter()
-const route = useRoute()
-const menuItems = routes.map(v => (v.name as string))
-const menuIndex = ref(0)
+const store = useStore();
+const router = useRouter();
+const route = useRoute();
+const menuItems = routes.map((v) => v.name as string);
+const menuIndex = ref(0);
 
 effect(() => {
-  const index = routes.findIndex(v => v.path === route.path)
+  const index = routes.findIndex((v) => v.path === route.path);
 
   if (index >= 0) {
-    menuIndex.value = index
+    menuIndex.value = index;
   } else {
-    router.replace(routes.at(0)?.path ?? '/')
+    router.replace(routes.at(0)?.path ?? "/");
   }
-})
+});
 
 const spMode = computed(() => {
-  const mode = store.mode
-  const name = store.settings.shuangpinMode.toString().split('').slice(0, 2)
-  const full = name.concat(['双', '拼']).map(v => {
-    const pinyin = getPinyinOf(v).at(0) ?? ''
-    const sp = mode.py2sp.get(pinyin) ?? ''
-    return [v, sp]
-  })
+  const mode = store.mode;
+  const name = store.settings.shuangpinMode.toString().split("").slice(0, 2);
+  const full = name.concat(["双", "拼"]).map((v) => {
+    const pinyin = getPinyinOf(v).at(0) ?? "";
+    const sp = mode.py2sp.get(pinyin) ?? "";
+    return [v, sp];
+  });
 
-  const left = full.slice(0, 2)
-  const right = full.slice(2, 4)
+  const left = full.slice(0, 2);
+  const right = full.slice(2, 4);
   const getBgItem = (item: typeof left) => ({
-    chars: item.map(v => v[0]).join(''),
-    shuangpins: item.map(v => v[1]).join('').toUpperCase()
-  })
+    chars: item.map((v) => v[0]).join(""),
+    shuangpins: item
+      .map((v) => v[1])
+      .join("")
+      .toUpperCase(),
+  });
 
   return {
     left: getBgItem(left),
-    right: getBgItem(right)
-  }
-})
+    right: getBgItem(right),
+  };
+});
 
 function onMenuChange(i: number) {
-  router.push(routes[i])
+  router.push(routes[i]);
 }
-
 </script>
 
 <template>
   <div class="content">
     <div class="main-menu">
-      <Menu default-show-item enable-arrow :index="menuIndex" :items="menuItems" @menu-change="onMenuChange" />
+      <Menu
+        default-show-item
+        enable-arrow
+        :index="menuIndex"
+        :items="menuItems"
+        @menu-change="onMenuChange"
+      />
     </div>
 
     <router-view v-slot="{ Component }">
@@ -98,8 +106,6 @@ function onMenuChange(i: number) {
   align-items: center;
   overflow: hidden;
 }
-
-
 
 .main-menu {
   color: @primary-color;
