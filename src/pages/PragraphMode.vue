@@ -356,8 +356,17 @@ function shortPinyin(pinyins: string[]) {
     align-items: center;
     justify-content: center;
 
+    @media (max-width: 576px) {
+      flex-direction: column;
+      padding: var(--app-padding);
+    }
+
     &.editing {
       align-items: flex-start;
+
+      @media (max-width: 576px) {
+        align-items: center;
+      }
     }
 
     .p-title {
@@ -366,6 +375,12 @@ function shortPinyin(pinyins: string[]) {
       display: flex;
       flex-direction: column;
       align-items: flex-end;
+
+      @media (max-width: 576px) {
+        width: 100vw;
+        padding-right: var(--app-padding);
+        margin-right: 50px;
+      }
 
       .pinyin {
         font-size: 12px;
@@ -397,6 +412,10 @@ function shortPinyin(pinyins: string[]) {
         .title {
           max-width: 160px;
           text-align: right;
+
+          @media (max-width: 576px) {
+            max-width: 100vw;
+          }
         }
       }
 
@@ -420,6 +439,10 @@ function shortPinyin(pinyins: string[]) {
         display: flex;
         flex-direction: column;
 
+        .menu {
+          overflow: visible;
+        }
+
         .delete-btn {
           color: @primary-color;
           opacity: 0.5;
@@ -440,7 +463,12 @@ function shortPinyin(pinyins: string[]) {
     .text-area {
       position: relative;
       width: 50vw;
-      max-width: 0.6 * @page-max-width;
+      max-width: calc(0.6 * var(--page-max-width));
+
+      @media (max-width: 576px) {
+        width: 100vw;
+        max-width: calc(100vw - var(--app-padding) * 2);
+      }
 
       &:before {
         content: "";
@@ -466,6 +494,10 @@ function shortPinyin(pinyins: string[]) {
         position: relative;
         margin: 8px 0;
 
+        @media (max-width: 576px) {
+          height: 30vh;
+        }
+
         .bg-text {
           opacity: 0.4;
         }
@@ -487,7 +519,12 @@ function shortPinyin(pinyins: string[]) {
       flex-direction: column;
       margin-top: 40px;
       width: 50vw;
-      max-width: 0.6 * @page-max-width;
+      max-width: calc(0.6 * var(--page-max-width));
+
+      @media (max-width: 576px) {
+        width: 100vw;
+        max-width: calc(100vw - var(--app-padding) * 2);
+      }
 
       .editing-bar {
         display: flex;
@@ -525,20 +562,24 @@ function shortPinyin(pinyins: string[]) {
         border: 0;
         outline: none;
         padding: 8px;
-        height: @page-height - 120px;
+        height: calc(var(--page-height) - 200px);
         resize: none;
         border: 3px double var(--gray-6);
         color: var(--black);
         background-color: transparent;
         padding-left: 10px;
+
+        @media (max-width: 576px) {
+          height: calc(var(--page-height) - 300px);
+        }
       }
     }
   }
 
   .summary {
     position: absolute;
-    right: @app-padding;
-    bottom: @app-padding;
+    right: var(--app-padding);
+    bottom: var(--app-padding);
   }
 }
 </style>

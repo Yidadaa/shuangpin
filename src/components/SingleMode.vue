@@ -166,7 +166,9 @@ watchPostEffect(() => {
       <Hanzi :hanzi-seq="[...hanziSeq]" />
     </div>
 
-    <Keyboard :valid-seq="onSeq" :hints="hints" />
+    <div class="single-keyboard">
+      <Keyboard :valid-seq="onSeq" :hints="hints" />
+    </div>
 
     <div class="summary">
       <TypeSummary
@@ -186,30 +188,50 @@ watchPostEffect(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-}
+  height: 100%;
 
-.single-menu {
-  position: absolute;
-  top: 0;
-  left: 100px;
-}
+  .single-menu {
+    position: absolute;
+    top: 0;
+    left: 100px;
+  }
 
-.input-area {
-  margin-bottom: 32px;
-  height: 160px;
-  display: flex;
-  align-items: center;
-}
+  .input-area {
+    margin-bottom: 32px;
+    height: 160px;
+    display: flex;
+    align-items: center;
 
-.summary {
-  position: absolute;
-  right: @app-padding;
-  bottom: @app-padding;
-}
+    @media (max-width: 576px) {
+      margin-top: 30vh;
+    }
+  }
 
-.hanzi-list {
-  position: absolute;
-  top: @app-padding;
-  right: @app-padding;
+  .summary {
+    position: absolute;
+    right: var(--app-padding);
+    bottom: var(--app-padding);
+
+    @media (max-width: 576px) {
+      top: 36px;
+    }
+  }
+
+  .hanzi-list {
+    position: absolute;
+    top: var(--app-padding);
+    right: var(--app-padding);
+
+    @media (max-width: 576px) {
+      top: 120px;
+    }
+  }
+
+  @media (max-width: 576px) {
+    .single-keyboard {
+      position: absolute;
+      bottom: 1em;
+    }
+  }
 }
 </style>

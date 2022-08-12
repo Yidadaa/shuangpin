@@ -1,4 +1,11 @@
-@app-padding: 30px;
-@page-width: 90vw;
-@page-max-width: 900px;
-@page-height: 500px;
+:root {
+  --app-padding: 30px;
+  --page-width: 900px;
+  --page-max-width: var(--page-width);
+  --page-height: 500px;
+
+  @media (max-width: 576px) {
+    --page-height: 100vh;
+    --page-width: 100vw;
+  }
+}

@@ -26,10 +26,28 @@ function pressKey(key: string) {
 function closePopup() {
   editingKey.value = "";
 }
+
+onActivated(() => {
+  window.addEventListener("resize", resizeKeyboard);
+
+  resizeKeyboard();
+});
+
+onDeactivated(() => {
+  window.removeEventListener("resize", resizeKeyboard);
+});
+
+const scale = ref(1);
+
+function resizeKeyboard() {
+  const screenWidth = document.getElementById("app")?.clientWidth ?? 920;
+  const keyboardWidth = document.getElementById("keyboard")?.clientWidth ?? 920;
+  scale.value = screenWidth < 576 ? (screenWidth / keyboardWidth) * 1.1 : 1;
+}
 </script>
 
 <template>
-  <div class="keyboard">
+  <div class="keyboard" :style="`transform: scale(${scale})`" id="keyboard">
     <div class="keyboard-name" v-if="props.isEditing">
       <input type="text" class="keyboard-name-input" value="我的双拼" />
     </div>

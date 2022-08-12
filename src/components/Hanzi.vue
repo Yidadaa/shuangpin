@@ -73,7 +73,7 @@ effect(() => {
     font-size: 36px;
     font-weight: bold;
     margin-right: 10px;
-    margin-top: -6px;
+    margin-top: -1px;
     position: absolute;
     right: 0;
     transition: all ease 0.3s;
@@ -103,7 +103,7 @@ effect(() => {
     .pinyin {
       font-size: 14px;
       position: absolute;
-      top: -2px;
+      top: -1px;
     }
 
     .hanzi {

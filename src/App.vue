@@ -91,12 +91,13 @@ function onMenuChange(i: number) {
 }
 
 .content {
-  width: @page-width;
-  max-width: @page-max-width;
-  height: @page-height;
+  box-sizing: border-box;
+  width: var(--page-width);
+  max-width: var(--page-max-width);
+  height: var(--page-height);
   box-shadow: 10px 20px 60px rgba(0, 0, 0, 0.1);
-  padding: 30px;
   border-radius: 0px;
+  padding: var(--app-padding);
   border: 1px solid var(--gray-010);
   position: relative;
   color: var(--black);

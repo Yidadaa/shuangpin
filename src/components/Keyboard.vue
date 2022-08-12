@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, watchPostEffect } from "vue";
 import { storeToRefs } from "pinia";
 import { ref, onActivated, onDeactivated } from "vue";
 import { useStore } from "../store";
@@ -15,6 +15,7 @@ const props = defineProps<{
 
 const pressingKeys = ref(new Set<string>());
 const keySeq = ref<string[]>([]);
+const scale = ref(1);
 
 const onPressKey = (e: KeyboardEvent) => pressKey(e.key);
 const onReleaseKey = (e: KeyboardEvent) => releaseKey(e.key);
@@ -22,15 +23,27 @@ const onReleaseKey = (e: KeyboardEvent) => releaseKey(e.key);
 onActivated(() => {
   document.addEventListener("keydown", onPressKey);
   document.addEventListener("keyup", onReleaseKey);
+  window.addEventListener("resize", resizeKeyboard);
+
+  resizeKeyboard();
 });
 
 onDeactivated(() => {
   document.removeEventListener("keydown", onPressKey);
   document.removeEventListener("keyup", onReleaseKey);
+  window.removeEventListener("resize", resizeKeyboard);
 });
+
+function resizeKeyboard() {
+  const screenWidth = document.getElementById("app")?.clientWidth ?? 920;
+  const keyboardWidth = document.getElementById("keyboard")?.clientWidth ?? 920;
+  scale.value = screenWidth < 576 ? (screenWidth / keyboardWidth) * 1.1 : 1;
+}
 
 function pressKey(key: string) {
   pressingKeys.value.add(key);
+
+  navigator.vibrate(100);
 }
 
 function send() {
@@ -87,7 +100,7 @@ function keyItemClass(key: string) {
 </script>
 
 <template>
-  <div class="keyboard">
+  <div class="keyboard" :style="`transform: scale(${scale})`" id="keyboard">
     <div v-for="(line, li) in keyLayout" :key="li" class="key-row">
       <div
         v-for="(keyItem, ki) in line"

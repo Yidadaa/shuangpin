@@ -84,7 +84,9 @@ function onModeChange(i: number) {
       </div>
     </div>
 
-    <ModeConfig :is-editing="isEditing" />
+    <div class="mode-config">
+      <ModeConfig :is-editing="isEditing" />
+    </div>
   </div>
 </template>
 
@@ -95,6 +97,11 @@ function onModeChange(i: number) {
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  @media (max-width: 576px) {
+    height: 100vh;
+    padding-top: 20vh;
+  }
 
   .settings {
     padding-top: 32px;
@@ -121,6 +128,13 @@ function onModeChange(i: number) {
 
     .setting-name {
       height: 2em;
+    }
+  }
+
+  .mode-config {
+    @media (max-width: 576px) {
+      position: absolute;
+      bottom: var(--app-padding);
     }
   }
 }

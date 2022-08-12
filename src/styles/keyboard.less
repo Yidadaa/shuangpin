@@ -4,6 +4,7 @@
   display: flex;
   justify-content: center;
   flex-direction: column;
+  z-index: 999;
 }
 
 .key-row {
@@ -20,8 +21,13 @@
     text-align: center;
     padding: 10px;
 
-    height: 45px;
+    height: 40px;
     width: 45px;
+
+    @media (max-width: 576px) {
+      margin: 5px 3px;
+      height: 60px;
+    }
 
     display: flex;
     flex-direction: column;
@@ -45,12 +51,20 @@
       .main-key {
         font-size: 14px;
         font-weight: bold;
+
+        @media (max-width: 576px) {
+          font-size: 18px;
+        }
       }
 
       .lead-key {
         font-size: 12px;
         font-weight: bold;
         color: @primary-color;
+
+        @media (max-width: 576px) {
+          font-size: 16px;
+        }
       }
     }
 
