@@ -14,7 +14,12 @@ const props = defineProps<BgProps>();
 
 <template>
   <div class="background">
-    <div v-for="([name, item], i) in Object.entries(props)" :key="i" :class="name" class="bg-side">
+    <div
+      v-for="([name, item], i) in Object.entries(props)"
+      :key="i"
+      :class="name"
+      class="bg-side"
+    >
       <div class="chars">
         <div v-for="(char, ci) in item.chars" :key="ci" class="char">
           {{ char }}
@@ -48,11 +53,11 @@ const props = defineProps<BgProps>();
     opacity: 0.05;
 
     .chars {
-      font-size: 10em;
+      font-size: 140px;
     }
 
     .shuangpin {
-      padding: 0.2em 0;
+      padding: 5px 0;
       font-size: 3.5em;
       width: 3.5em;
     }

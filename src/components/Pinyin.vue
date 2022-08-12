@@ -1,11 +1,10 @@
 <script lang="ts" setup>
-import { computed } from 'vue';
-import { defineProps } from 'vue'
+import { computed } from "vue";
+import { defineProps } from "vue";
 
 const props = defineProps<{
-  chars: string[]
-}>()
-
+  chars: string[];
+}>();
 </script>
 
 <template>
@@ -21,12 +20,12 @@ const props = defineProps<{
 .pinyin-input {
   display: flex;
   font-weight: bold;
-  font-size: 5em;
+  font-size: 60px;
 
   .cursor {
     position: relative;
-    min-height: 1.1em;
-    min-width: 0.5em;
+    min-height: 70px;
+    min-width: 54px;
     text-align: center;
     line-height: 1;
 
@@ -46,11 +45,9 @@ const props = defineProps<{
     }
 
     &:last-child::after {
-      animation: alternate infinite .6s blink;
+      animation: alternate infinite 0.6s blink;
     }
   }
-
-
 }
 
 @keyframes blink {

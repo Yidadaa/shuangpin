@@ -350,7 +350,7 @@ function shortPinyin(pinyins: string[]) {
 
 .p-mode {
   .display-area {
-    padding: 0 4em 2em 2em;
+    padding: 0 64px 32px 32px;
 
     display: flex;
     align-items: center;
@@ -361,8 +361,8 @@ function shortPinyin(pinyins: string[]) {
     }
 
     .p-title {
-      margin-right: 2em;
-      width: 16em;
+      margin-right: 32px;
+      width: 260px;
       display: flex;
       flex-direction: column;
       align-items: flex-end;
@@ -374,11 +374,11 @@ function shortPinyin(pinyins: string[]) {
       .title-info {
         display: flex;
         align-items: center;
-        margin-top: 0.5em;
+        margin-top: 8px;
 
         .answer {
-          font-size: 1.2em;
-          margin-right: 1em;
+          font-size: 20px;
+          margin-right: 16px;
           font-weight: bold;
 
           @border: 1px solid var(--black);
@@ -392,17 +392,17 @@ function shortPinyin(pinyins: string[]) {
         flex-direction: column;
         align-items: flex-end;
         font-weight: bold;
-        font-size: 0.8em;
+        font-size: 12px;
 
         .title {
-          max-width: 10em;
+          max-width: 160px;
           text-align: right;
         }
       }
 
       .article-menu {
         display: none;
-        height: 7em;
+        height: 110px;
       }
     }
 
@@ -427,7 +427,7 @@ function shortPinyin(pinyins: string[]) {
           cursor: pointer;
           font-weight: bold;
           transition: all ease 0.3s;
-          margin-top: 1em;
+          margin-top: 16px;
           text-align: center;
 
           &:hover {
@@ -462,9 +462,9 @@ function shortPinyin(pinyins: string[]) {
 
       .scroll-area {
         overflow-y: scroll;
-        height: 9em;
+        height: 144px;
         position: relative;
-        margin: 0.5em 0;
+        margin: 8px 0;
 
         .bg-text {
           opacity: 0.4;
@@ -485,14 +485,14 @@ function shortPinyin(pinyins: string[]) {
     .editing-text-area {
       display: flex;
       flex-direction: column;
-      margin-top: 2.5em;
+      margin-top: 40px;
       width: 50vw;
       max-width: 0.6 * @page-max-width;
 
       .editing-bar {
         display: flex;
         align-items: center;
-        margin-bottom: 1em;
+        margin-bottom: 16px;
 
         .editing-title {
           font-family: inherit;
@@ -500,7 +500,7 @@ function shortPinyin(pinyins: string[]) {
           font-weight: bold;
           border: 0;
           outline: none;
-          padding: 0 0.5em;
+          padding: 0 8px;
           color: @primary-color;
           border-left: 5px solid @primary-color;
           flex: 1;
@@ -524,13 +524,13 @@ function shortPinyin(pinyins: string[]) {
         font-weight: bold;
         border: 0;
         outline: none;
-        padding: 0.5em;
-        height: 25em;
+        padding: 8px;
+        height: @page-height - 120px;
         resize: none;
         border: 3px double var(--gray-6);
         color: var(--black);
         background-color: transparent;
-        padding-left: calc(0.5em + 1px);
+        padding-left: 10px;
       }
     }
   }

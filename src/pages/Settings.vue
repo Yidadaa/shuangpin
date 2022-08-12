@@ -97,10 +97,10 @@ function onModeChange(i: number) {
   align-items: center;
 
   .settings {
-    padding-top: 2em;
+    padding-top: 32px;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1em 2em;
+    gap: 16px 32px;
   }
 
   .setting-item {
@@ -110,13 +110,14 @@ function onModeChange(i: number) {
 
     .setting-name {
       color: @primary-color;
-      margin-right: 1em;
+      margin-right: 16px;
     }
   }
 
   .mode-setting {
     align-items: baseline;
     max-height: 6em;
+    margin-bottom: 2px;
 
     .setting-name {
       height: 2em;

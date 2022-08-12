@@ -111,7 +111,7 @@ function closePopup() {
 .input {
   background-color: var(--white);
   border: 1px solid var(--gray-010);
-  padding: 0.5em;
+  padding: 8px;
   color: var(--black);
   outline: none;
   font-family: inherit;
@@ -124,11 +124,11 @@ function closePopup() {
     display: flex;
     justify-content: center;
     width: 100%;
-    margin-bottom: 1em;
+    margin-bottom: 10px;
 
     .keyboard-name-input {
       .input();
-      font-size: 1.2em;
+      font-size: 18px;
       text-align: center;
       line-height: 1.2;
       font-weight: bolder;
@@ -146,33 +146,33 @@ function closePopup() {
 
   .edit-popup {
     position: absolute;
-    top: -11em;
+    top: -160px;
     left: -80%;
 
     display: flex;
     flex-direction: column;
 
     background-color: var(--white);
-    padding: 1em;
+    padding: 14px;
     border: 1px solid var(--gray-010);
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
 
-    font-size: 0.9em;
+    font-size: 14px;
 
     .edit-line {
       display: flex;
       align-items: center;
-      margin-bottom: 1em;
+      margin-bottom: 14px;
 
       .edit-label {
-        margin-right: 0.5em;
-        width: 3em;
+        margin-right: 8px;
+        width: 40px;
         font-weight: bolder;
       }
 
       .edit-input {
         .input();
-        max-width: 5em;
+        max-width: 60px;
       }
     }
 
