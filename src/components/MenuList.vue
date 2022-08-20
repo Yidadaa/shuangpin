@@ -1,39 +1,24 @@
 <script lang="ts" setup>
-import {
-  ref,
-  defineProps,
-  readonly,
-  computed,
-  onMounted,
-  onUnmounted,
-} from "vue";
+import { computed, onMounted, onUnmounted } from "vue";
 
 export interface MenuProps {
-  onMenuChange?: (i: number) => void;
-  index?: number;
+  index: number;
   items: string[];
   defaultShowItem?: boolean;
   enableArrow?: boolean;
 }
 
 const props = defineProps<MenuProps>();
+const emits = defineEmits(["menu-change"]);
 
 const menuItems = computed(() => props.items);
-
-const currentIndex = ref(props.index ?? 0);
-const index = computed(() => props.index ?? currentIndex.value);
+const index = computed(() => props.index);
 
 function shiftItem(deltaIndex: number) {
-  currentIndex.value = props.index ?? currentIndex.value;
-  currentIndex.value += deltaIndex;
-  currentIndex.value = Math.max(
-    0,
-    Math.min(menuItems.value.length - 1, currentIndex.value)
-  );
+  const target = index.value + deltaIndex;
+  if (target < 0 || target > menuItems.value.length - 1) return;
 
-  if (deltaIndex !== 0) {
-    props.onMenuChange?.(currentIndex.value);
-  }
+  emits("menu-change", target);
 }
 
 function buildItemClass(deltaIndex: number) {
