@@ -1,7 +1,8 @@
 <script lang="ts" setup>
-import { computed, onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 
 export interface MenuProps {
+  onMenuChange?: (i: number) => void;
   index: number;
   items: string[];
   defaultShowItem?: boolean;
@@ -9,16 +10,12 @@ export interface MenuProps {
 }
 
 const props = defineProps<MenuProps>();
-const emits = defineEmits(["menu-change"]);
-
-const menuItems = computed(() => props.items);
-const index = computed(() => props.index);
 
 function shiftItem(deltaIndex: number) {
-  const target = index.value + deltaIndex;
-  if (target < 0 || target > menuItems.value.length - 1) return;
+  const target = props.index + deltaIndex;
+  if (target < 0 || target > props.items.length - 1) return;
 
-  emits("menu-change", target);
+  props.onMenuChange?.(target);
 }
 
 function buildItemClass(deltaIndex: number) {
@@ -55,12 +52,12 @@ onUnmounted(() => {
   <div class="menu">
     <div
       class="menu-items"
-      :class="props.defaultShowItem && 'show-items'"
+      :class="defaultShowItem && 'show-items'"
       :style="`transform: translateY(${-index * 2}em)`"
       @wheel.prevent="onItemWheel"
     >
       <div
-        v-for="(item, i) in menuItems"
+        v-for="(item, i) in items"
         :key="i"
         class="menu-item"
         :class="buildItemClass(i - index)"
