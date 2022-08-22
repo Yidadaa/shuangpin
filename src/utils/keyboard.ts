@@ -127,8 +127,6 @@ export function parseRawConfig(name: string, config: RawShuangPinConfig) {
 export function loadShuangpinConfig(name: ShuangpinType): ShuangpinMode {
   const config = loadConfig(name);
 
-  console.log("load shuangpin", name, config, parseRawConfig(name, config));
-
   return parseRawConfig(name, config);
 }
 

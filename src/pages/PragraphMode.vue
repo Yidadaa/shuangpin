@@ -584,6 +584,10 @@ function shortPinyin(pinyins: string[]) {
     position: absolute;
     right: var(--app-padding);
     bottom: var(--app-padding);
+
+    @media (max-width: 576px) {
+      top: 36px;
+    }
   }
 }
 </style>
