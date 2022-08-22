@@ -47,4 +47,4 @@
 
 ## LICENSE
 - 本项目使用 [MIT License](https://en.wikipedia.org/wiki/MIT_License) 开源协议；
-- 本项目使用 [Anti 996 License](https://github.com/kattgu7/Anti-996-License/blob/master/LICENSE_CN_EN) 作为补充开源协议，**消灭 996，胜利属于人民**。
+- 本项目使用 [Anti 996 License](https://github.com/kattgu7/Anti-996-License/blob/master/LICENSE_CN_EN) 作为补充开源协议。
