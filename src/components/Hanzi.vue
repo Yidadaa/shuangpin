@@ -17,6 +17,8 @@ effect(() => {
   currentHanzi.value = props.hanziSeq.pop();
   if (settings.enablePinyinHint) {
     pinyin.value = getPinyinOf(currentHanzi.value).at(0) ?? "";
+  } else {
+    pinyin.value = ""
   }
 });
 </script>

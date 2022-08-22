@@ -13,13 +13,13 @@ import {
   ref,
   watchPostEffect,
 } from "vue";
-import { matchSpToPinyin } from "../utils/keyboard";
-import { useStore } from "../store";
-import { computed } from "vue";
-import { getPinyinOf } from "../utils/hanzi";
-import { TypingSummary } from "../utils/summary";
-import { followKeys, leadKeys } from "../utils/pinyin";
-import { randInt, randomChoice } from "../utils/number";
+import {matchSpToPinyin} from "../utils/keyboard";
+import {useStore} from "../store";
+import {computed} from "vue";
+import {getPinyinOf} from "../utils/hanzi";
+import {TypingSummary} from "../utils/summary";
+import {followKeys, leadKeys} from "../utils/pinyin";
+import {randInt, randomChoice} from "../utils/number";
 
 export interface SingleModeProps {
   nextChar?: () => string;
@@ -151,11 +151,7 @@ watchPostEffect(() => {
 <template>
   <div class="home-page">
     <div class="single-menu">
-      <menu-list
-        :items="listMenuItems"
-        :index="menuIndex"
-        @menu-change="onMenuChange"
-      />
+      <menu-list :items="listMenuItems" :index="menuIndex" @menu-change="onMenuChange" />
     </div>
 
     <div class="input-area">
@@ -171,11 +167,7 @@ watchPostEffect(() => {
     </div>
 
     <div class="summary">
-      <TypeSummary
-        :speed="summary.hanziPerMinutes"
-        :accuracy="summary.accuracy"
-        :avgpress="summary.pressPerHanzi"
-      />
+      <TypeSummary :speed="summary.hanziPerMinutes" :accuracy="summary.accuracy" :avgpress="summary.pressPerHanzi" />
     </div>
   </div>
 </template>
