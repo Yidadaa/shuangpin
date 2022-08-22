@@ -378,8 +378,9 @@ function shortPinyin(pinyins: string[]) {
 
       @media (max-width: 576px) {
         width: 100vw;
-        padding-right: var(--app-padding);
-        margin-right: 50px;
+        padding-right: calc(var(--app-padding) + 2px);
+        margin-right: 0;
+        box-sizing: border-box;
       }
 
       .pinyin {
@@ -428,6 +429,10 @@ function shortPinyin(pinyins: string[]) {
     .p-title:hover,
     .p-title.editing {
       flex-direction: column;
+
+      @media (max-width: 576px) {
+        align-items: center;
+      }
 
       .pinyin,
       .title-info,
