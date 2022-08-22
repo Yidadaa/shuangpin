@@ -1,16 +1,9 @@
 <script lang="ts" setup>
-import {
-  ref,
-  defineProps,
-  readonly,
-  computed,
-  onMounted,
-  onUnmounted,
-} from "vue";
+import { onMounted, onUnmounted } from "vue";
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void;
-  index?: number;
+  index: number;
   items: string[];
   defaultShowItem?: boolean;
   enableArrow?: boolean;
@@ -18,22 +11,11 @@ export interface MenuProps {
 
 const props = defineProps<MenuProps>();
 
-const menuItems = computed(() => props.items);
-
-const currentIndex = ref(props.index ?? 0);
-const index = computed(() => props.index ?? currentIndex.value);
-
 function shiftItem(deltaIndex: number) {
-  currentIndex.value = props.index ?? currentIndex.value;
-  currentIndex.value += deltaIndex;
-  currentIndex.value = Math.max(
-    0,
-    Math.min(menuItems.value.length - 1, currentIndex.value)
-  );
+  const target = props.index + deltaIndex;
+  if (target < 0 || target > props.items.length - 1) return;
 
-  if (deltaIndex !== 0) {
-    props.onMenuChange?.(currentIndex.value);
-  }
+  props.onMenuChange?.(target);
 }
 
 function buildItemClass(deltaIndex: number) {
@@ -70,12 +52,12 @@ onUnmounted(() => {
   <div class="menu">
     <div
       class="menu-items"
-      :class="props.defaultShowItem && 'show-items'"
+      :class="defaultShowItem && 'show-items'"
       :style="`transform: translateY(${-index * 2}em)`"
       @wheel.prevent="onItemWheel"
     >
       <div
-        v-for="(item, i) in menuItems"
+        v-for="(item, i) in items"
         :key="i"
         class="menu-item"
         :class="buildItemClass(i - index)"
