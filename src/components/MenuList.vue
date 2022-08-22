@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, onUnmounted } from "vue";
+import { ref, defineProps, computed, onMounted, onUnmounted } from "vue";
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void;
@@ -12,10 +12,12 @@ export interface MenuProps {
 const props = defineProps<MenuProps>();
 
 function shiftItem(deltaIndex: number) {
-  const target = props.index + deltaIndex;
-  if (target < 0 || target > props.items.length - 1) return;
+  const changedIndex = Math.max(
+    0,
+    Math.min(props.items.length - 1, props.index + deltaIndex)
+  );
 
-  props.onMenuChange?.(target);
+  props.onMenuChange?.(changedIndex);
 }
 
 function buildItemClass(deltaIndex: number) {

@@ -4,6 +4,7 @@ import { createPinia } from "pinia";
 import persistPlugin from "pinia-plugin-persistedstate";
 import { createRouter, createWebHashHistory } from "vue-router";
 import { routes } from "./router";
+import "./utils/polyfill";
 
 const pinia = createPinia();
 pinia.use(persistPlugin);

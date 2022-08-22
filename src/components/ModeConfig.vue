@@ -3,7 +3,14 @@ import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { ref, onActivated, onDeactivated } from "vue";
 import { useStore } from "../store";
-import { loadShuangpinConfig, mapConfigToLayout } from "../utils/keyboard";
+import {
+  loadConfig,
+  saveConfig,
+  loadShuangpinConfig,
+  mapConfigToLayout,
+  parseRawConfig,
+} from "../utils/keyboard";
+import { followMap, leadMap } from "../utils/pinyin";
 
 const store = useStore();
 const settings = storeToRefs(store).settings;
@@ -11,12 +18,23 @@ const props = defineProps<{
   isEditing?: boolean;
 }>();
 
-const keyLayout = computed(() => {
-  const config = loadShuangpinConfig(settings.value.shuangpinMode);
-  return mapConfigToLayout(config);
+const keyConfig = computed(() => {
+  return loadShuangpinConfig(settings.value.shuangpinMode);
 });
 
+const keyLayout = computed(() => {
+  return mapConfigToLayout(keyConfig.value);
+});
+
+const rawConfig = loadConfig("小鹤双拼"); // 加载默认配置
+const editingConfig = ref(rawConfig);
 const editingKey = ref("");
+
+const displayLayout = computed(() =>
+  props.isEditing
+    ? mapConfigToLayout(parseRawConfig(name.value, editingConfig.value))
+    : keyLayout.value
+);
 
 function pressKey(key: string) {
   if (!props.isEditing) return;
@@ -44,14 +62,43 @@ function resizeKeyboard() {
   const keyboardWidth = document.getElementById("keyboard")?.clientWidth ?? 920;
   scale.value = screenWidth < 576 ? (screenWidth / keyboardWidth) * 1.1 : 1;
 }
+
+const name = ref("");
+
+function onSaveConfig() {
+  if (name.value.length === 0) return;
+  saveConfig(name.value, editingConfig.value);
+  location.reload();
+}
+
+function onEditKey(key: string, leads: string[], follows: string[]) {
+  // 过滤掉非法字符
+  leads = leads.map((v) => v.trim()).filter((v) => leadMap.has(v));
+  follows = follows.map((v) => v.trim()).filter((v) => followMap.has(v));
+  editingConfig.value.keyMap = editingConfig.value.keyMap.map((v) =>
+    v.startsWith(key) ? [key, follows.join(","), leads.join(",")].join("/") : v
+  );
+}
 </script>
 
 <template>
   <div class="keyboard" :style="`transform: scale(${scale})`" id="keyboard">
     <div class="keyboard-name" v-if="props.isEditing">
-      <input type="text" class="keyboard-name-input" value="我的双拼" />
+      <input
+        type="text"
+        class="keyboard-name-input"
+        placeholder="输入自定义名称"
+        v-model="name"
+      />
+      <div
+        class="submit-btn"
+        :class="name.length > 0 && 'active-btn'"
+        @click="onSaveConfig"
+      >
+        确认
+      </div>
     </div>
-    <div v-for="(line, li) in keyLayout" :key="li" class="key-row">
+    <div v-for="(line, li) in displayLayout" :key="li" class="key-row">
       <div
         v-for="(keyItem, ki) in line"
         :key="ki"
@@ -65,11 +112,22 @@ function resizeKeyboard() {
         >
           <div class="edit-line">
             <div class="edit-label">声母</div>
-            <input class="edit-input" :value="keyItem.leads.join(', ')" />
+            <input
+              class="edit-input"
+              :value="keyItem.leads.join(',')"
+              @change="
+                e => onEditKey(keyItem.main, (e.target as HTMLInputElement).value.split(','), keyItem.follows)
+              "
+            />
           </div>
           <div class="edit-line">
             <div class="edit-label">韵母</div>
-            <input class="edit-input" :value="keyItem.follows.join(', ')" />
+            <input
+              class="edit-input"
+              :value="keyItem.follows.join(',')"
+              @change="
+                e => onEditKey(keyItem.main, keyItem.leads, (e.target as HTMLInputElement).value.split(','))"
+            />
           </div>
           <div class="edit-confirm-btn" @click.stop.prevent="closePopup">
             关闭
@@ -91,7 +149,7 @@ function resizeKeyboard() {
       </div>
 
       <div
-        v-if="li === keyLayout.length - 1"
+        v-if="li === displayLayout.length - 1"
         class="key-item backspace"
         @mousedown="pressKey('Backspace')"
         @touchstart.stop.prevent="pressKey('Backspace')"
@@ -140,16 +198,27 @@ function resizeKeyboard() {
 
   .keyboard-name {
     display: flex;
-    justify-content: center;
-    width: 100%;
+    align-items: center;
+    margin: auto;
     margin-bottom: 10px;
+    position: relative;
 
     .keyboard-name-input {
       .input();
       font-size: 18px;
-      text-align: center;
       line-height: 1.2;
       font-weight: bolder;
+    }
+
+    .submit-btn {
+      position: absolute;
+      right: 10px;
+      cursor: pointer;
+      color: var(--gray-010);
+    }
+
+    .active-btn {
+      color: var(--primary-color);
     }
   }
 }

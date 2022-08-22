@@ -70,7 +70,7 @@ interface KeyConfig {
 }
 
 interface ShuangpinMode {
-  name: ShuangpinType;
+  name: string;
   groupByKey: Map<Char, KeyConfig>; // 键盘 -> KeyConfig
   groupByFollow: Map<string, KeyConfig>; // 声母 -> KeyConfig
   groupByLead: Map<string, KeyConfig>; // 韵母 -> KeyConfig

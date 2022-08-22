@@ -438,6 +438,7 @@ function shortPinyin(pinyins: string[]) {
       .article-menu {
         display: flex;
         flex-direction: column;
+        position: relative;
 
         .menu {
           overflow: visible;
@@ -452,6 +453,9 @@ function shortPinyin(pinyins: string[]) {
           transition: all ease 0.3s;
           margin-top: 16px;
           text-align: center;
+          position: absolute;
+          bottom: -10px;
+          padding-left: 1.4em;
 
           &:hover {
             opacity: 1;

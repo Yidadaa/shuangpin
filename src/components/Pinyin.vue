@@ -21,13 +21,13 @@ const props = defineProps<{
   display: flex;
   font-weight: bold;
   font-size: 60px;
+  line-height: 1.2;
 
   .cursor {
     position: relative;
-    min-height: 70px;
-    min-width: 54px;
     text-align: center;
-    line-height: 1;
+    min-height: 1.2em;
+    min-width: 0.5em;
 
     &:first-child {
       margin-right: 5px;
