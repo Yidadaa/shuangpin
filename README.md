@@ -1,5 +1,5 @@
 <div align="center">
-<img src="./screenshots/cover.png" alt="预览" width=500/>
+<img src="./screenshots/cover.png" alt="预览"/>
 
 <h1 align="center">纸砚</h1>
 
