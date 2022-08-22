@@ -1,21 +1,18 @@
-
 <div align="center">
-<img src="./public/apple-icon-180x180.png" alt="logo" align="center" width="40"/>
-</div>
+<img src="./screenshots/cover.png" alt="预览" width=500/>
+
 <h1 align="center">纸砚</h1>
-<div align="center">
 
-可能是最好用的双拼练习工具。
-
+可能是最好用的双拼练习工具，帮助你快速掌握双拼输入法。
 
 [开始使用](https://blog.simplenaive.cn/shuangpin) / [反馈问题](https://github.com/yidadaa/shuangpin/issues)
 
-<img src="./screenshots/cover.jpg" alt="预览" width=500/>
 </div>
 
+
 ## 主要功能
-- 多种模式：随机模式、声母模式、韵母模式、长句模式
-- 支持自定义双拼模式 [WIP]
+- 多种练习模式：随机模式、声母模式、韵母模式、长句模式
+- 多种预置双拼输入模式，支持自定义双拼模式
 - 自定义输入文章
 - 一目了然的进度统计
 - 持续激励的成就系统 [WIP]
@@ -24,17 +21,21 @@
 
 <div align="center">随机模式</div>
 
-![随机模式](./screenshots/random.jpeg)
+![随机模式](./screenshots/random.png)
+
+<div align="center">韵母模式</div>
+
+![韵母模式](./screenshots/lead-mode.png)
 
 
 <div align="center">长句模式</div>
 
-![长句模式](./screenshots/p-mode.jpeg)
+![长句模式](./screenshots/p-mode.png)
 
 
 <div align="center">设置</div>
 
-![设置](./screenshots/settings.jpg)
+![设置](./screenshots/setting.png)
 
 ## 常见问题
 ### 为什么多音字展示不全？
