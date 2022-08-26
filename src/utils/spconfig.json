@@ -87,6 +87,50 @@
       "ou/ou"
     ]
   },
+  "小月双拼": {
+    "keyMap": [
+      "q/iu/q",
+      "w/ei/w",
+      "e/e/",
+      "r/uan/r",
+      "t/ing/t",
+      "y/ue,ve/y",
+      "u/u/sh",
+      "i/i/ch",
+      "o/o,uo/",
+      "p/ie/p",
+      "a/a/",
+      "s/an/s",
+      "d/ang/d",
+      "f/en/f",
+      "g/eng/g",
+      "h/ong,iong/h",
+      "j/in,ui/j",
+      "k/ai,ia/k",
+      "l/iang,uang/l",
+      "z/ou/z",
+      "x/ua/x",
+      "c/ao/c",
+      "v/uai,v/zh",
+      "b/un,vn/b",
+      "n/iao/n",
+      "m/ian/m"
+    ],
+    "zeroMap": [
+      "aa/a",
+      "ai/ai",
+      "an/an",
+      "ad/ang",
+      "ao/ao",
+      "ee/e",
+      "ei/ei",
+      "en/en",
+      "eg/eng",
+      "er/er",
+      "oo/o",
+      "ou/ou"
+    ]
+  },
   "搜狗双拼": {
     "keyMap": [
       "q/iu/q",
