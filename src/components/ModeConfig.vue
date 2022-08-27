@@ -237,6 +237,7 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
 
     .keyboard-name-input {
       color: var(--black);
+      background-color: var(--white);
       outline: none;
       font-family: inherit;
       border: 0;
