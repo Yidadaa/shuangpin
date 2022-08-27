@@ -27,13 +27,19 @@ const keyLayout = computed(() => {
 });
 
 const rawConfig = loadConfig("小鹤双拼"); // 加载默认配置
-const editingConfig = ref(rawConfig);
+const editingRawConfig = ref(rawConfig);
 const editingKey = ref("");
 
+const editingConfig = computed(() =>
+  parseRawConfig(name.value, editingRawConfig.value)
+);
+
 const displayLayout = computed(() =>
-  props.isEditing
-    ? mapConfigToLayout(parseRawConfig(name.value, editingConfig.value))
-    : keyLayout.value
+  props.isEditing ? mapConfigToLayout(editingConfig.value) : keyLayout.value
+);
+
+const zeroLayout = computed(() =>
+  props.isEditing ? editingConfig.value.zero2sp : keyConfig.value.zero2sp
 );
 
 function pressKey(key: string) {
@@ -67,7 +73,7 @@ const name = ref("");
 
 function onSaveConfig() {
   if (name.value.length === 0) return;
-  saveConfig(name.value, editingConfig.value);
+  saveConfig(name.value, editingRawConfig.value);
   location.reload();
 }
 
@@ -75,7 +81,7 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
   // 过滤掉非法字符
   leads = leads.map((v) => v.trim()).filter((v) => leadMap.has(v));
   follows = follows.map((v) => v.trim()).filter((v) => followMap.has(v));
-  editingConfig.value.keyMap = editingConfig.value.keyMap.map((v) =>
+  editingRawConfig.value.keyMap = editingRawConfig.value.keyMap.map((v) =>
     v.startsWith(key) ? [key, follows.join(","), leads.join(",")].join("/") : v
   );
 }
@@ -83,21 +89,24 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
 
 <template>
   <div class="keyboard" :style="`transform: scale(${scale})`" id="keyboard">
-    <div class="keyboard-name" v-if="props.isEditing">
-      <input
-        type="text"
-        class="keyboard-name-input"
-        placeholder="输入自定义名称"
-        v-model="name"
-      />
-      <div
-        class="submit-btn"
-        :class="name.length > 0 && 'active-btn'"
-        @click="onSaveConfig"
-      >
-        确认
+    <Transition name="scale-to-center">
+      <div class="keyboard-name" v-if="props.isEditing">
+        <input
+          type="text"
+          class="keyboard-name-input"
+          placeholder="请输入自定义名称"
+          v-model="name"
+        />
+        <div
+          class="submit-btn"
+          :class="name.length > 0 && 'active-btn'"
+          @click="onSaveConfig"
+        >
+          确认
+        </div>
       </div>
-    </div>
+    </Transition>
+
     <div v-for="(line, li) in displayLayout" :key="li" class="key-row">
       <div
         v-for="(keyItem, ki) in line"
@@ -180,6 +189,13 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
         </svg>
       </div>
     </div>
+
+    <div class="zero-config">
+      <div class="zero-item" v-for="[py, sp] in zeroLayout" :key="py">
+        <div class="zero-text">{{ py }}</div>
+        <div class="sp-text">{{ sp }}</div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -193,6 +209,21 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
   font-family: inherit;
 }
 
+.scale-to-center {
+  &-enter-active,
+  &-leave-active {
+    transition: all 0.3s ease;
+    opacity: 1;
+    max-height: 45px;
+  }
+
+  &-leave-to,
+  &-enter-from {
+    opacity: 0;
+    max-height: 0;
+  }
+}
+
 .keyboard {
   position: relative;
 
@@ -200,21 +231,37 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
     display: flex;
     align-items: center;
     margin: auto;
-    margin-bottom: 10px;
     position: relative;
+    height: 40px;
+    transform: translateY(-20px);
 
     .keyboard-name-input {
-      .input();
-      font-size: 18px;
+      color: var(--black);
+      outline: none;
+      font-family: inherit;
+      border: 0;
+      border-bottom: 2px solid var(--gray-010);
+      padding-bottom: 4px;
+      font-size: 16px;
       line-height: 1.2;
       font-weight: bolder;
+
+      &::placeholder {
+        color: var(--gray-a);
+      }
+
+      &:focus {
+        border-color: var(--primary-color);
+      }
     }
 
     .submit-btn {
       position: absolute;
-      right: 10px;
+      right: 0px;
+      bottom: 14px;
       cursor: pointer;
       color: var(--gray-010);
+      font-size: 12px;
     }
 
     .active-btn {
@@ -270,6 +317,40 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
       &:hover {
         font-weight: bold;
       }
+    }
+  }
+}
+
+.zero-config {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  @border: 2px double var(--gray-6);
+
+  .zero-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 12px;
+
+    border-top: @border;
+    border-bottom: @border;
+
+    .zero-text {
+      border-bottom: @border;
+      border-width: 1px;
+      font-weight: bolder;
+    }
+
+    .sp-text {
+      font-style: italic;
+    }
+
+    .zero-text,
+    .sp-text {
+      width: 50px;
+      padding: 3px 0;
+      text-align: center;
     }
   }
 }

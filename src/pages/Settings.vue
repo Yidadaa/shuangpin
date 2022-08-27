@@ -57,21 +57,23 @@ function onModeChange(i: number) {
 
 <template>
   <div class="settings-page">
-    <div class="settings">
-      <div
-        v-for="([name, value, toggleValue], i) in settingItems"
-        :key="i"
-        class="setting-item"
-        @click="toggleValue"
-      >
-        <div class="setting-name">
-          {{ name }}
-        </div>
-        <div class="setting-value">
-          {{ value }}
+    <Transition name="slide-from-bottom">
+      <div class="settings" v-if="!isEditing">
+        <div
+          v-for="([name, value, toggleValue], i) in settingItems"
+          :key="i"
+          class="setting-item"
+          @click="toggleValue"
+        >
+          <div class="setting-name">
+            {{ name }}
+          </div>
+          <div class="setting-value">
+            {{ value }}
+          </div>
         </div>
       </div>
-    </div>
+    </Transition>
 
     <div class="mode-setting setting-item">
       <div class="setting-name">当前模式</div>
@@ -92,6 +94,7 @@ function onModeChange(i: number) {
 
 <style lang="less" scoped>
 @import "../styles/color.less";
+@import "../styles/animation.less";
 
 .settings-page {
   display: flex;

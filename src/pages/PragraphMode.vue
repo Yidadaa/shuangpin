@@ -197,7 +197,7 @@ watchPostEffect(() => {
       pinyin.value = [];
       article.value.progress.currentIndex += 1;
       isValidPinyin.value = false;
-    }, 100);
+    }, 30);
   }
 });
 

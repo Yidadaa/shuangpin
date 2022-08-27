@@ -1,0 +1,14 @@
+.slide-from-bottom {
+  &-enter-active,
+  &-leave-active {
+    transition: all 0.3s ease;
+    margin-top: 0px;
+    opacity: 1;
+  }
+
+  &-leave-to,
+  &-enter-from {
+    margin-top: -95px;
+    opacity: 0;
+  }
+}
