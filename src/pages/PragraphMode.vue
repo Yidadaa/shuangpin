@@ -116,7 +116,7 @@ const article = computed(() => {
     text,
     currentHanzi,
     answer: [...new Set(pinyin)],
-    spHints: (store.mode.py2sp.get(pinyin.at(0) ?? "") ?? "").split(""),
+    spHints: (store.mode().py2sp.get(pinyin.at(0) ?? "") ?? "").split(""),
     progress: info.progress,
     name: info.name,
   };
@@ -152,7 +152,7 @@ const isValidPinyin = ref(false);
 function onSeq([lead, follow]: [string?, string?]) {
   for (const answer of article.value.answer) {
     const res = matchSpToPinyin(
-      store.mode,
+      store.mode(),
       lead as Char,
       follow as Char,
       answer

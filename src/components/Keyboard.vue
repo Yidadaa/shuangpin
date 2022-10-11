@@ -3,7 +3,7 @@ import { computed, watchPostEffect } from "vue";
 import { storeToRefs } from "pinia";
 import { ref, onActivated, onDeactivated } from "vue";
 import { useStore } from "../store";
-import { loadShuangpinConfig, mapConfigToLayout } from "../utils/keyboard";
+import { mapConfigToLayout } from "../utils/keyboard";
 
 const store = useStore();
 const settings = storeToRefs(store).settings;
@@ -60,7 +60,7 @@ function releaseKey(key: string, shouldSend = true) {
     return send();
   }
 
-  if (!shouldSend || !store.mode.groupByKey.has(key as Char)) {
+  if (!shouldSend || !store.mode().groupByKey.has(key as Char)) {
     return;
   }
 
@@ -80,8 +80,7 @@ function releaseKey(key: string, shouldSend = true) {
 }
 
 const keyLayout = computed(() => {
-  const config = loadShuangpinConfig(settings.value.shuangpinMode);
-  return mapConfigToLayout(config);
+  return mapConfigToLayout(store.mode());
 });
 
 function keyItemClass(key: string) {

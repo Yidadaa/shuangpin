@@ -1,10 +1,12 @@
 import { defineStore } from "pinia";
-import { loadShuangpinConfig } from "./utils/keyboard";
+import { PresetConfigs, ShuangpinConfig } from "./utils/keyboard";
 import rawArticles from "./utils/article.json";
 
 declare global {
   type RawArticleName = keyof typeof rawArticles;
 }
+
+const cache: Record<string, ShuangpinConfig> = {};
 
 export const useStore = defineStore("app", {
   state: (): AppState => {
@@ -13,6 +15,7 @@ export const useStore = defineStore("app", {
       currentFollowIndex: 0,
       currentArticleIndex: 0,
       progresses: {},
+      localConfigs: {},
 
       combines: [],
       articles: [],
@@ -26,8 +29,8 @@ export const useStore = defineStore("app", {
     };
   },
   getters: {
-    mode(state) {
-      return loadShuangpinConfig(state.settings.shuangpinMode);
+    modes(state) {
+      return Object.keys(PresetConfigs).concat(Object.keys(state.localConfigs));
     },
   },
   actions: {
@@ -57,6 +60,41 @@ export const useStore = defineStore("app", {
       const progress = this.getProgress(name);
       if (progress.correctTry === 0) return 0;
       return progress.correctTry / progress.totalTry;
+    },
+
+    mode() {
+      const name = this.$state.settings.shuangpinMode;
+      if (!cache[name]) {
+        const config = this.loadConfig(name);
+        cache[config.name] = config;
+        if (name !== config.name) {
+          this.$state.settings.shuangpinMode = name;
+        }
+      }
+      return cache[name];
+    },
+
+    // 配置文件
+    saveConfig(name: string, config: RawShuangPinConfig) {
+      if (name in this.localConfigs) {
+        name += " 副本";
+      }
+      this.localConfigs[name] = config;
+    },
+    deleteConfig(name: string) {
+      delete this.localConfigs[name];
+    },
+    getAllConfigs() {
+      this.modes.map(this.loadConfig.bind(this));
+    },
+    loadConfig(name: string) {
+      if (!!this.localConfigs[name]) {
+        return new ShuangpinConfig(name, this.localConfigs[name], true);
+      }
+      if (!PresetConfigs[name as ShuangpinType]) {
+        name = Object.keys(PresetConfigs)[0];
+      }
+      return new ShuangpinConfig(name, PresetConfigs[name as ShuangpinType]);
     },
   },
   persist: true,

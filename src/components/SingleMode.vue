@@ -101,12 +101,12 @@ const answer = computed(() => {
 });
 
 const hints = computed(() => {
-  return (store.mode.py2sp.get(answer.value) ?? "").split("");
+  return (store.mode().py2sp.get(answer.value) ?? "").split("");
 });
 
 function onSeq([lead, follow]: [string?, string?]) {
   const res = matchSpToPinyin(
-    store.mode,
+    store.mode(),
     lead as Char,
     follow as Char,
     answer.value

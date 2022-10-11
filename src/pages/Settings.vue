@@ -2,7 +2,6 @@
 import { computed, ref, ssrContextKey } from "vue";
 import { storeToRefs } from "pinia";
 import { useStore } from "../store";
-import { shuangpins as sps } from "../utils/keyboard";
 import MenuList from "../components/MenuList.vue";
 import { watchPostEffect } from "vue";
 
@@ -36,9 +35,13 @@ const settingItems = computed(
     ] as [string, string, () => void][]
 );
 
-const shuangpins = computed(() => (sps as string[]).concat("新建双拼"));
+const CREATE_NAME = "新建双拼";
+const shuangpins = computed(() => store.modes.concat(CREATE_NAME));
 const spName = ref(settings.value.shuangpinMode as string);
-const isEditing = computed(() => !(sps as string[]).includes(spName.value));
+const editName = computed(() => store.modes[store.modes.indexOf(spName.value)]);
+const isEditing = ref(false);
+const isCutom = computed(() => store.mode().custom);
+const shouldShowEdit = computed(() => spName.value !== CREATE_NAME);
 
 const currentIndex = computed(() => {
   return shuangpins.value.indexOf(spName.value);
@@ -51,7 +54,24 @@ function onModeChange(i: number) {
     settings.value.shuangpinMode = shuangpins.value[
       i
     ] as unknown as ShuangpinType;
+    isEditing.value = false;
+  } else {
+    isEditing.value = true;
   }
+}
+
+function deleteMode() {
+  if (confirm("确认删除？")) {
+    store.deleteConfig(spName.value);
+    settings.value.shuangpinMode = store.modes.at(
+      Math.max(currentIndex.value, -1)
+    ) as ShuangpinType;
+    spName.value = settings.value.shuangpinMode;
+  }
+}
+
+function downloadConfig(name: string) {
+  store.loadConfig(name).download();
 }
 </script>
 
@@ -84,10 +104,37 @@ function onModeChange(i: number) {
           :index="currentIndex"
         />
       </div>
+      <div class="mode-actions">
+        <div
+          class="mode-edit mode-action"
+          :class="shouldShowEdit && 'show'"
+          @click="isEditing = true"
+        >
+          编辑
+        </div>
+        <div
+          class="mode-download mode-action"
+          @click="deleteMode"
+          :class="shouldShowEdit && isCutom && 'show'"
+        >
+          删除
+        </div>
+        <div
+          class="mode-delete mode-action"
+          :class="shouldShowEdit && 'show'"
+          @click="downloadConfig(spName)"
+        >
+          下载
+        </div>
+      </div>
     </div>
 
     <div class="mode-config">
-      <ModeConfig :is-editing="isEditing" />
+      <ModeConfig
+        :is-editing="isEditing"
+        :editing-name="editName"
+        :key="spName"
+      />
     </div>
   </div>
 </template>
@@ -131,6 +178,40 @@ function onModeChange(i: number) {
 
     .setting-name {
       height: 2em;
+    }
+
+    .mode-actions {
+      display: flex;
+      align-items: center;
+      cursor: default;
+
+      .mode-action {
+        margin-right: 5px;
+        cursor: pointer;
+        color: var(--black);
+
+        width: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        opacity: 0;
+
+        &.show {
+          width: 35px;
+          opacity: 0.5;
+        }
+
+        &:hover {
+          opacity: 1;
+        }
+
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+
+      &.hide {
+        width: 0;
+      }
     }
   }
 

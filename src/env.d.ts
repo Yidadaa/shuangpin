@@ -69,17 +69,6 @@ interface KeyConfig {
   follows: string[];
 }
 
-interface ShuangpinMode {
-  name: string;
-  groupByKey: Map<Char, KeyConfig>; // 键盘 -> KeyConfig
-  groupByFollow: Map<string, KeyConfig>; // 声母 -> KeyConfig
-  groupByLead: Map<string, KeyConfig>; // 韵母 -> KeyConfig
-  sp2zero: Map<string, string>; // 零声母 -> 双拼
-  zero2sp: Map<string, string>; // 双拼 -> 零声母
-  sp2py: Map<string, string>; // 双拼 -> 拼音
-  py2sp: Map<string, string>; // 拼音 -> 双拼
-}
-
 interface Settings {
   enableForceDark: boolean; // 强制深色
   enableKeyHint: boolean; // 按键提示
@@ -93,6 +82,7 @@ interface AppState {
   currentFollowIndex: number;
   currentArticleIndex: number;
   progresses: Record<string, Progress>;
+  localConfigs: Record<string, RawShuangPinConfig>;
 
   combines: Combine[];
   articles: Article[];

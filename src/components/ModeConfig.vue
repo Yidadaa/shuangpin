@@ -3,44 +3,57 @@ import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { ref, onActivated, onDeactivated } from "vue";
 import { useStore } from "../store";
-import {
-  loadConfig,
-  saveConfig,
-  loadShuangpinConfig,
-  mapConfigToLayout,
-  parseRawConfig,
-} from "../utils/keyboard";
+import { mapConfigToLayout, ShuangpinConfig } from "../utils/keyboard";
 import { followMap, leadMap } from "../utils/pinyin";
 
 const store = useStore();
-const settings = storeToRefs(store).settings;
 const props = defineProps<{
   isEditing?: boolean;
+  editingName?: string;
 }>();
 
-const keyConfig = computed(() => {
-  return loadShuangpinConfig(settings.value.shuangpinMode);
-});
-
+const keyConfig = computed(() => store.mode());
 const keyLayout = computed(() => {
   return mapConfigToLayout(keyConfig.value);
 });
 
-const rawConfig = loadConfig("小鹤双拼"); // 加载默认配置
+const rawConfig = computed(() => keyConfig.value.config); // 加载默认配置
 const editingRawConfig = ref(rawConfig);
 const editingKey = ref("");
-
-const editingConfig = computed(() =>
-  parseRawConfig(name.value, editingRawConfig.value)
+const editingConfig = computed(
+  () => new ShuangpinConfig(props.editingName ?? "", editingRawConfig.value)
 );
 
 const displayLayout = computed(() =>
   props.isEditing ? mapConfigToLayout(editingConfig.value) : keyLayout.value
 );
 
+// 编辑零声母
 const zeroLayout = computed(() =>
   props.isEditing ? editingConfig.value.zero2sp : keyConfig.value.zero2sp
 );
+const editingZero = ref("");
+
+function resetEditingZero() {
+  editingZero.value = "";
+}
+
+function onClickZero(key: string) {
+  if (!props.isEditing) return;
+  editingZero.value = key;
+}
+
+function onZeroChange(key: string, value: string) {
+  editingRawConfig.value.zeroMap = editingRawConfig.value.zeroMap.map((v) =>
+    v.endsWith(key) ? [value, key].join("/") : v
+  );
+}
+
+function onZeroKeyDown(e: KeyboardEvent) {
+  if (e.key === "Enter" || e.key === "Escape") {
+    resetEditingZero();
+  }
+}
 
 function pressKey(key: string) {
   if (!props.isEditing) return;
@@ -69,12 +82,11 @@ function resizeKeyboard() {
   scale.value = screenWidth < 576 ? (screenWidth / keyboardWidth) * 1.1 : 1;
 }
 
-const name = ref("");
+const name = ref(props.editingName ?? "");
 
 function onSaveConfig() {
   if (name.value.length === 0) return;
-  saveConfig(name.value, editingRawConfig.value);
-  location.reload();
+  store.saveConfig(name.value, editingRawConfig.value);
 }
 
 function onEditKey(key: string, leads: string[], follows: string[]) {
@@ -193,7 +205,26 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
     <div class="zero-config">
       <div class="zero-item" v-for="[py, sp] in zeroLayout" :key="py">
         <div class="zero-text">{{ py }}</div>
-        <div class="sp-text">{{ sp }}</div>
+        <input
+          type="text"
+          class="sp-text"
+          v-if="py === editingZero && isEditing"
+          :value="sp"
+          maxlength="2"
+          autofocus
+          :key="py"
+          @keydown="onZeroKeyDown"
+          @input="(e) => onZeroChange(py, (e.target as HTMLInputElement).value)"
+          @blur="resetEditingZero"
+        />
+        <div
+          class="sp-text"
+          :class="isEditing && 'editing'"
+          @click="onClickZero(py)"
+          v-else
+        >
+          {{ sp }}
+        </div>
       </div>
     </div>
   </div>
@@ -345,6 +376,22 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
 
     .sp-text {
       font-style: italic;
+      background-color: var(--white);
+      color: var(--black);
+
+      &.editing {
+        cursor: pointer;
+      }
+    }
+
+    input.sp-text {
+      box-sizing: border-box;
+      border: none;
+      background: var(--primary-color);
+      color: var(--white);
+      height: 100%;
+      font-family: inherit;
+      font-size: inherit;
     }
 
     .zero-text,
