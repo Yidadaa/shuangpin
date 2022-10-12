@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "lint": "eslint --ext .ts,.vue src",
     "fix": "yarn lint --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "test": "vitest"
   },
   "dependencies": {
     "less": "^4.1.3",
@@ -21,14 +22,16 @@
     "@napi-rs/pinyin": "^1.7.0",
     "@rushstack/eslint-patch": "^1.1.4",
     "@types/node": "^18.0.0",
-    "@vitejs/plugin-vue": "^2.3.3",
-    "@vue/eslint-config-typescript": "^11.0.0",
+    "@vitejs/plugin-vue": "latest",
+    "@vue/eslint-config-typescript": "latest",
     "eslint": "^8.20.0",
     "eslint-plugin-vue": "^9.3.0",
+    "husky": "^8.0.0",
+    "jsdom": "^20.0.1",
     "ts-node": "^10.8.1",
     "typescript": "^4.5.4",
-    "vite": "^2.9.9",
-    "vue-tsc": "^0.35.0",
-    "husky": "^8.0.0"
+    "vite": "latest",
+    "vitest": "latest",
+    "vue-tsc": "latest"
   }
 }
