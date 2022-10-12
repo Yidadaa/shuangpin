@@ -180,10 +180,22 @@ function downloadConfig(name: string) {
       height: 2em;
     }
 
+    &:hover {
+      // margin-right: 0;
+
+      .mode-actions {
+        opacity: 1;
+      }
+    }
+
     .mode-actions {
       display: flex;
       align-items: center;
       cursor: default;
+
+      opacity: 0;
+      width: 120px;
+      margin-right: -120px;
 
       .mode-action {
         margin-right: 5px;

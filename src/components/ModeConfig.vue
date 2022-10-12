@@ -108,6 +108,7 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
           class="keyboard-name-input"
           placeholder="请输入自定义名称"
           v-model="name"
+          maxlength="8"
         />
         <div
           class="submit-btn"
@@ -279,7 +280,7 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
       font-weight: bolder;
 
       &::placeholder {
-        color: var(--gray-a);
+        color: var(--gray-010);
       }
 
       &:focus {

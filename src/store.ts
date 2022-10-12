@@ -76,7 +76,7 @@ export const useStore = defineStore("app", {
 
     // 配置文件
     saveConfig(name: string, config: RawShuangPinConfig) {
-      if (name in this.localConfigs) {
+      if (this.modes.includes(name)) {
         name += " 副本";
       }
       this.localConfigs[name] = config;
