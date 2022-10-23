@@ -72,7 +72,6 @@ const settingItems = Object.keys(settingOptions) as Array<SettingKeys>;
 const CREATE_NAME = "新建双拼";
 const shuangpins = computed(() => store.modes.concat(CREATE_NAME));
 const spName = ref(settings.value.shuangpinMode as string);
-const editName = computed(() => store.modes[store.modes.indexOf(spName.value)]);
 const isEditing = ref(false);
 const isCutom = computed(() => store.mode().custom);
 const shouldShowEdit = computed(() => spName.value !== CREATE_NAME);
@@ -106,6 +105,10 @@ function deleteMode() {
 
 function downloadConfig(name: string) {
   store.loadConfig(name).download();
+}
+
+function editConfig() {
+  isEditing.value = true;
 }
 </script>
 
@@ -142,7 +145,7 @@ function downloadConfig(name: string) {
         <div
           class="mode-edit mode-action"
           :class="shouldShowEdit && 'show'"
-          @click="isEditing = true"
+          @click="editConfig"
         >
           编辑
         </div>
@@ -164,11 +167,7 @@ function downloadConfig(name: string) {
     </div>
 
     <div class="mode-config">
-      <ModeConfig
-        :is-editing="isEditing"
-        :editing-name="editName"
-        :key="spName"
-      />
+      <ModeConfig :is-editing="isEditing" :editing-name="spName" />
     </div>
   </div>
 </template>

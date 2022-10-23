@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { storeToRefs } from "pinia";
-import { ref, onActivated, onDeactivated } from "vue";
+import { ref, onActivated, onDeactivated, watchEffect } from "vue";
 import { useStore } from "../store";
 import { mapConfigToLayout, ShuangpinConfig } from "../utils/keyboard";
 import { followMap, leadMap } from "../utils/pinyin";
@@ -83,6 +82,10 @@ function resizeKeyboard() {
 }
 
 const name = ref(props.editingName ?? "");
+
+watchEffect(() => {
+  name.value = props.editingName ?? "";
+});
 
 function onSaveConfig() {
   if (name.value.length === 0) return;
