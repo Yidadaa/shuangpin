@@ -70,12 +70,14 @@ interface KeyConfig {
 }
 
 interface Settings {
-  enableForceDark: boolean; // 强制深色
+  theme: Theme; // 主题
   enableKeyHint: boolean; // 按键提示
   enablePinyinHint: boolean; // 拼音提示
   enableAutoClear: boolean; // 自动清空
   shuangpinMode: ShuangpinType;
 }
+
+type Theme = "auto" | "dark" | "light";
 
 interface AppState {
   currentLeadIndex: number;

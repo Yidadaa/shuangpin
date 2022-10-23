@@ -4,7 +4,7 @@ import Bg from "./components/Background.vue";
 import { routes } from "./router";
 import { useRoute, useRouter } from "vue-router";
 import { useStore } from "./store";
-import { computed } from "vue";
+import { computed, watchPostEffect } from "vue";
 import { ref, effect } from "vue";
 import { getPinyinOf } from "./utils/hanzi";
 
@@ -52,6 +52,19 @@ const spMode = computed(() => {
 function onMenuChange(i: number) {
   router.push(routes[i]);
 }
+
+watchPostEffect(() => {
+  const theme = store.settings.theme;
+
+  document.body.classList.remove("light");
+  document.body.classList.remove("dark");
+
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+  } else if (theme === "light") {
+    document.body.classList.add("light");
+  }
+});
 </script>
 
 <template>

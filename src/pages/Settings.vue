@@ -1,39 +1,73 @@
 <script setup lang="ts">
-import { computed, ref, ssrContextKey } from "vue";
+import { computed, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useStore } from "../store";
 import MenuList from "../components/MenuList.vue";
-import { watchPostEffect } from "vue";
 
 import ModeConfig from "../components/ModeConfig.vue";
 
 const store = useStore();
 const settings = storeToRefs(store).settings;
 
-const buildSettingItem = (name: keyof Omit<Settings, "shuangpinMode">) => {
-  return [
-    settings.value[name] ? "启用" : "关闭",
-    () => (settings.value[name] = !settings.value[name]),
-  ];
+type SettingOption<T> = {
+  options: Array<{
+    option: T;
+    name: string;
+  }>;
+  name: string;
 };
 
-watchPostEffect(() => {
-  if (settings.value.enableForceDark) {
-    document.body.classList.add("dark");
-  } else {
-    document.body.classList.remove("dark");
-  }
+const buildBooleanOption = (name: string): SettingOption<boolean> => ({
+  options: [
+    {
+      option: true,
+      name: "启用",
+    },
+    {
+      option: false,
+      name: "关闭",
+    },
+  ],
+  name,
 });
 
-const settingItems = computed(
-  () =>
-    [
-      ["强制深色", ...buildSettingItem("enableForceDark")],
-      ["键位提示", ...buildSettingItem("enableKeyHint")],
-      ["拼音提示", ...buildSettingItem("enablePinyinHint")],
-      ["自动清空", ...buildSettingItem("enableAutoClear")],
-    ] as [string, string, () => void][]
-);
+type SettingKeys = keyof Omit<Settings, "shuangpinMode">;
+
+const settingOptions: {
+  [_ in SettingKeys]: SettingOption<boolean | Theme>;
+} = {
+  enableAutoClear: buildBooleanOption("自动清空"),
+  enableKeyHint: buildBooleanOption("键位提示"),
+  enablePinyinHint: buildBooleanOption("拼音提示"),
+  theme: {
+    options: [
+      { option: "auto", name: "自动" },
+      { option: "light", name: "浅色" },
+      { option: "dark", name: "深色" },
+    ],
+    name: "主题模式",
+  },
+};
+
+function nextOption(name: SettingKeys) {
+  const setting = settingOptions[name];
+  const currentValue = settings.value[name];
+  const index = setting.options.findIndex((v) => v.option === currentValue);
+  const nextOption =
+    setting.options[(index + 1) % setting.options.length].option;
+  (settings.value[name] as boolean | Theme) = nextOption;
+}
+
+function getOptionName(name: SettingKeys) {
+  const setting = settingOptions[name];
+  const index = setting.options.findIndex(
+    (v) => v.option === settings.value[name]
+  );
+  const safeIndex = Math.max(index, 0);
+  return setting.options[safeIndex].name;
+}
+
+const settingItems = Object.keys(settingOptions) as Array<SettingKeys>;
 
 const CREATE_NAME = "新建双拼";
 const shuangpins = computed(() => store.modes.concat(CREATE_NAME));
@@ -80,16 +114,16 @@ function downloadConfig(name: string) {
     <Transition name="slide-from-bottom">
       <div class="settings" v-if="!isEditing">
         <div
-          v-for="([name, value, toggleValue], i) in settingItems"
+          v-for="(settingName, i) in settingItems"
           :key="i"
           class="setting-item"
-          @click="toggleValue"
+          @click="() => nextOption(settingName)"
         >
           <div class="setting-name">
-            {{ name }}
+            {{ settingOptions[settingName].name }}
           </div>
           <div class="setting-value">
-            {{ value }}
+            {{ getOptionName(settingName) }}
           </div>
         </div>
       </div>
