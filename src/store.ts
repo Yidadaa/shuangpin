@@ -20,6 +20,7 @@ declare global {
 
     localConfigs: Record<string, RawShuangPinConfig>;
     localArticles: Record<string, string>;
+    isEditingArticle: boolean;
 
     combines: Combine[];
     settings: Settings;
@@ -57,6 +58,7 @@ export const useStore = defineStore("app", {
       localArticles: {},
 
       currentArticleIndex: 0,
+      isEditingArticle: false,
       combines: [],
       settings: {
         enableAutoClear: true,
@@ -97,6 +99,35 @@ export const useStore = defineStore("app", {
 
       return article;
     },
+    currentParagraphs(): string[] {
+      const paragraphs = this.currentArticle.text.split("\n");
+
+      return paragraphs;
+    },
+    currentParagraphIndex(): {
+      paragraphIndex: number;
+      textIndex: number;
+    } {
+      const ret = {
+        paragraphIndex: 0, // 段落索引
+        textIndex: 0, // 行内索引
+      };
+
+      let totalCount = 0;
+      const currentTextIndex = this.currentArticleProgress.currentIndex;
+
+      for (let i = 0; i < this.currentParagraphs.length; i += 1) {
+        const textCount = this.currentParagraphs[i].length + 1;
+        totalCount += textCount;
+        if (totalCount > currentTextIndex) {
+          ret.paragraphIndex = i;
+          ret.textIndex = currentTextIndex - totalCount + textCount; // 这里需要减去缺少的末尾换行符
+          break;
+        }
+      }
+
+      return ret;
+    },
     currentArticleProgress(state): Progress {
       const progress = getOrCreateProgress(
         state.progresses,
@@ -118,7 +149,6 @@ export const useStore = defineStore("app", {
     },
     updateProgress(name: string, progress: Progress) {
       this.progresses[name] = progress;
-      console.log("update", name, progress, this.progresses[name]);
     },
     updateProgressOnValid(lead: string, follow: string, isValid: boolean) {
       for (const name of [lead, follow, lead + follow]) {
@@ -189,6 +219,7 @@ export const useStore = defineStore("app", {
     },
     deleteArticle(name: string) {
       delete this.localArticles[name];
+      this.currentArticleIndex = Math.max(0, this.currentArticleIndex - 1);
     },
   },
   persist: true,

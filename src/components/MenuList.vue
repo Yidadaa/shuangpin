@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineProps, computed, onMounted, onUnmounted } from "vue";
+import { defineProps, onMounted, onUnmounted } from "vue";
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void;
@@ -64,6 +64,7 @@ onUnmounted(() => {
         class="menu-item"
         :class="buildItemClass(i - index)"
         @click="shiftItem(i - index)"
+        :title="item"
       >
         {{ item }}
       </div>
