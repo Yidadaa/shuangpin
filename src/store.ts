@@ -4,6 +4,31 @@ import PresetArticles from "./utils/article.json";
 import { map } from "./utils/common";
 import { nextValidHanziIndex } from "./utils/hanzi";
 
+const defaultAppState = {
+  currentLeadIndex: 0,
+  currentFollowIndex: 0,
+  progresses: {} as Record<string, Progress>,
+
+  // 用户自定义双拼配置
+  localConfigs: {} as Record<string, RawShuangPinConfig>,
+
+  // 用户自定义文章
+  localArticles: {} as Record<string, string>,
+
+  currentArticleIndex: 0,
+  isEditingArticle: false,
+
+  isFreeMode: true,
+
+  settings: {
+    enableAutoClear: true,
+    enableKeyHint: true,
+    enablePinyinHint: true,
+    theme: "auto",
+    shuangpinMode: "小鹤双拼",
+  },
+};
+
 declare global {
   type RawArticleName = keyof typeof PresetArticles;
   type Article = {
@@ -12,19 +37,7 @@ declare global {
     type: "CUSTOM" | "PRESET";
   };
 
-  interface AppState {
-    currentLeadIndex: number;
-    currentFollowIndex: number;
-    currentArticleIndex: number;
-    progresses: Record<string, Progress>;
-
-    localConfigs: Record<string, RawShuangPinConfig>;
-    localArticles: Record<string, string>;
-    isEditingArticle: boolean;
-
-    combines: Combine[];
-    settings: Settings;
-  }
+  type AppState = typeof defaultAppState;
 }
 
 const cache: Record<string, ShuangpinConfig> = {};
@@ -46,28 +59,7 @@ function getOrCreateProgress(
 
 export const useStore = defineStore("app", {
   state: (): AppState => {
-    return {
-      currentLeadIndex: 0,
-      currentFollowIndex: 0,
-      progresses: {},
-
-      // 用户自定义双拼配置
-      localConfigs: {},
-
-      // 用户自定义文章
-      localArticles: {},
-
-      currentArticleIndex: 0,
-      isEditingArticle: false,
-      combines: [],
-      settings: {
-        enableAutoClear: true,
-        enableKeyHint: true,
-        enablePinyinHint: true,
-        theme: "auto",
-        shuangpinMode: "小鹤双拼",
-      },
-    };
+    return defaultAppState;
   },
   getters: {
     modes(state) {

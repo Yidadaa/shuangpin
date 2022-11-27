@@ -1,17 +1,68 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
+import { ref, computed } from "vue";
 
 import { useStore } from "../store";
 
 const store = useStore();
 const paragraphs = storeToRefs(store).currentParagraphs;
 const currentParagraph = storeToRefs(store).currentParagraphIndex;
+
+const isFreeMode = storeToRefs(store).isFreeMode;
+const currentInput = ref("");
+
+const inputChars = computed(() => {
+  const expectedText = paragraphs.value[currentParagraph.value.paragraphIndex];
+  const inputText = currentInput.value;
+
+  const longerCount = Math.max(expectedText.length, inputText.length);
+
+  return new Array(longerCount).fill(0).map((_, i) => ({
+    text: expectedText[i] ?? "",
+    isCursor: i === inputText.length,
+    class:
+      i === inputText.length
+        ? "current-text"
+        : i > inputText.length
+        ? "bg-text"
+        : expectedText[i] === inputText[i]
+        ? "done-text"
+        : "error-text",
+  }));
+});
 </script>
 
 <template>
   <!-- eslint-disable vue/html-indent -->
   <div class="text-area">
-    <div class="scroll-area">
+    <div class="scroll-area free-mode" v-if="isFreeMode">
+      <p v-for="(p, i) in paragraphs" :key="i">
+        <span v-if="i < currentParagraph.paragraphIndex" class="done-text">
+          {{ p }}
+        </span>
+        <span
+          class="editing-paragraph"
+          v-else-if="i === currentParagraph.paragraphIndex"
+        >
+          <span>
+            <span
+              v-for="(char, ti) in inputChars"
+              :key="ti"
+              :class="char.class"
+              :id="char.isCursor ? 'cursor' : ''"
+            >
+              {{ char.text }}
+            </span>
+          </span>
+          <textarea
+            class="done-text editing-input"
+            v-model="currentInput"
+          ></textarea>
+        </span>
+        <span v-else class="bg-text">{{ p }}</span>
+      </p>
+    </div>
+    <div class="scroll-area" v-else>
       <p v-for="(p, i) in paragraphs" :key="i">
         <span v-if="i < currentParagraph.paragraphIndex" class="done-text">
           {{ p }}
@@ -77,6 +128,10 @@ const currentParagraph = storeToRefs(store).currentParagraphIndex;
     position: relative;
     margin: 8px 0;
 
+    &.free-mode {
+      height: 350px;
+    }
+
     @media (max-width: 576px) {
       height: 30vh;
     }
@@ -103,19 +158,32 @@ const currentParagraph = storeToRefs(store).currentParagraphIndex;
       margin: 0.5em 0;
     }
 
-    .scroll-input {
-      width: 100%;
-      height: 100%;
-      padding: 0;
-      margin: 0;
-      background: transparent;
-      position: absolute;
-      top: 0;
-      left: 0;
-      font-size: 16px;
-      border: 0;
-      line-height: 1.5;
-      opacity: 0.1;
+    .editing-paragraph {
+      display: block;
+      position: relative;
+
+      .editing-bg {
+        display: block;
+        line-height: 1.5;
+      }
+
+      .editing-input {
+        width: 100%;
+        height: 100%;
+        padding: 0;
+        margin: 0;
+        background: transparent;
+        position: absolute;
+        top: 0;
+        left: 0;
+        font-size: 16px;
+        border: 0;
+        line-height: 1.5;
+        opacity: 0.1;
+        color: var(--black);
+        outline: 0;
+        font-family: inherit;
+      }
     }
   }
 }

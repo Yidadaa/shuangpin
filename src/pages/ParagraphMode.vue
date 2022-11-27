@@ -27,6 +27,7 @@ const store = useStore();
 const settings = storeToRefs(store).settings;
 
 const summary = ref(new TypingSummary());
+const isFreeMode = storeToRefs(store).isFreeMode;
 
 function onKeyPressed() {
   summary.value.onKeyPressed();
@@ -145,13 +146,27 @@ function shortPinyin(pinyins: string[]) {
   }
   return ret.join("/");
 }
+
+const displayAreaClass = computed(() => {
+  let retClasses = [];
+
+  if (isEditing.value) {
+    retClasses.push("editing");
+  }
+
+  if (isFreeMode.value) {
+    retClasses.push("free-mode");
+  }
+
+  return retClasses.join(" ");
+});
 </script>
 
 <template>
   <div class="p-mode">
-    <div class="display-area" :class="isEditing && 'editing'">
+    <div class="display-area" :class="displayAreaClass">
       <div class="p-title" :class="isEditing && 'editing'">
-        <div class="pinyin">
+        <div class="pinyin" v-if="!isFreeMode">
           <Pinyin :chars="pinyin" />
         </div>
 
@@ -201,7 +216,7 @@ function shortPinyin(pinyins: string[]) {
     </div>
 
     <Keyboard
-      v-if="!isEditing"
+      v-if="!isEditing && !isFreeMode"
       :valid-seq="onSeq"
       :hints="currentInput.spHints"
     />
