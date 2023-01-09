@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { ref, computed } from "vue";
+import {
+  ref,
+  computed,
+  onActivated,
+  onDeactivated,
+  watchPostEffect,
+} from "vue";
 
 import { useStore } from "../store";
 
@@ -9,7 +15,52 @@ const paragraphs = storeToRefs(store).currentParagraphs;
 const currentParagraph = storeToRefs(store).currentParagraphIndex;
 
 const isFreeMode = storeToRefs(store).isFreeMode;
-const currentInput = ref("");
+const currentInput = ref(
+  paragraphs.value[currentParagraph.value.paragraphIndex].slice(
+    0,
+    currentParagraph.value.textIndex
+  )
+);
+let lastInputLength = currentInput.value.length;
+const summary = storeToRefs(store).summary;
+
+store.resetSummary();
+
+onActivated(() => {
+  let el = document.body;
+  if (isFreeMode) {
+    el = document.getElementById("free-input")!;
+  }
+
+  summary.value.addListener(el);
+});
+
+onDeactivated(() => {
+  let el = document.body;
+  if (isFreeMode) {
+    el = document.getElementById("free-input")!;
+  }
+
+  summary.value.removeListener(el);
+});
+
+watchPostEffect(() => {
+  const expectedText = paragraphs.value[currentParagraph.value.paragraphIndex];
+  const inputText = currentInput.value;
+
+  // 计算正确率
+  const currentInputLength = inputText.length;
+  let isValid = true;
+  let validCount = 0;
+  for (let i = lastInputLength; i < currentInputLength; i += 1) {
+    summary.value.onValid(inputText[i] === expectedText[i]);
+    isValid &&= inputText[i] === expectedText[i];
+    validCount += Number(isValid);
+  }
+  lastInputLength = currentInputLength;
+
+  store.updateArticleProgress(validCount);
+});
 
 const inputChars = computed(() => {
   const expectedText = paragraphs.value[currentParagraph.value.paragraphIndex];
@@ -57,6 +108,7 @@ const inputChars = computed(() => {
           <textarea
             class="done-text editing-input"
             v-model="currentInput"
+            id="free-input"
           ></textarea>
         </span>
         <span v-else class="bg-text">{{ p }}</span>

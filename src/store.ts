@@ -3,6 +3,7 @@ import { PresetConfigs, ShuangpinConfig } from "./utils/keyboard";
 import PresetArticles from "./utils/article.json";
 import { map } from "./utils/common";
 import { nextValidHanziIndex } from "./utils/hanzi";
+import { TypingSummary } from "./utils/summary";
 
 const defaultAppState = {
   currentLeadIndex: 0,
@@ -19,6 +20,9 @@ const defaultAppState = {
   isEditingArticle: false,
 
   isFreeMode: true,
+
+  // 输入统计
+  summary: new TypingSummary(),
 
   settings: {
     enableAutoClear: true,
@@ -142,6 +146,16 @@ export const useStore = defineStore("app", {
     updateProgress(name: string, progress: Progress) {
       this.progresses[name] = progress;
     },
+    updateProgressWithStep(progress: Progress, step = 1) {
+      progress.currentIndex = nextValidHanziIndex(
+        this.currentArticle.text,
+        progress.currentIndex + step
+      );
+
+      if (progress.currentIndex >= progress.total) {
+        progress.currentIndex = 0;
+      }
+    },
     updateProgressOnValid(lead: string, follow: string, isValid: boolean) {
       for (const name of [lead, follow, lead + follow]) {
         const progress = this.getProgress(name);
@@ -192,18 +206,9 @@ export const useStore = defineStore("app", {
     },
 
     // 文章
-    updateArticleProgress() {
+    updateArticleProgress(step = 1) {
       const progress = this.currentArticleProgress;
-
-      progress.currentIndex = nextValidHanziIndex(
-        this.currentArticle.text,
-        progress.currentIndex + 1
-      );
-
-      if (progress.currentIndex >= progress.total) {
-        progress.currentIndex = 0;
-      }
-
+      this.updateProgressWithStep(progress, step);
       this.updateProgress(this.currentArticleName, progress);
     },
     saveArticle(article: Article) {
@@ -212,6 +217,9 @@ export const useStore = defineStore("app", {
     deleteArticle(name: string) {
       delete this.localArticles[name];
       this.currentArticleIndex = Math.max(0, this.currentArticleIndex - 1);
+    },
+    resetSummary() {
+      this.summary = new TypingSummary();
     },
   },
   persist: true,

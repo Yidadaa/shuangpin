@@ -1,8 +1,11 @@
 export class TypingSummary {
-  constructor() {}
+  constructor() {
+    this.keyPressEventListener = this.onKeyPressed.bind(this);
+  }
 
   onKeyPressed() {
     this.pressCount += 1;
+    // TODO: 这里改成与 Progress 相关的计算方式
 
     this.accumTime();
   }
@@ -10,6 +13,16 @@ export class TypingSummary {
   onValid(result: boolean) {
     this.totalValid += 1;
     this.totalCorrect += Number(result);
+  }
+
+  addListener(el: HTMLElement) {
+    el.addEventListener("keypress", this.keyPressEventListener);
+    el.addEventListener("compositionupdate", this.keyPressEventListener);
+  }
+
+  removeListener(el: HTMLElement) {
+    el.removeEventListener("keypress", this.keyPressEventListener);
+    el.removeEventListener("compositionupdate", this.keyPressEventListener);
   }
 
   /**
@@ -45,6 +58,7 @@ export class TypingSummary {
   private totalTime = 0;
   private totalValid = 0;
   private totalCorrect = 0;
+  private keyPressEventListener = () => {};
 }
 
 export type AchievementCond =

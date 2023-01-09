@@ -11,7 +11,6 @@ import { storeToRefs } from "pinia";
 
 import { getPinyinOf } from "../utils/hanzi";
 import { matchSpToPinyin } from "../utils/keyboard";
-import { TypingSummary } from "../utils/summary";
 
 import { shortText } from "../utils/common";
 
@@ -22,24 +21,17 @@ import TypeSummary from "../components/TypeSummary.vue";
 import EditArticlePage from "./EditArticlePage.vue";
 import ParagraphTextInput from "../components/ParagraphTextInput.vue";
 
+// TODO: 将这个页面拆分成以下模块：
+// 1. 文章进度和文章选择
+// 2. 自由输入模块
+// 3. 固定输入模块
+
 const CREATE_ARTICLE = "新建文章";
 const store = useStore();
 const settings = storeToRefs(store).settings;
 
-const summary = ref(new TypingSummary());
+const summary = storeToRefs(store).summary;
 const isFreeMode = storeToRefs(store).isFreeMode;
-
-function onKeyPressed() {
-  summary.value.onKeyPressed();
-}
-
-onActivated(() => {
-  document.addEventListener("keypress", onKeyPressed);
-});
-
-onDeactivated(() => {
-  document.removeEventListener("keypress", onKeyPressed);
-});
 
 const index = ref(store.currentArticleIndex);
 const articleProgress = storeToRefs(store).currentArticleProgress;
