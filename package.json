@@ -10,7 +10,7 @@
     "fix": "yarn lint --fix",
     "prepare": "husky install",
     "test": "vitest",
-    "watch": "vitest --ui"
+    "watch": "vitest --watch"
   },
   "dependencies": {
     "less": "^4.1.3",

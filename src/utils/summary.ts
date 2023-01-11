@@ -1,17 +1,23 @@
 export type TypingProgress = {
-  currentCorrectCount: number;
-  currentInputCount: number;
+  currentCorrectCount: number; // 当前正确字符总数
+  currentInputCount: number; // 本次输入字符数
 };
 
 export class TypeSummary {
-  constructor() {}
+  constructor(private lastCorrectCount = 0) {}
 
   update(progress: TypingProgress) {
     this.totalValid += progress.currentInputCount;
-    this.totalCorrect = progress.currentCorrectCount;
+    this.totalCorrect += Math.max(
+      0,
+      progress.currentCorrectCount - this.lastCorrectCount
+    );
+    this.lastCorrectCount = progress.currentCorrectCount;
   }
 
-  reset() {}
+  reset() {
+    this.lastCorrectCount = 0;
+  }
 
   onKeyPressed() {
     this.pressCount += 1;

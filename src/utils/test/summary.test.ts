@@ -75,6 +75,20 @@ describe("输入统计", () => {
         expect(summary.accuracy).toBe(expected.accuracy);
       }
     );
+
+    test("输入一个错误字符，退格一个字符，再输入一个正确字符", () => {
+      summary = new TypeSummary(10);
+      vi.spyOn(performance, "now").mockReturnValue(1000);
+      summary.onKeyPressed();
+      summary.update({ currentCorrectCount: 10, currentInputCount: 1 });
+      vi.spyOn(performance, "now").mockReturnValue(2000);
+      summary.onKeyPressed();
+      summary.update({ currentCorrectCount: 11, currentInputCount: 1 });
+
+      expect(summary.hanziPerMinutes).toBe(60);
+      expect(summary.pressPerHanzi).toBe(2);
+      expect(summary.accuracy).toBe(0.5);
+    });
   });
 
   describe("暂停时间过长", () => {
@@ -104,6 +118,24 @@ describe("输入统计", () => {
       expect(summary.hanziPerMinutes).toBe(10);
       expect(summary.pressPerHanzi).toBe(3);
       expect(summary.accuracy).toBe(1);
+    });
+  });
+
+  describe("重置统计", () => {
+    test("重置后不影响计算", () => {
+      vi.spyOn(performance, "now").mockReturnValue(1000);
+      summary.onKeyPressed();
+      vi.spyOn(performance, "now").mockReturnValue(2000);
+      summary.onKeyPressed();
+      summary.update({ currentCorrectCount: 1, currentInputCount: 1 });
+      summary.reset();
+      vi.spyOn(performance, "now").mockReturnValue(3000);
+      summary.onKeyPressed();
+      summary.update({ currentCorrectCount: 1, currentInputCount: 2 });
+
+      expect(summary.hanziPerMinutes).toBe(60);
+      expect(summary.pressPerHanzi).toBe(1.5);
+      expect(summary.accuracy).toBe(2 / 3);
     });
   });
 });
