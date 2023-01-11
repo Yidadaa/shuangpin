@@ -2,7 +2,8 @@ import { defineStore } from "pinia";
 import { PresetConfigs, ShuangpinConfig } from "./utils/keyboard";
 import PresetArticles from "./utils/article.json";
 import { map } from "./utils/common";
-import { nextValidHanziIndex } from "./utils/hanzi";
+import { getPinyinOf, nextValidHanziIndex } from "./utils/hanzi";
+import { matchSpToPinyin } from "./utils/keyboard";
 import { TypingSummary } from "./utils/summary";
 
 const defaultAppState = {
@@ -20,6 +21,10 @@ const defaultAppState = {
   isEditingArticle: false,
 
   isFreeMode: true,
+
+  // 输入状态
+  currentPinYinInput: [] as string[],
+  isValidPinYinInput: false,
 
   // 输入统计
   summary: new TypingSummary(),
@@ -124,6 +129,15 @@ export const useStore = defineStore("app", {
 
       return ret;
     },
+    currentHanzi(): string {
+      return (
+        this.currentArticle.text[this.currentArticleProgress.currentIndex] ?? ""
+      );
+    },
+    currentPinYinHints(): string[] {
+      return [...new Set(getPinyinOf(this.currentHanzi))];
+    },
+
     currentArticleProgress(state): Progress {
       const progress = getOrCreateProgress(
         state.progresses,
@@ -169,8 +183,7 @@ export const useStore = defineStore("app", {
       if (progress.correctTry === 0) return 0;
       return progress.correctTry / progress.totalTry;
     },
-
-    mode() {
+    mode(): ShuangpinConfig {
       const name = this.$state.settings.shuangpinMode;
       if (!cache[name]) {
         const config = this.loadConfig(name);
@@ -180,6 +193,10 @@ export const useStore = defineStore("app", {
         }
       }
       return cache[name];
+    },
+    getShuangPinHints(): string[] {
+      const pinyin = this.currentPinYinHints[0] ?? "";
+      return (this.mode().py2sp.get(pinyin) ?? "").split("");
     },
 
     // 配置文件
@@ -220,6 +237,31 @@ export const useStore = defineStore("app", {
     },
     resetSummary() {
       this.summary = new TypingSummary();
+    },
+
+    // 输入
+    onInputSequence([lead, follow]: [string?, string?]) {
+      const mode = this.mode();
+
+      for (const answer of this.currentPinYinHints) {
+        const res = matchSpToPinyin(mode, lead as Char, follow as Char, answer);
+        this.currentPinYinInput = [res.lead, res.follow].filter((v) => !!v);
+
+        if (!!lead && !!follow) {
+          this.updateProgressOnValid(res.lead, res.follow, res.valid);
+        }
+
+        this.isValidPinYinInput ||= res.valid;
+
+        if (this.isValidPinYinInput) break;
+      }
+
+      const isFullInput = !!lead && !!follow;
+      if (isFullInput) {
+        this.summary.onValid(this.isValidPinYinInput);
+      }
+
+      return this.isValidPinYinInput;
     },
   },
   persist: true,

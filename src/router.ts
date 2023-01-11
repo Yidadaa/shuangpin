@@ -13,6 +13,11 @@ export const routes: RouteRecordRaw[] = [
     component: RandomMode,
   },
   {
+    path: "/p-mode",
+    name: "长句模式",
+    component: ParagraphMode,
+  },
+  {
     path: "/lead-mode",
     name: "声母模式",
     component: LeadMode,
@@ -22,11 +27,7 @@ export const routes: RouteRecordRaw[] = [
     name: "韵母模式",
     component: FollowMode,
   },
-  {
-    path: "/p-mode",
-    name: "长句模式",
-    component: ParagraphMode,
-  },
+
   {
     path: "/settings",
     name: "设置",

@@ -58,3 +58,20 @@ export const pinyinSummary = {
 export function getCombineOf(p: Pinyin) {
   return p.lead + p.follow;
 }
+
+/**
+ * 生成拼音的提示文字
+ * @param pinyins 提示拼音列表
+ * @returns
+ */
+export function shortPinyin(pinyins: string[]) {
+  const ret = [];
+  let count = 0;
+  for (const py of pinyins) {
+    if (count + py.length <= 10) {
+      count += py.length;
+      ret.push(py.toUpperCase());
+    }
+  }
+  return ret.join("/");
+}

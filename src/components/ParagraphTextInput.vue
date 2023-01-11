@@ -32,7 +32,7 @@ onActivated(() => {
     el = document.getElementById("free-input")!;
   }
 
-  summary.value.addListener(el);
+  el && summary.value.addListener(el);
 });
 
 onDeactivated(() => {
@@ -41,7 +41,7 @@ onDeactivated(() => {
     el = document.getElementById("free-input")!;
   }
 
-  summary.value.removeListener(el);
+  el && summary.value.removeListener(el);
 });
 
 watchPostEffect(() => {
