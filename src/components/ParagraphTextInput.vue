@@ -6,6 +6,7 @@ import {
   onActivated,
   onDeactivated,
   watchPostEffect,
+  watch,
 } from "vue";
 
 import { useStore } from "../store";
@@ -26,40 +27,87 @@ const summary = storeToRefs(store).summary;
 
 store.resetSummary();
 
-onActivated(() => {
-  let el = document.body;
-  if (isFreeMode) {
-    el = document.getElementById("free-input")!;
+function scrollToFocus() {
+  const cursor = document.getElementById("cursor");
+  if (cursor) {
+    cursor.scrollIntoView({
+      inline: "nearest",
+      block: "center",
+      behavior: "smooth",
+    });
   }
 
-  el && summary.value.addListener(el);
+  // 聚焦到输入框
+  if (isFreeMode.value) {
+    const el = document.getElementById("free-input")!;
+    el.focus();
+  }
+}
+
+onActivated(() => {
+  scrollToFocus();
+
+  isFreeMode.value = true;
+
+  summary.value.addListener(document.body);
 });
 
 onDeactivated(() => {
-  let el = document.body;
-  if (isFreeMode) {
-    el = document.getElementById("free-input")!;
-  }
+  scrollToFocus();
 
-  el && summary.value.removeListener(el);
+  summary.value.removeListener(document.body);
+});
+
+watch(currentParagraph, (oldParagraph, newParagraph) => {
+  // 换行时，清空当前输入
+  if (newParagraph.paragraphIndex != oldParagraph.paragraphIndex) {
+    currentInput.value = "";
+  }
 });
 
 watchPostEffect(() => {
+  scrollToFocus();
+
   const expectedText = paragraphs.value[currentParagraph.value.paragraphIndex];
   const inputText = currentInput.value;
 
   // 计算正确率
   const currentInputLength = inputText.length;
-  let isValid = true;
+
+  // 计算正确字符个数
   let validCount = 0;
-  for (let i = lastInputLength; i < currentInputLength; i += 1) {
+  for (
+    let i = lastInputLength, isValid = true;
+    i < currentInputLength && isValid;
+    i += 1
+  ) {
     summary.value.onValid(inputText[i] === expectedText[i]);
     isValid &&= inputText[i] === expectedText[i];
     validCount += Number(isValid);
   }
-  lastInputLength = currentInputLength;
 
-  store.updateArticleProgress(validCount);
+  // 计算删除字符个数
+  let deleteCount = 0;
+  for (
+    let i = currentInputLength, isValid = true;
+    i < lastInputLength;
+    i += 1
+  ) {
+    isValid &&= inputText[i] === expectedText[i];
+    deleteCount += Number(isValid);
+  }
+
+  // 判断是否为换行，如果删除字符等于整段字符，则表示需要换行
+  const currentParagraphCount =
+    paragraphs.value.at(currentParagraph.value.paragraphIndex)?.length ?? 0;
+  if (deleteCount >= currentParagraphCount) {
+    deleteCount = 0;
+  }
+
+  store.updateArticleProgress(deleteCount > 0 ? -deleteCount : validCount);
+
+  // 记录上次输入字符数
+  lastInputLength = currentInputLength;
 });
 
 const inputChars = computed(() => {
@@ -109,6 +157,7 @@ const inputChars = computed(() => {
             class="done-text editing-input"
             v-model="currentInput"
             id="free-input"
+            key="free-input"
           ></textarea>
         </span>
         <span v-else class="bg-text">{{ p }}</span>

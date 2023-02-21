@@ -16,11 +16,6 @@ import ArticleInfo from "../components/ArticleInfo.vue";
 import EditArticlePage from "./EditArticlePage.vue";
 import ParagraphTextInput from "../components/ParagraphTextInput.vue";
 
-// TODO: 将这个页面拆分成以下模块：
-// 1. 文章进度和文章选择 [v]
-// 2. 自由输入模块
-// 3. 固定输入模块
-
 const store = useStore();
 
 const isEditing = storeToRefs(store).isEditingArticle;
@@ -34,23 +29,7 @@ function onArticleSave(newIndex: number) {
   // TODO
 }
 
-function scrollToFocus() {
-  isFreeMode.value = false;
-  const cursor = document.getElementById("cursor");
-  if (cursor) {
-    cursor.scrollIntoView({
-      inline: "nearest",
-      block: "center",
-      behavior: "smooth",
-    });
-  }
-}
-
-onActivated(() => scrollToFocus());
-
 watchPostEffect(() => {
-  scrollToFocus();
-
   if (isValidPinYinInput.value) {
     setTimeout(() => {
       currentPinYinInput.value = [];
@@ -80,7 +59,7 @@ const displayAreaClass = computed(() => {
     <div class="display-area" :class="displayAreaClass">
       <ArticleInfo
         :pinyin-input="currentPinYinInput"
-        show-pinyin
+        :show-pinyin="!isFreeMode"
         :pinyin-answers="pinYinHints"
       />
 
