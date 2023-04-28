@@ -9,17 +9,18 @@ const props = defineProps<{
 }>();
 
 const pinyin = ref("");
+const showPinyin = ref(false);
 const currentHanzi = ref();
 const settings = useStore().settings;
+
+function togglePinyin(show: boolean) {
+  showPinyin.value = show;
+}
 
 effect(() => {
   // eslint-disable-next-line vue/no-mutating-props
   currentHanzi.value = props.hanziSeq.pop();
-  if (settings.enablePinyinHint) {
-    pinyin.value = getPinyinOf(currentHanzi.value).at(0) ?? "";
-  } else {
-    pinyin.value = ""
-  }
+  pinyin.value = getPinyinOf(currentHanzi.value).at(0) ?? "";
 });
 </script>
 
@@ -35,10 +36,14 @@ effect(() => {
     >
       {{ item }}
     </div>
-    <div class="current-outset">
+    <div
+      class="current-outset"
+      @mouseover="togglePinyin(true)"
+      @mouseleave="togglePinyin(false)"
+    >
       <div class="current-item">
         <img class="mi-bg" src="../assets/mi-bg.svg" />
-        <div class="pinyin">
+        <div v-show="settings.enablePinyinHint || showPinyin" class="pinyin">
           {{ pinyin }}
         </div>
         <div :key="currentHanzi" class="hanzi">
