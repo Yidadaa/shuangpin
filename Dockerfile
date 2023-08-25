@@ -14,6 +14,7 @@ RUN yarn build
 
 FROM nginx:alpine
 ENV CODEDIR=/opt/code/
+RUN mkdir /app/
 
-COPY --from=builder "${CODEDIR}/dist/" /usr/share/nginx/html/
+COPY --from=builder "${CODEDIR}/dist/" /app
 
