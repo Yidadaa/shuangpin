@@ -1,5 +1,5 @@
 FROM node:latest as builder
-ENV CODEDIR=/opt/code/ NODE_ENV=production
+ENV CODEDIR=/opt/code/
 
 RUN mkdir -p "${CODEDIR}"
 WORKDIR "${CODEDIR}"
