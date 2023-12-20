@@ -355,5 +355,50 @@
       "oo/o",
       "oz/ou"
     ]
+  },
+  "中文之星": { // 最早的双拼方案之一。声母部分和后来的拼音加加一样，韵母部分和紫光类似，都是用o开始。
+    "keyMap": [
+      "q/er,ing/q",
+      "w/ei/w",
+      "e/e/",
+      "r/en/r",
+      "t/eng/t",
+      "y/ong,iong/y",
+      "u/u/ch",
+      "i/i/sh",
+      "o/uo,o/",
+      "p/ou/p",
+      "a/a/",
+      "s/ai/s",
+      "d/ao/d",
+      "f/an/f",
+      "g/ang/g",
+      "h/iang,uang/h",
+      "j/ian/j",
+      "k/iao/k",
+      "l/in/l",
+      ";//",
+      "z/un/z",
+      "x/uai,ue/x",
+      "c/uan/c",
+      "v/ui,v/zh",
+      "b/ia,ua/b",
+      "n/iu/n",
+      "m/ie/m"
+    ],
+    "zeroMap": [
+      "oa/a",
+      "os/ai",
+      "of/an",
+      "og/ang",
+      "od/ao",
+      "oe/e",
+      "ow/ei",
+      "or/en",
+      "ot/eng",
+      "oq/er",
+      "oo/o",
+      "op/ou"
+    ]
   }
 }
