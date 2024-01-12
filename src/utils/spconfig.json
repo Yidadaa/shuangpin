@@ -400,5 +400,50 @@
       "oo/o",
       "op/ou"
     ]
+  },
+  "蓝天双拼": {
+    "keyMap": [
+      "q/ua/q",
+      "w/ei/w",
+      "e/e/",
+      "r/ou/r",
+      "t/iu/t",
+      "y/ue,ve/y",
+      "u/u/sh",
+      "i/i/ch",
+      "o/uo,o/",
+      "p/ie/p",
+      "a/a/",
+      "s/iong,ong/s",
+      "d/ai/d",
+      "f/ing,uai/f",
+      "g/ang/g",
+      "h/uan/h",
+      "j/an/j",
+      "k/en,ia/k",
+      "l/iang,uang/l",
+      ";//",
+      "z/eng/z",
+      "x/in/x",
+      "c/ao/c",
+      "v/ui,v/zh",
+      "b/un/b",
+      "n/iao/n",
+      "m/ian/m"
+    ],
+    "zeroMap": [
+      "aa/a",
+      "ai/ai",
+      "an/an",
+      "ag/ang",
+      "ao/ao",
+      "ee/e",
+      "ei/ei",
+      "en/en",
+      "ez/eng",
+      "er/er",
+      "oo/o",
+      "ou/ou"
+    ]
   }
 }
