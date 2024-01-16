@@ -445,5 +445,68 @@
       "oo/o",
       "ou/ou"
     ]
+  },
+  "大牛双拼": {
+    "keyMap": [
+      "q/ua,ian/q",
+      "w/vn,ei/w",
+      "e/e/",
+      "r/ou/r",
+      "t/iu/t",
+      "y/un/y",
+      "u/u,er/sh",
+      "i/i/ch",
+      "o/o,uo/zh",
+      "p/ie/p",
+      "a/a/zh",
+      "s/ao/s",
+      "d/an/d",
+      "f/ang/f",
+      "g/uai,ing/g",
+      "h/ai,ue/h",
+      "j/eng,van/j",
+      "k/en,ia/k",
+      "l/ong,iong/l",
+      ";//",
+      "z/uan/z",
+      "x/ve,uang/x",
+      "c/ian/c",
+      "v/ui,v/sh",
+      "b/in/b",
+      "n/ui,iang/n",
+      "m/iao/m"
+    ],
+    "zeroMap": [
+      "ea/a",
+      "eh/ai",
+      "ed/an",
+      "ef/ang",
+      "es/ao",
+      "ee/e",
+      "ew/ei",
+      "ek/en",
+      "ej/eng",
+      "eu/er",
+      "eo/o",
+      "er/ou"
+    ],
+    "additionalMap": [
+      "jw/jun",
+      "qw/qun",
+      "xw/xun",
+      "yw/yun",
+      "jj/juan",
+      "qj/quan",
+      "xj/xuan",
+      "yj/yuan",
+      "jx/jue",
+      "qx/que",
+      "xx/xue",
+      "yx/yue",
+      "jv/ju",
+      "qv/qu",
+      "xv/xu",
+      "yv/yu"
+    ]
   }
 }
