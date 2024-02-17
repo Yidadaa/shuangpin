@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watchPostEffect } from "vue";
+import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { ref, onActivated, onDeactivated } from "vue";
 import { useStore } from "../store";
