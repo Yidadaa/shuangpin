@@ -12,7 +12,7 @@ import { computed } from "vue";
 import { getPinyinOf } from "../utils/hanzi";
 import { TypingSummary } from "../utils/summary";
 import { followKeys, leadKeys } from "../utils/pinyin";
-import { randInt, randomChoice } from "../utils/number";
+import { randInt } from "../utils/number";
 
 export interface SingleModeProps {
   nextChar?: () => string;
@@ -21,7 +21,7 @@ export interface SingleModeProps {
   mode?: "Lead" | "Follow";
 }
 
-function nextChar() {
+function getNextChar() {
   if (!props.mode) {
     return props.nextChar?.() ?? "";
   }
@@ -32,7 +32,7 @@ const pinyin = ref<string[]>([]);
 
 const store = useStore();
 const props = defineProps<SingleModeProps>();
-const hanziSeq = ref(new Array(4).fill(0).map(() => nextChar()));
+const hanziSeq = ref(new Array(4).fill(0).map(() => getNextChar()));
 const isValid = ref(false);
 
 const summary = ref(new TypingSummary());
@@ -78,7 +78,7 @@ function onMenuChange(i: number) {
 
 watchPostEffect(() => {
   for (let i = 0; i < 4; ++i) {
-    hanziSeq.value.unshift(nextChar());
+    hanziSeq.value.unshift(getNextChar());
     hanziSeq.value.pop();
   }
 });
@@ -132,7 +132,7 @@ function onSeq([lead, follow]: [string?, string?]) {
 watchPostEffect(() => {
   if (isValid.value) {
     setTimeout(() => {
-      hanziSeq.value.unshift(nextChar());
+      hanziSeq.value.unshift(getNextChar());
       hanziSeq.value.pop();
       pinyin.value = [];
       isValid.value = false;

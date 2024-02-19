@@ -8,7 +8,6 @@ import {
   watchPostEffect,
   onActivated,
   onDeactivated,
-  onMounted,
   watchEffect,
 } from "vue";
 import { useStore } from "../store";
