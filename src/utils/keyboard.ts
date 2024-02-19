@@ -53,6 +53,9 @@ export class ShuangpinConfig {
   ) {
     for (const line of config["keyMap"]) {
       const [main, follow, lead] = line.split("/");
+      if (!follow && !lead) {
+        continue;
+      }
       const keyConfig: KeyConfig = {
         main: (main as Char) ?? "",
         follows: follow?.split(",") ?? [],
@@ -100,6 +103,9 @@ export class ShuangpinConfig {
       const pinyins = product(leads, follows);
       for (const [l, f] of pinyins) {
         const pinyin = l + f;
+        if (!(l && f)) {
+          continue;
+        }
         if (pinyin == this.spNot2py.get(sp)) {
           continue;
         }
