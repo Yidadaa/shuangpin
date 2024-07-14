@@ -128,6 +128,7 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
         v-for="(keyItem, ki) in line"
         :key="ki"
         class="key-item"
+        :class="keyItem.main.trim() === '' ? 'empty' : ''"
         @click="pressKey(keyItem.main)"
         @touchstart.stop.prevent="pressKey(keyItem.main)"
       >
@@ -312,6 +313,10 @@ function onEditKey(key: string, leads: string[], follows: string[]) {
 
   &:active {
     background-color: var(--gray-010);
+  }
+
+  &.empty {
+    opacity: 0;
   }
 
   .edit-popup {
