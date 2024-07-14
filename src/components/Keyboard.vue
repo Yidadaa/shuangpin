@@ -86,6 +86,10 @@ const keyLayout = computed(() => {
 function keyItemClass(key: string) {
   let classNames = [];
 
+  if (!key.trim()) {
+    classNames.push("empty");
+  }
+
   if (pressingKeys.value.has(key)) {
     classNames.push("pressing");
   }
