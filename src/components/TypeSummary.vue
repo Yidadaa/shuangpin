@@ -1,23 +1,24 @@
 <script setup lang="ts">
-export interface TypeSummaryProps {
-  accuracy: number,
-  speed: number,
-  avgpress: number
+export interface TypeSummary {
+  accuracy: number;
+  speed: number;
+  avgpress: number;
+  extraInfos?: string[];
+  hideAvgPress?: boolean;
 }
 
-const props = defineProps<TypeSummaryProps>()
+defineProps<TypeSummary>();
 </script>
 
 <template>
   <div class="type-summary">
-    <div class="accuaracy">
-      {{ (props.accuracy * 100).toFixed(2) }} %
+    <div v-for="(info, i) in extraInfos" :key="i">
+      {{ info }}
     </div>
-    <div class="speed">
-      {{ props.speed.toFixed(2) }} 字每分
-    </div>
-    <div class="avgpress">
-      {{ props.avgpress.toFixed(2) }} 次每字
+    <div class="accuaracy">{{ (accuracy * 100).toFixed(2) }} %</div>
+    <div class="speed">{{ speed.toFixed(2) }} 字每分</div>
+    <div v-if="hideAvgPress" class="avgpress">
+      {{ avgpress.toFixed(2) }} 次每字
     </div>
   </div>
 </template>
