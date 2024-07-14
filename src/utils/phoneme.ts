@@ -1,3 +1,5 @@
+import type { CharModeType } from "./keyPosition";
+
 export type PhonemeInputStatus =
     | "activate"
     | "activate-correct"
@@ -12,3 +14,7 @@ export type Phoneme = {
     char: string;
     status: PhonemeInputStatus;
 };
+
+export interface KeyPracticeProps {
+    mode?: CharModeType;
+}
