@@ -11,6 +11,7 @@ const settings = storeToRefs(store).settings;
 const props = defineProps<{
   hints?: string[];
   validSeq?: (_: [string?, string?]) => boolean;
+  keyBoardLayout?: string[];
 }>();
 
 const pressingKeys = ref(new Set<string>());
@@ -80,7 +81,7 @@ function releaseKey(key: string, shouldSend = true) {
 }
 
 const keyLayout = computed(() => {
-  return mapConfigToLayout(store.mode());
+  return mapConfigToLayout(store.mode(), props.keyBoardLayout);
 });
 
 function keyItemClass(key: string) {

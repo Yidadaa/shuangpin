@@ -118,8 +118,8 @@ export function mergeString([a, b]: string[] = []) {
   return `(${prefix})${suffix}`;
 }
 
-export function mapConfigToLayout(config: ShuangpinMode) {
-  return keyboardLayout.map((v) =>
+export function mapConfigToLayout(config: ShuangpinMode, layout = keyboardLayout) {
+  return layout.map((v) =>
     v.split("").map((key) => {
       const keyConfig = config.groupByKey.get(key as Char) ?? {
         main: key,
