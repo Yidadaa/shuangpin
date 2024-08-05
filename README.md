@@ -5,7 +5,7 @@
 
 可能是最好用的双拼练习工具，帮助你快速掌握双拼输入法。
 
-[开始使用](https://blog.simplenaive.cn/shuangpin) / [反馈问题](https://github.com/yidadaa/shuangpin/issues)
+[开始使用](https://shuangpin.simplenaive.cn) / [反馈问题](https://github.com/yidadaa/shuangpin/issues)
 
 </div>
 
