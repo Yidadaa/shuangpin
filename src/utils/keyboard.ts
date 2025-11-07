@@ -14,11 +14,22 @@ declare global {
    *   ],
    *   zeroMap: [ // 零声母映射
    *     '${双拼按键}/${对应拼音}'
+   *   ],
+   *   additionalMap: [ // 附加映射
+   *     '${双拼按键}/${对应拼音}'
+   *   ],
+   *   excludingMap: [ // 不匹配映射
+   *     '${双拼按键}/${对应拼音}'
    *   ]
    * }
    * ```
    */
-  type RawShuangPinConfig = typeof configs["小鹤双拼"];
+  type RawShuangPinConfig = {
+    keyMap: string[],
+    zeroMap: string[],
+    additionalMap?: string[],
+    excludingMap?: string[],
+  };
   type ShuangpinMode = ShuangpinConfig;
 }
 
@@ -33,6 +44,7 @@ export class ShuangpinConfig {
   zero2sp = new Map<string, string>(); // 双拼 -> 零声母
   sp2py = new Map<string, string>(); // 双拼 -> 拼音
   py2sp = new Map<string, string>(); // 拼音 -> 双拼
+  spNot2py = new Map<string, string>(); // 不匹配映射：双拼 -> 拼音
 
   constructor(
     public name: string,
@@ -41,6 +53,9 @@ export class ShuangpinConfig {
   ) {
     for (const line of config["keyMap"]) {
       const [main, follow, lead] = line.split("/");
+      if (!follow && !lead) {
+        continue;
+      }
       const keyConfig: KeyConfig = {
         main: (main as Char) ?? "",
         follows: follow?.split(",") ?? [],
@@ -60,6 +75,22 @@ export class ShuangpinConfig {
       this.py2sp.set(zero, sp);
       this.sp2py.set(sp, zero);
     }
+    const additionalMap = config["additionalMap"];
+    if (additionalMap) {
+      for (const line of additionalMap) {
+        const [sp, pinyin] = line.split("/");
+        this.py2sp.set(pinyin, sp);
+        this.sp2py.set(sp, pinyin);
+      }
+    }
+
+    const excludingMap = config["excludingMap"];
+    if (excludingMap) {
+      for (const line of excludingMap) {
+        const [sp, pinyin] = line.split("/");
+        this.spNot2py.set(sp, pinyin);
+      }
+    }
 
     const allCombs = product(
       [...this.groupByKey.keys()],
@@ -72,8 +103,14 @@ export class ShuangpinConfig {
       const pinyins = product(leads, follows);
       for (const [l, f] of pinyins) {
         const pinyin = l + f;
+        if (!(l && f)) {
+          continue;
+        }
+        if (pinyin == this.spNot2py.get(sp)) {
+          continue;
+        }
         if (validCombines.has(pinyin)) {
-          this.py2sp.set(pinyin, sp);
+          this.py2sp.set(pinyin, sp.concat(this.py2sp.get(pinyin) ?? ""));
           this.sp2py.set(sp, pinyin);
         }
       }

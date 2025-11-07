@@ -2,7 +2,7 @@
 import SingleMode from '../components/SingleMode.vue';
 import { followMap, followKeys } from '../utils/pinyin'
 import { useStore } from '../store'
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 import { hanziMap } from '../utils/hanzi';
 import { storeToRefs } from 'pinia';
 

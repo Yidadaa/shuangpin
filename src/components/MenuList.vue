@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineProps, computed, onMounted, onUnmounted } from "vue";
+import { defineProps, onMounted, onUnmounted } from "vue";
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void;

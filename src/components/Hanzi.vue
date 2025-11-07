@@ -2,7 +2,6 @@
 import { effect, ref } from "vue";
 import { useStore } from "../store";
 import { getPinyinOf } from "../utils/hanzi";
-import { randomChoice } from "../utils/number";
 
 const props = defineProps<{
   hanziSeq: string[];
