@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineProps, computed, onMounted, onUnmounted } from "vue";
+import { defineProps, onMounted, onUnmounted } from "vue";
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void;
@@ -7,6 +7,7 @@ export interface MenuProps {
   items: string[];
   defaultShowItem?: boolean;
   enableArrow?: boolean;
+  menuChangeKeys?: readonly [up: string, down: string];
 }
 
 const props = defineProps<MenuProps>();
@@ -34,9 +35,11 @@ function onItemWheel(e: WheelEvent) {
 
 function arrawChangeMenu(e: KeyboardEvent) {
   if (!props.enableArrow) return;
-  if (e.key === "ArrowUp") {
+
+  const [up, down] = props.menuChangeKeys ?? ["ArrowUp", "ArrowDown"];
+  if (e.key === up) {
     shiftItem(-1);
-  } else if (e.key === "ArrowDown") {
+  } else if (e.key === down) {
     shiftItem(1);
   }
 }

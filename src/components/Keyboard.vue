@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watchPostEffect } from "vue";
+import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { ref, onActivated, onDeactivated } from "vue";
 import { useStore } from "../store";
@@ -11,6 +11,8 @@ const settings = storeToRefs(store).settings;
 const props = defineProps<{
   hints?: string[];
   validSeq?: (_: [string?, string?]) => boolean;
+  keyBoardLayout?: string[];
+  mode?: "singleKey" | "doubleKey";
 }>();
 
 const pressingKeys = ref(new Set<string>());
@@ -52,8 +54,18 @@ function send() {
   }
 }
 
+function sendSingleKey(key: string) {
+  props.validSeq?.([key]);
+  keySeq.value = [];
+}
+
 function releaseKey(key: string, shouldSend = true) {
   pressingKeys.value.delete(key);
+
+  if (props.mode === "singleKey") {
+    if (shouldSend) sendSingleKey(key);
+    return;
+  }
 
   if (key === "Backspace") {
     keySeq.value.pop();
@@ -80,11 +92,15 @@ function releaseKey(key: string, shouldSend = true) {
 }
 
 const keyLayout = computed(() => {
-  return mapConfigToLayout(store.mode());
+  return mapConfigToLayout(store.mode(), props.keyBoardLayout);
 });
 
 function keyItemClass(key: string) {
   let classNames = [];
+
+  if (!key.trim()) {
+    classNames.push("empty");
+  }
 
   if (pressingKeys.value.has(key)) {
     classNames.push("pressing");
