@@ -1,9 +1,85 @@
-export class TypingSummary {
-  constructor() {}
+export type TypingProgress = {
+  currentCorrectCount: number; // 当前正确字符总数
+  currentInputCount: number; // 本次输入字符数
+};
+
+export class TypeSummary {
+  constructor(private lastCorrectCount = 0) {}
+
+  update(progress: TypingProgress) {
+    this.totalValid += progress.currentInputCount;
+    this.totalCorrect += Math.max(
+      0,
+      progress.currentCorrectCount - this.lastCorrectCount
+    );
+    this.lastCorrectCount = progress.currentCorrectCount;
+  }
+
+  reset() {
+    this.lastCorrectCount = 0;
+  }
 
   onKeyPressed() {
     this.pressCount += 1;
+    this.accumTime();
+  }
 
+  addListener(el: HTMLElement) {
+    el.addEventListener("keypress", this.keyPressEventListener);
+    el.addEventListener("compositionupdate", this.keyPressEventListener);
+  }
+
+  removeListener(el: HTMLElement) {
+    el.removeEventListener("keypress", this.keyPressEventListener);
+    el.removeEventListener("compositionupdate", this.keyPressEventListener);
+  }
+
+  /**
+   * 累计时间，如果间隔大于 5s，则暂停计时
+   */
+  private accumTime() {
+    const time = performance.now();
+    const diff = time - this.lastTime;
+
+    // 跳过首次闲置时间，最高只记录 5s
+    if (this.lastTime > 0) {
+      this.totalTime += Math.min(5000, diff);
+    }
+    this.lastTime = time;
+  }
+
+  get hanziPerMinutes() {
+    if (this.totalTime === 0) return 0;
+    return (this.totalCorrect / this.totalTime) * 1000 * 60;
+  }
+
+  get pressPerHanzi() {
+    if (this.totalCorrect === 0) return 0;
+    return this.pressCount / this.totalCorrect;
+  }
+
+  get accuracy() {
+    if (this.totalValid === 0) return 1;
+    return this.totalCorrect / this.totalValid;
+  }
+
+  private lastTime = 0;
+  private totalTime = 0;
+  private pressCount = 0;
+
+  private totalValid = 0;
+  private totalCorrect = 0;
+
+  private keyPressEventListener = this.onKeyPressed.bind(this);
+}
+
+export class TypingSummary {
+  constructor() {
+    this.keyPressEventListener = this.onKeyPressed.bind(this);
+  }
+
+  onKeyPressed() {
+    this.pressCount += 1;
     this.accumTime();
   }
 
@@ -12,8 +88,18 @@ export class TypingSummary {
     this.totalCorrect += Number(result);
   }
 
+  addListener(el: HTMLElement) {
+    el.addEventListener("keypress", this.keyPressEventListener);
+    el.addEventListener("compositionupdate", this.keyPressEventListener);
+  }
+
+  removeListener(el: HTMLElement) {
+    el.removeEventListener("keypress", this.keyPressEventListener);
+    el.removeEventListener("compositionupdate", this.keyPressEventListener);
+  }
+
   /**
-   * 击键间隔大于 5s，不收集时间
+   * 击键间隔大于 5s，暂停累计时间
    */
   private accumTime() {
     const time = performance.now();
@@ -43,8 +129,11 @@ export class TypingSummary {
   private lastTime = 0;
   private pressCount = 0;
   private totalTime = 0;
+
   private totalValid = 0;
   private totalCorrect = 0;
+
+  private keyPressEventListener = () => {};
 }
 
 export type AchievementCond =

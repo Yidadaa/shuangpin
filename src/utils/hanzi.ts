@@ -3,18 +3,18 @@ import hanziTable from "./hanzi.json";
 type HanziLib = typeof hanziTable.popular;
 
 function buildTable({ pinyin, hanzi }: HanziLib) {
-  const h2p = new Map<string, string[]>;
-  const p2h = new Map<string, string[]>;
+  const h2p = new Map<string, string[]>();
+  const p2h = new Map<string, string[]>();
 
   for (let i = 0; i < pinyin.length; i += 1) {
     const h = hanzi[i];
     const ps = pinyin[i];
 
-    h2p.set(h, ps)
+    h2p.set(h, ps);
 
     for (const p of ps) {
-      if (!p2h.has(p)) p2h.set(p, [])
-      p2h.get(p)?.push(h)
+      if (!p2h.has(p)) p2h.set(p, []);
+      p2h.get(p)?.push(h);
     }
   }
 
@@ -29,5 +29,13 @@ export function getPinyinOf(hanzi: string) {
 }
 
 export function getHanziOf(pinyin: string) {
-  return hanziMap.p2h.get(pinyin) ?? ''
+  return hanziMap.p2h.get(pinyin) ?? "";
+}
+
+export function nextValidHanziIndex(text: string, currentIndex: number) {
+  while (currentIndex < text.length && !hanziMap.h2p.has(text[currentIndex])) {
+    currentIndex += 1;
+  }
+
+  return currentIndex;
 }

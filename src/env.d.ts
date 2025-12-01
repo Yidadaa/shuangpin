@@ -52,17 +52,6 @@ interface Combine {
   progress: Progress;
 }
 
-type Article =
-  | {
-      type: RawArticleName;
-      progress: Progress;
-    }
-  | {
-      type: "CUSTOM";
-      name: string;
-      progress: Progress;
-    };
-
 interface KeyConfig {
   main: Char;
   leads: string[];
@@ -78,15 +67,3 @@ interface Settings {
 }
 
 type Theme = "auto" | "dark" | "light";
-
-interface AppState {
-  currentLeadIndex: number;
-  currentFollowIndex: number;
-  currentArticleIndex: number;
-  progresses: Record<string, Progress>;
-  localConfigs: Record<string, RawShuangPinConfig>;
-
-  combines: Combine[];
-  articles: Article[];
-  settings: Settings;
-}
