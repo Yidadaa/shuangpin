@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { ref, onActivated, onDeactivated, watchEffect } from "vue";
+import { computed,ref, onActivated, onDeactivated, watchEffect } from "vue";
 import { useStore } from "../store";
 import { mapConfigToLayout, ShuangpinConfig } from "../utils/keyboard";
 import { followMap, leadMap } from "../utils/pinyin";

@@ -1,14 +1,20 @@
 import RandomMode from "./pages/RandomMode.vue";
 import LeadMode from "./pages/LeadMode.vue";
 import FollowMode from "./pages/FollowMode.vue";
-import ParagraphMode from "./pages/PragraphMode.vue";
+import ParagraphMode from "./pages/ParagraphMode.vue";
 import Settings from "./pages/Settings.vue";
+import ProgressiveMode from "./pages/ProgressiveMode.vue";
 
 import { RouteRecordRaw } from "vue-router";
 
 export const routes: RouteRecordRaw[] = [
   {
     path: "/",
+    name: "渐进模式",
+    component: ProgressiveMode,
+  },
+  {
+    path: "/random-mode",
     name: "随机模式",
     component: RandomMode,
   },

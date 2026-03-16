@@ -31,10 +31,12 @@ const buildBooleanOption = (name: string): SettingOption<boolean> => ({
   name,
 });
 
-type SettingKeys = keyof Omit<Settings, "shuangpinMode">;
-
+type SettingKeys = keyof Omit<
+  Settings,
+  "shuangpinMode" | "targetSpeed" | "targetAccuracy"
+>;
 const settingOptions: {
-  [_ in SettingKeys]: SettingOption<boolean | Theme>;
+  [_ in SettingKeys]: SettingOption<boolean | Theme | number>;
 } = {
   enableAutoClear: buildBooleanOption("自动清空"),
   enableKeyHint: buildBooleanOption("键位提示"),
@@ -47,6 +49,18 @@ const settingOptions: {
     ],
     name: "主题模式",
   },
+  fontSize: {
+    options: [
+      { option: 16, name: "较小" },
+      { option: 24, name: "标准" },
+      { option: 32, name: "中大" },
+      { option: 40, name: "较大" },
+      { option: 52, name: "特大" },
+      { option: 64, name: "超大" },
+      { option: 80, name: "极大" },
+    ],
+    name: "文章字号",
+  },
 };
 
 function nextOption(name: SettingKeys) {
@@ -55,13 +69,13 @@ function nextOption(name: SettingKeys) {
   const index = setting.options.findIndex((v) => v.option === currentValue);
   const nextOption =
     setting.options[(index + 1) % setting.options.length].option;
-  (settings.value[name] as boolean | Theme) = nextOption;
+  (settings.value[name] as boolean | Theme | number) = nextOption;
 }
 
 function getOptionName(name: SettingKeys) {
   const setting = settingOptions[name];
   const index = setting.options.findIndex(
-    (v) => v.option === settings.value[name]
+    (v) => v.option === settings.value[name],
   );
   const safeIndex = Math.max(index, 0);
   return setting.options[safeIndex].name;
@@ -97,7 +111,7 @@ function deleteMode() {
   if (confirm("确认删除？")) {
     store.deleteConfig(spName.value);
     settings.value.shuangpinMode = store.modes.at(
-      Math.max(currentIndex.value, -1)
+      Math.max(currentIndex.value, -1),
     ) as ShuangpinType;
     spName.value = settings.value.shuangpinMode;
   }
@@ -218,8 +232,6 @@ function editConfig() {
     }
 
     &:hover {
-      // margin-right: 0;
-
       .mode-actions {
         opacity: 1;
       }

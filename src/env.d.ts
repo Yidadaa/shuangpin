@@ -39,10 +39,10 @@ declare type Char =
 type Pinyin = { lead: string; follow: string; full: string };
 
 interface Progress {
-  currentIndex: number = 0;
-  total: number = 0;
-  correctTry: number = 0;
-  totalTry: number = 0;
+  currentIndex: number;
+  total: number;
+  history: number[];
+  correctSum: number;
 }
 
 interface Combine {
@@ -75,6 +75,9 @@ interface Settings {
   enablePinyinHint: boolean; // 拼音提示
   enableAutoClear: boolean; // 自动清空
   shuangpinMode: ShuangpinType;
+  targetSpeed: number;    // 目标速度 (WPM/KPM)
+  targetAccuracy: number; // 目标准确率 (0-100)
+  fontSize: number; // 默认值可以设为 28
 }
 
 type Theme = "auto" | "dark" | "light";
@@ -82,6 +85,7 @@ type Theme = "auto" | "dark" | "light";
 interface AppState {
   currentLeadIndex: number;
   currentFollowIndex: number;
+  currentProgressiveIndex: number;
   currentArticleIndex: number;
   progresses: Record<string, Progress>;
   localConfigs: Record<string, RawShuangPinConfig>;

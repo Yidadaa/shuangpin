@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import { computed, watchPostEffect } from "vue";
 import { storeToRefs } from "pinia";
-import { ref, onActivated, onDeactivated } from "vue";
+import { computed, ref, onActivated, onDeactivated } from "vue";
 import { useStore } from "../store";
 import { mapConfigToLayout } from "../utils/keyboard";
 
@@ -35,15 +34,27 @@ onDeactivated(() => {
 });
 
 function resizeKeyboard() {
-  const screenWidth = document.getElementById("app")?.clientWidth ?? 920;
-  const keyboardWidth = document.getElementById("keyboard")?.clientWidth ?? 920;
-  scale.value = screenWidth < 576 ? (screenWidth / keyboardWidth) * 1.1 : 1;
+  const app = document.getElementById("app");
+  const kbd = document.getElementById("keyboard");
+  const screenWidth = app?.clientWidth || window.innerWidth;
+
+  if (!kbd) return;
+  const keyboardWidth = kbd.clientWidth;
+
+  if (screenWidth < 576) {
+    let targetScale = screenWidth / keyboardWidth;
+    scale.value = Math.min(targetScale, 1);
+  } else {
+    scale.value = 1;
+  }
 }
 
 function pressKey(key: string) {
   pressingKeys.value.add(key);
 
-  navigator.vibrate(100);
+  if (typeof navigator.vibrate === "function") {
+    navigator.vibrate(50);
+  }
 }
 
 function send() {
@@ -101,6 +112,7 @@ function keyItemClass(key: string) {
 <template>
   <div class="keyboard" :style="`transform: scale(${scale})`" id="keyboard">
     <div v-for="(line, li) in keyLayout" :key="li" class="key-row">
+      <div v-if="li === 1" class="key-spacer"></div>
       <div
         v-for="(keyItem, ki) in line"
         :key="ki"
@@ -169,4 +181,20 @@ function keyItemClass(key: string) {
 <style lang="less">
 @import "../styles/color.less";
 @import "../styles/keyboard.less";
+.keyboard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .key-row {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .key-spacer {
+    width: 40px;
+    flex-shrink: 0;
+  }
+}
 </style>

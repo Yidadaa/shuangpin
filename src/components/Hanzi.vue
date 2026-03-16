@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { effect, ref } from "vue";
 import { useStore } from "../store";
-import { getPinyinOf } from "../utils/hanzi";
-import { randomChoice } from "../utils/number";
+import { getSinglePinyinOf } from "../utils/hanzi";
 
 const props = defineProps<{
   hanziSeq: string[];
@@ -20,7 +19,7 @@ function togglePinyin(show: boolean) {
 effect(() => {
   // eslint-disable-next-line vue/no-mutating-props
   currentHanzi.value = props.hanziSeq.pop();
-  pinyin.value = getPinyinOf(currentHanzi.value).at(0) ?? "";
+  pinyin.value = getSinglePinyinOf(currentHanzi.value).at(0) ?? "";
 });
 </script>
 

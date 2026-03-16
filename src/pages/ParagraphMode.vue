@@ -8,15 +8,14 @@ import {
   watchPostEffect,
   onActivated,
   onDeactivated,
-  onMounted,
   watchEffect,
+  computed,
 } from "vue";
 import { useStore } from "../store";
 import { storeToRefs } from "pinia";
 
 import rawArticles from "../utils/article.json";
-import { computed } from "vue";
-import { getPinyinOf, hanziMap } from "../utils/hanzi";
+import { getPinyinOf, isValidHanzi } from "../utils/hanzi";
 import { matchSpToPinyin } from "../utils/keyboard";
 import { TypingSummary } from "../utils/summary";
 import MenuList from "../components/MenuList.vue";
@@ -40,7 +39,7 @@ onDeactivated(() => {
 });
 
 (function checkArticles() {
-  const rawNames = new Set([...Object.keys(rawArticles)]);
+  const rawNames = new Set(Object.keys(rawArticles));
   articles.value.forEach((v) => {
     rawNames.delete(v.type);
   });
@@ -50,8 +49,8 @@ onDeactivated(() => {
     const progress: Progress = {
       currentIndex: 0,
       total: rawArticles[name].length,
-      correctTry: 0,
-      totalTry: 0,
+      history: [],
+      correctSum: 0,
     };
 
     articles.value.push({ progress, type: name });
@@ -78,11 +77,13 @@ function loadArticleText(article: Article) {
   };
 }
 
+/**
+ * 跳转到下一个有效的汉字（即在拼音库中存在的汉字）
+ */
 function jumpToNextValidHanzi(index: number, text: string) {
-  while (index < text.length && !hanziMap.h2p.has(text[index])) {
+  while (index < text.length && !isValidHanzi(text[index])) {
     index += 1;
   }
-
   return index;
 }
 
@@ -94,7 +95,7 @@ const article = computed(() => {
 
   info.progress.currentIndex = jumpToNextValidHanzi(
     info.progress.currentIndex,
-    info.text
+    info.text,
   );
 
   const currentHanzi = info.text[info.progress.currentIndex] ?? "";
@@ -155,7 +156,7 @@ function onSeq([lead, follow]: [string?, string?]) {
       store.mode(),
       lead as Char,
       follow as Char,
-      answer
+      answer,
     );
     pinyin.value = [res.lead, res.follow].filter((v) => !!v);
 
@@ -227,8 +228,8 @@ function saveArticle() {
     progress: {
       currentIndex: 0,
       total: editingContent.value.length,
-      correctTry: 0,
-      totalTry: 0,
+      history: [],
+      correctSum: 0,
     },
   });
 
@@ -296,7 +297,11 @@ function shortPinyin(pinyins: string[]) {
       </div>
       <div v-if="!isEditing" class="text-area">
         <div class="scroll-area">
-          <p v-for="(p, i) in article.text" :key="i">
+          <p
+            v-for="(p, i) in article.text"
+            :key="i"
+            :style="{ fontSize: settings.fontSize + 'px' }"
+          >
             <span
               v-for="([s, t], si) in p"
               :key="si"
@@ -333,11 +338,10 @@ function shortPinyin(pinyins: string[]) {
     </div>
 
     <Keyboard v-if="!isEditing" :valid-seq="onSeq" :hints="article.spHints" />
-
     <div v-if="!isEditing" class="summary">
       <TypeSummary
         :speed="summary.hanziPerMinutes"
-        :accuracy="summary.accuracy"
+        :accuracy="summary.totalAccuracy"
         :avgpress="summary.pressPerHanzi"
       />
     </div>
@@ -507,6 +511,12 @@ function shortPinyin(pinyins: string[]) {
           height: 30vh;
         }
 
+        p {
+          line-height: 1.5;
+          margin-bottom: 0.8em;
+          word-break: break-all;
+        }
+
         .bg-text {
           opacity: 0.4;
         }
@@ -517,8 +527,10 @@ function shortPinyin(pinyins: string[]) {
 
         .current-text {
           text-decoration: underline;
-          text-underline-offset: 2px;
-          opacity: 0.8;
+          text-underline-offset: 4px;
+          opacity: 1;
+          font-weight: 900;
+          color: @primary-color;
         }
       }
     }
@@ -568,7 +580,6 @@ function shortPinyin(pinyins: string[]) {
         font-family: inherit;
         font-size: 14px;
         font-weight: bold;
-        border: 0;
         outline: none;
         padding: 8px;
         height: calc(var(--page-height) - 200px);

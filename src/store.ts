@@ -7,12 +7,13 @@ declare global {
 }
 
 const cache: Record<string, ShuangpinConfig> = {};
-
+const WINDOW_SIZE = 50;
 export const useStore = defineStore("app", {
   state: (): AppState => {
     return {
       currentLeadIndex: 0,
       currentFollowIndex: 0,
+      currentProgressiveIndex: 0,
       currentArticleIndex: 0,
       progresses: {},
       localConfigs: {},
@@ -25,6 +26,9 @@ export const useStore = defineStore("app", {
         enablePinyinHint: true,
         theme: "auto",
         shuangpinMode: "小鹤双拼",
+        targetSpeed: 35,      
+        targetAccuracy: 95, 
+        fontSize: 28,
       },
     };
   },
@@ -39,8 +43,8 @@ export const useStore = defineStore("app", {
         this.progresses[name] = {
           currentIndex: 0,
           total: 0,
-          correctTry: 0,
-          totalTry: 0,
+          history: [],
+          correctSum: 0,
         };
       }
       return this.progresses[name];
@@ -49,17 +53,26 @@ export const useStore = defineStore("app", {
       this.progresses[name] = progress;
     },
     updateProgressOnValid(lead: string, follow: string, isValid: boolean) {
+      const value = isValid ? 1 : 0;
+
       for (const name of [lead, follow, lead + follow]) {
         const progress = this.getProgress(name);
-        progress.correctTry += Number(isValid);
-        progress.totalTry += 1;
-        this.updateProgress(name, progress);
+
+        progress.history.push(value);
+        progress.correctSum += value;
+
+        if (progress.history.length > WINDOW_SIZE) {
+          const removedValue = progress.history.shift()!;
+          progress.correctSum -= removedValue; 
+        }
+
+        progress.total += 1;
       }
     },
     getAccuracy(name: string) {
-      const progress = this.getProgress(name);
-      if (progress.correctTry === 0) return 0;
-      return progress.correctTry / progress.totalTry;
+      const progress = this.progresses[name];
+      if (!progress || progress.history.length === 0) return 0;
+      return progress.correctSum / progress.history.length;
     },
 
     mode() {
@@ -85,10 +98,10 @@ export const useStore = defineStore("app", {
       delete this.localConfigs[name];
     },
     getAllConfigs() {
-      this.modes.map(this.loadConfig.bind(this));
+      this.modes.forEach((mode) => this.loadConfig(mode));
     },
     loadConfig(name: string) {
-      if (!!this.localConfigs[name]) {
+      if (this.localConfigs[name]) {
         return new ShuangpinConfig(name, this.localConfigs[name], true);
       }
       if (!PresetConfigs[name as ShuangpinType]) {

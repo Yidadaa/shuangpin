@@ -1,33 +1,31 @@
 <script setup lang="ts">
-import SingleMode from '../components/SingleMode.vue';
-import { followMap, followKeys } from '../utils/pinyin'
-import { useStore } from '../store'
-import { computed, ref } from 'vue';
-import { hanziMap } from '../utils/hanzi';
-import { storeToRefs } from 'pinia';
+import SingleMode from "../components/SingleMode.vue";
+import { followMap, followKeys } from "../utils/pinyin";
+import { useStore } from "../store";
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import { getHanziOf } from "../utils/hanzi";
 
-const store = useStore()
-const currentFollowIndex = storeToRefs(store).currentFollowIndex
+const store = useStore();
+
+const { currentFollowIndex } = storeToRefs(store);
+
 const followList = computed(() => {
-  if (currentFollowIndex.value < 0 || currentFollowIndex.value >= followKeys.length) {
-    return []
+  if (
+    currentFollowIndex.value < 0 ||
+    currentFollowIndex.value >= followKeys.length
+  ) {
+    return [];
   }
-
-  return followMap.get(followKeys[currentFollowIndex.value]) ?? []
-})
-
+  const key = followKeys[currentFollowIndex.value];
+  const result = followMap.get(key) ?? [];
+  return result;
+});
 const hanziList = computed(() => {
-  return followList.value.reduce((pre, cur) => pre.concat(hanziMap.p2h.get(cur.full) ?? []), [] as string[])
-})
-
+  return followList.value.flatMap((cur) => getHanziOf(cur.full));
+});
 </script>
 
 <template>
-  <single-mode
-    :hanzi-list="hanziList"
-    mode="Follow"
-  />
+  <single-mode :hanzi-list="hanziList" mode="Follow" />
 </template>
-
-<style lang="less">
-</style>

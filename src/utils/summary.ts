@@ -1,50 +1,80 @@
 export class TypingSummary {
-  constructor() {}
+  private readonly WINDOW_SIZE = 50;
+  private history: Array<{
+    result: boolean;
+    duration: number;
+    presses: number;
+  }> = [];
+
+  private lastTime = 0;
+  private currentTermPresses = 0;
+
+  public totalPressCount = 0;
+  public totalCorrectMatches = 0;
+  public totalValidMatches = 0;
 
   onKeyPressed() {
-    this.pressCount += 1;
+    this.totalPressCount += 1;
+    this.currentTermPresses += 1;
 
-    this.accumTime();
+    const now = performance.now();
+    if (this.lastTime === 0) {
+      this.lastTime = now;
+    }
   }
 
   onValid(result: boolean) {
-    this.totalValid += 1;
-    this.totalCorrect += Number(result);
+    this.totalValidMatches += 1;
+    if (result) this.totalCorrectMatches += 1;
+
+    const now = performance.now();
+    let diff = now - this.lastTime;
+
+    if (diff > 5000 || this.lastTime === 0) {
+      diff = 0;
+    }
+
+    this.history.push({
+      result,
+      duration: diff,
+      presses: this.currentTermPresses,
+    });
+
+    if (this.history.length > this.WINDOW_SIZE) {
+      this.history.shift();
+    }
+
+    this.lastTime = now;
+    this.currentTermPresses = 0;
   }
 
-  /**
-   * 击键间隔大于 5s，不收集时间
-   */
-  private accumTime() {
-    const time = performance.now();
-    const diff = time - this.lastTime;
-
-    if (diff < 5000) {
-      this.totalTime += diff;
-    }
-    this.lastTime = time;
+  get slidingAccuracy() {
+    if (this.history.length === 0) return 0;
+    const correctCount = this.history.filter((h) => h.result).length;
+    return correctCount / this.history.length;
   }
 
   get hanziPerMinutes() {
-    if (this.totalTime === 0) return 0;
-    return (this.totalCorrect / this.totalTime) * 1000 * 60;
+    const totalDuration = this.history.reduce((sum, h) => sum + h.duration, 0);
+    const totalCorrect = this.history.filter((h) => h.result).length;
+
+    if (totalDuration === 0 || totalCorrect === 0) return 0;
+    return (totalCorrect / totalDuration) * 1000 * 60;
   }
 
   get pressPerHanzi() {
-    if (this.totalCorrect === 0) return 0;
-    return this.pressCount / this.totalCorrect;
+    const correctItems = this.history.filter((h) => h.result);
+    if (correctItems.length === 0) return 0;
+
+    const windowPresses = correctItems.reduce((sum, h) => sum + h.presses, 0);
+    return windowPresses / correctItems.length;
   }
 
-  get accuracy() {
-    if (this.totalValid === 0) return 0;
-    return this.totalCorrect / this.totalValid;
+  get totalAccuracy() {
+    return this.totalValidMatches === 0
+      ? 0
+      : this.totalCorrectMatches / this.totalValidMatches;
   }
-
-  private lastTime = 0;
-  private pressCount = 0;
-  private totalTime = 0;
-  private totalValid = 0;
-  private totalCorrect = 0;
 }
 
 export type AchievementCond =

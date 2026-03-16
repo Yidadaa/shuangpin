@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, defineProps, computed, onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted } from "vue";
 
 export interface MenuProps {
   onMenuChange?: (i: number) => void;
@@ -14,22 +14,28 @@ const props = defineProps<MenuProps>();
 function shiftItem(deltaIndex: number) {
   const changedIndex = Math.max(
     0,
-    Math.min(props.items.length - 1, props.index + deltaIndex)
+    Math.min(props.items.length - 1, props.index + deltaIndex),
   );
 
   props.onMenuChange?.(changedIndex);
 }
 
 function buildItemClass(deltaIndex: number) {
-  return deltaIndex === 0
-    ? "selected-item"
-    : Math.abs(deltaIndex) === 1
-    ? "adj-item"
-    : "other-item";
+  if (deltaIndex === 0) {
+    return "selected-item";
+  }
+  const isAdjacent = Math.abs(deltaIndex) === 1;
+  return isAdjacent ? "adj-item" : "other-item";
 }
 
 function onItemWheel(e: WheelEvent) {
-  shiftItem(e.deltaY > 0 ? 1 : e.deltaY < 0 ? -1 : 0);
+  let direction = 0;
+  if (e.deltaY > 0) {
+    direction = 1;
+  } else if (e.deltaY < 0) {
+    direction = -1;
+  }
+  shiftItem(direction);
 }
 
 function arrawChangeMenu(e: KeyboardEvent) {

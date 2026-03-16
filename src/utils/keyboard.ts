@@ -1,6 +1,4 @@
 import { download } from "./common";
-import { product } from "./number";
-import { validCombines } from "./pinyin";
 import configs from "./spconfig.json";
 
 declare global {
@@ -18,66 +16,104 @@ declare global {
    * }
    * ```
    */
-  type RawShuangPinConfig = typeof configs["小鹤双拼"];
+  type RawShuangPinConfig = (typeof configs)["小鹤双拼"];
   type ShuangpinMode = ShuangpinConfig;
 }
 
-export const PresetConfigs = configs;
-
 export function encodeShuangpin() {}
+
+export interface KeyBinding {
+  main: string;
+  leads: string[];
+  follows: string[];
+}
+
 export class ShuangpinConfig {
-  groupByKey = new Map<Char, KeyConfig>(); // 键盘 -> KeyConfig
-  groupByFollow = new Map<string, KeyConfig>(); // 声母 -> KeyConfig
-  groupByLead = new Map<string, KeyConfig>(); // 韵母 -> KeyConfig
-  sp2zero = new Map<string, string>(); // 零声母 -> 双拼
-  zero2sp = new Map<string, string>(); // 双拼 -> 零声母
-  sp2py = new Map<string, string>(); // 双拼 -> 拼音
-  py2sp = new Map<string, string>(); // 拼音 -> 双拼
+  private readonly leadToKey = new Map<string, string>();
+  private readonly followToKey = new Map<string, string>();
+  private readonly zeroMap = new Map<string, string>();
+  public readonly py2sp = new Map<string, string>();
+  public groupByKey = new Map<string, any>();
 
   constructor(
     public name: string,
     public config: RawShuangPinConfig,
-    public custom = false
+    public custom = false,
   ) {
-    for (const line of config["keyMap"]) {
-      const [main, follow, lead] = line.split("/");
-      const keyConfig: KeyConfig = {
-        main: (main as Char) ?? "",
-        follows: follow?.split(",") ?? [],
-        leads: lead?.split(",") ?? [],
-      };
-      this.groupByKey.set(keyConfig.main, keyConfig);
-      keyConfig.leads.forEach((lead) => this.groupByLead.set(lead, keyConfig));
-      keyConfig.follows.forEach((follow) =>
-        this.groupByFollow.set(follow, keyConfig)
-      );
+    this.init();
+  }
+
+  private init() {
+    const normalize = (s: string) => s.replaceAll("v", "ü");
+
+    for (const line of this.config.keyMap) {
+      const [key, followStr, leadStr] = line.split("/");
+      const follows = followStr ? followStr.split(",").map(normalize) : [];
+      const leads = leadStr ? leadStr.split(",") : [];
+
+      this.groupByKey.set(key, { main: key, leads, follows });
+
+      leads.forEach((l) => this.leadToKey.set(l, key));
+      follows.forEach((f) => this.followToKey.set(f, key));
     }
 
-    for (const line of config["zeroMap"]) {
-      const [sp, zero] = line.split("/");
-      this.sp2zero.set(sp, zero);
-      this.zero2sp.set(zero, sp);
-      this.py2sp.set(zero, sp);
-      this.sp2py.set(sp, zero);
+    for (const line of this.config.zeroMap) {
+      const [sp, py] = line.split("/");
+      const normalizedPy = normalize(py);
+      this.zeroMap.set(normalizedPy, sp);
+      this.py2sp.set(normalizedPy, sp);
     }
 
-    const allCombs = product(
-      [...this.groupByKey.keys()],
-      [...this.groupByKey.keys()]
-    );
-    for (const [lead, follow] of allCombs) {
-      const sp = lead + follow;
-      const leads = this.groupByKey.get(lead)!.leads;
-      const follows = this.groupByKey.get(follow)!.follows;
-      const pinyins = product(leads, follows);
-      for (const [l, f] of pinyins) {
-        const pinyin = l + f;
-        if (validCombines.has(pinyin)) {
-          this.py2sp.set(pinyin, sp);
-          this.sp2py.set(sp, pinyin);
-        }
+    this.leadToKey.forEach((smKey, sm) => {
+      this.followToKey.forEach((ymKey, ym) => {
+        const pinyin = sm + ym;
+        const sp = smKey + ymKey;
+        this.py2sp.set(pinyin, sp);
+      });
+    });
+
+    ["zh", "ch", "sh", "r"].forEach(sm => {
+      const smKey = this.leadToKey.get(sm);
+      const ymKey = this.followToKey.get("i");
+      if (smKey && ymKey) {
+        this.py2sp.set(sm, smKey + ymKey);
+        this.py2sp.set(sm + "i", smKey + ymKey);
       }
+    });
+  }
+  get zero2sp(): Map<string, string> {
+    return this.py2sp;
+  }
+
+  getSp(py: string): string | null {
+    const normalizedPy = py.replaceAll("v", "ü");
+
+    if (this.zeroMap.has(normalizedPy)) {
+      return this.zeroMap.get(normalizedPy)!;
     }
+
+    const match = new RegExp(/^(zh|ch|sh|[bpmfdtnlgkhjqxrwyzsc])/).exec(
+      normalizedPy,
+    );
+    if (!match) return null;
+
+    const sm = match[0];
+    let ym = normalizedPy.slice(sm.length);
+    if (ym === "" && ["zh", "ch", "sh", "r"].includes(sm)) {
+      ym = "i";
+    }
+
+    const smKey = this.leadToKey.get(sm);
+    const ymKey = this.followToKey.get(ym);
+
+    return smKey && ymKey ? smKey + ymKey : null;
+  }
+
+  getStandardAnswers(pinyins: string[]): string[] {
+    const answers = pinyins
+      .map((py) => this.getSp(py))
+      .filter((sp): sp is string => !!sp);
+    return Array.from(new Set(answers));
   }
 
   download() {
@@ -85,102 +121,73 @@ export class ShuangpinConfig {
   }
 }
 
-export const keyboardLayout = ["qwertyuiop", " asdfghjkl;", "zxcvbnm"];
+export const keyboardLayout = ["qwertyuiop", "asdfghjkl;", "zxcvbnm"];
 
-export function mergeString([a, b]: string[] = []) {
-  if (!(a && b && a.length > 2 && b.length > 2)) {
-    return [a, b].join(" ");
-  }
-  const aChars = a.split("");
-  const bChars = b.split("");
-  const commonSuffix = [];
-
-  while (
-    aChars.length &&
-    bChars.length &&
-    aChars[aChars.length - 1] === bChars[bChars.length - 1]
-  ) {
-    commonSuffix.push(aChars.pop());
-    bChars.pop();
-  }
-
-  const prefixs = [aChars.join(""), bChars.join("")].filter(
-    (v) => v.length > 0
-  );
-
-  if (commonSuffix.length === 0) {
-    return prefixs.join(" ");
-  }
-
-  const prefix = prefixs.join("/");
-  const suffix = commonSuffix.reverse().join("");
-
-  return `(${prefix})${suffix}`;
+export function mergeString(list: string[] = []): string {
+  if (list.length === 0) return "";
+  const unique = Array.from(new Set(list));
+  if (unique.length <= 2) return unique.join("/");
+  return unique.slice(0, 3).join("/") + (unique.length > 3 ? "..." : "");
 }
 
 export function mapConfigToLayout(config: ShuangpinMode) {
-  return keyboardLayout.map((v) =>
-    v.split("").map((key) => {
-      const keyConfig = config.groupByKey.get(key as Char) ?? {
+  return keyboardLayout.map((row) =>
+    row.split("").map((key) => {
+      const keyConfig: KeyBinding = config.groupByKey.get(key) ?? {
         main: key,
         leads: [],
         follows: [],
       };
+
       return {
         main: keyConfig.main,
-        lead: mergeString(keyConfig.leads.filter((v) => v !== keyConfig.main)),
+        lead: mergeString(
+          keyConfig.leads.filter((v: string) => v !== keyConfig.main),
+        ),
         follow: mergeString(keyConfig.follows),
         leads: keyConfig.leads,
         follows: keyConfig.follows,
       };
-    })
+    }),
   );
 }
 
 export function matchSpToPinyin(
-  mode: ShuangpinMode,
-  leadKey: Char,
-  followKey: Char,
-  targetPinyin: string
+  mode: ShuangpinConfig,
+  leadKey: string,
+  followKey: string,
+  targetPinyin: string,
 ) {
-  const allMatched = !!leadKey && !!followKey;
-  const leads = mode.groupByKey.get(leadKey)?.leads ?? [];
-  const follows = mode.groupByKey.get(followKey)?.follows ?? [];
-  const combines = product(leads.concat(""), follows.concat("")).filter(
-    ([a, b]) => !!a || !!b
-  );
+  const sp = (leadKey ?? "") + (followKey ?? "");
+  const standardAnswers = mode.getStandardAnswers([targetPinyin]);
+  const isValid = !!leadKey && !!followKey && standardAnswers.includes(sp);
+  let lead = leadKey;
+  let follow = followKey;
 
-  let lead = leadKey as string;
-  let follow = followKey as string;
-
-  const sp = (lead ?? "") + (follow ?? "");
-  const valid = mode.sp2py.get(sp) === targetPinyin;
-
-  if (valid) {
-    lead = validCombines.get(targetPinyin)!.lead;
-    follow = validCombines.get(targetPinyin)!.follow;
-  }
-
-  if (!valid) {
-    // 匹配声母的情况
-    combines.some(([l, f]) => {
-      if (l.length && targetPinyin?.startsWith(l)) {
-        lead = l;
-
-        return true;
+  if (isValid) {
+    if (mode.py2sp.get(targetPinyin) === sp) {
+      const match = /^(zh|ch|sh|[bpmfdtnlgkhjqxrwyzsc])/.exec(targetPinyin.replaceAll("v", "ü"));
+      if (match) {
+        lead = match[0];
+        follow = targetPinyin.slice(lead.length);
+      } else {
+        lead = "〇";
+        follow = targetPinyin;
       }
-
-      if (f.length && targetPinyin?.endsWith(f)) {
-        follow = f;
-
-        return true;
-      }
-    });
+    }
+  } else {
+    const leadConfig = mode.groupByKey.get(leadKey);
+    const followConfig = mode.groupByKey.get(followKey);
+    
+    if (leadConfig?.leads?.length) lead = leadConfig.leads[0];
+    if (followConfig?.follows?.length) follow = followConfig.follows[0];
   }
 
   return {
-    valid: valid && allMatched,
-    lead,
-    follow,
+    valid: isValid,
+    lead: lead,
+    follow: follow,
   };
 }
+
+export { default as PresetConfigs } from "./spconfig.json";
