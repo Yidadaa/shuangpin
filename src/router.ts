@@ -3,10 +3,11 @@ import LeadMode from "./pages/LeadMode.vue";
 import FollowMode from "./pages/FollowMode.vue";
 import ParagraphMode from "./pages/PragraphMode.vue";
 import Settings from "./pages/Settings.vue";
+import XhyxPage from "./pages/XhyxPage.vue";
 
 import { RouteRecordRaw } from "vue-router";
 
-export const routes: RouteRecordRaw[] = [
+export const shuangpinRoutes: RouteRecordRaw[] = [
   {
     path: "/",
     name: "随机模式",
@@ -33,3 +34,13 @@ export const routes: RouteRecordRaw[] = [
     component: Settings,
   },
 ];
+
+export const xhyxRoutes: RouteRecordRaw[] = [
+  {
+    path: "/xhyx",
+    name: "音形",
+    component: XhyxPage,
+  },
+];
+
+export const routes: RouteRecordRaw[] = [...shuangpinRoutes, ...xhyxRoutes];

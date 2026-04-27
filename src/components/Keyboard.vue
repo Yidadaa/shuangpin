@@ -10,8 +10,12 @@ const settings = storeToRefs(store).settings;
 
 const props = defineProps<{
   hints?: string[];
-  validSeq?: (_: [string?, string?]) => boolean;
+  inputLength?: number;
+  modeConfig?: ShuangpinMode;
+  validSeq?: (_: string[]) => InputMatchResult;
 }>();
+
+const activeMode = computed(() => props.modeConfig ?? store.mode());
 
 const pressingKeys = ref(new Set<string>());
 const keySeq = ref<string[]>([]);
@@ -47,7 +51,13 @@ function pressKey(key: string) {
 }
 
 function send() {
-  if (props.validSeq?.([keySeq.value.at(0), keySeq.value.at(1)])) {
+  const result = props.validSeq?.([...keySeq.value]) ?? {
+    valid: false,
+    completed: false,
+    display: [],
+  };
+
+  if (result.completed && (result.valid || settings.value.enableAutoClear)) {
     keySeq.value = [];
   }
 }
@@ -60,15 +70,17 @@ function releaseKey(key: string, shouldSend = true) {
     return send();
   }
 
-  if (!shouldSend || !store.mode().groupByKey.has(key as Char)) {
+  if (!shouldSend || !activeMode.value.groupByKey.has(key as Char)) {
     return;
   }
 
-  if (keySeq.value.length <= 2) {
+  const inputLength = props.inputLength ?? 2;
+
+  if (keySeq.value.length <= inputLength) {
     keySeq.value.push(key);
   }
 
-  if (keySeq.value.length > 2) {
+  if (keySeq.value.length > inputLength) {
     if (settings.value.enableAutoClear) {
       keySeq.value = [key];
     } else {
@@ -80,7 +92,7 @@ function releaseKey(key: string, shouldSend = true) {
 }
 
 const keyLayout = computed(() => {
-  return mapConfigToLayout(store.mode());
+  return mapConfigToLayout(activeMode.value);
 });
 
 function keyItemClass(key: string) {
