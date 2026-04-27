@@ -37,6 +37,7 @@ declare type Char =
   | ";";
 
 type Pinyin = { lead: string; follow: string; full: string };
+type PracticeScheme = "shuangpin" | "xhyx";
 
 interface Progress {
   currentIndex: number = 0;
@@ -75,6 +76,13 @@ interface Settings {
   enablePinyinHint: boolean; // 拼音提示
   enableAutoClear: boolean; // 自动清空
   shuangpinMode: ShuangpinType;
+}
+
+interface InputMatchResult {
+  valid: boolean;
+  completed: boolean;
+  display: string[];
+  progressKeys?: string[];
 }
 
 type Theme = "auto" | "dark" | "light";

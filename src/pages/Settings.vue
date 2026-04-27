@@ -165,7 +165,6 @@ function editConfig() {
         </div>
       </div>
     </div>
-
     <div class="mode-config">
       <ModeConfig :is-editing="isEditing" :editing-name="spName" />
     </div>

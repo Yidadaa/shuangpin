@@ -2,10 +2,10 @@
 import { effect, ref } from "vue";
 import { useStore } from "../store";
 import { getPinyinOf } from "../utils/hanzi";
-import { randomChoice } from "../utils/number";
 
 const props = defineProps<{
   hanziSeq: string[];
+  hintText?: string;
 }>();
 
 const pinyin = ref("");
@@ -44,7 +44,7 @@ effect(() => {
       <div class="current-item">
         <img class="mi-bg" src="../assets/mi-bg.svg" />
         <div v-show="settings.enablePinyinHint || showPinyin" class="pinyin">
-          {{ pinyin }}
+          {{ props.hintText ?? pinyin }}
         </div>
         <div :key="currentHanzi" class="hanzi">
           {{ currentHanzi }}

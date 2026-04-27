@@ -8,7 +8,6 @@ import {
   watchPostEffect,
   onActivated,
   onDeactivated,
-  onMounted,
   watchEffect,
 } from "vue";
 import { useStore } from "../store";
@@ -17,13 +16,14 @@ import { storeToRefs } from "pinia";
 import rawArticles from "../utils/article.json";
 import { computed } from "vue";
 import { getPinyinOf, hanziMap } from "../utils/hanzi";
-import { matchSpToPinyin } from "../utils/keyboard";
 import { TypingSummary } from "../utils/summary";
 import MenuList from "../components/MenuList.vue";
+import { buildPracticePrompt, matchPracticeInput } from "../utils/practice";
 
 const store = useStore();
 const articles = storeToRefs(store).articles;
 const settings = storeToRefs(store).settings;
+const practiceMode = computed(() => store.practiceMode("shuangpin"));
 
 const summary = ref(new TypingSummary());
 
@@ -99,6 +99,11 @@ const article = computed(() => {
 
   const currentHanzi = info.text[info.progress.currentIndex] ?? "";
   const pinyin = getPinyinOf(currentHanzi);
+  const practice = buildPracticePrompt(
+    currentHanzi,
+    "shuangpin",
+    practiceMode.value
+  );
 
   // 分段
   let text: [[string, number][]] = [[]];
@@ -116,7 +121,8 @@ const article = computed(() => {
     text,
     currentHanzi,
     answer: [...new Set(pinyin)],
-    spHints: (store.mode().py2sp.get(pinyin.at(0) ?? "") ?? "").split(""),
+    practice,
+    spHints: practice.hintKeys,
     progress: info.progress,
     name: info.name,
   };
@@ -149,31 +155,26 @@ function onAriticleChange(i: number) {
 const pinyin = ref<string[]>([]);
 const isValidPinyin = ref(false);
 
-function onSeq([lead, follow]: [string?, string?]) {
-  for (const answer of article.value.answer) {
-    const res = matchSpToPinyin(
-      store.mode(),
-      lead as Char,
-      follow as Char,
-      answer
-    );
-    pinyin.value = [res.lead, res.follow].filter((v) => !!v);
+function onSeq(seq: string[]) {
+  const result = matchPracticeInput(
+    seq,
+    article.value.practice,
+    practiceMode.value
+  );
 
-    if (!!lead && !!follow) {
-      store.updateProgressOnValid(res.lead, res.follow, res.valid);
-    }
+  pinyin.value = result.display;
 
-    isValidPinyin.value ||= res.valid;
-
-    if (isValidPinyin.value) break;
+  if (result.completed && result.progressKeys) {
+    store.updateProgressOnValid(result.progressKeys, result.valid);
   }
 
-  const fullInput = !!lead && !!follow;
-  if (fullInput) {
-    summary.value.onValid(isValidPinyin.value);
+  if (result.completed) {
+    summary.value.onValid(result.valid);
   }
 
-  return isValidPinyin.value;
+  isValidPinyin.value = result.valid;
+
+  return result;
 }
 
 function scrollToFocus() {
@@ -253,6 +254,7 @@ function shortPinyin(pinyins: string[]) {
   }
   return ret.join("/");
 }
+
 </script>
 
 <template>
@@ -294,7 +296,7 @@ function shortPinyin(pinyins: string[]) {
           </div>
         </div>
       </div>
-      <div v-if="!isEditing" class="text-area">
+      <div v-if="!isEditing" class="text-area" :title="article.practice.detailHint">
         <div class="scroll-area">
           <p v-for="(p, i) in article.text" :key="i">
             <span
@@ -330,9 +332,14 @@ function shortPinyin(pinyins: string[]) {
           placeholder="键入范文……"
         />
       </div>
-    </div>
+      </div>
 
-    <Keyboard v-if="!isEditing" :valid-seq="onSeq" :hints="article.spHints" />
+    <Keyboard
+      v-if="!isEditing"
+      :valid-seq="onSeq"
+      :hints="article.spHints"
+      :input-length="article.practice.inputLength"
+    />
 
     <div v-if="!isEditing" class="summary">
       <TypeSummary

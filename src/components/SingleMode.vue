@@ -6,19 +6,19 @@ import TypeSummary from "../components/TypeSummary.vue";
 import MenuList from "../components/MenuList.vue";
 
 import { onActivated, onDeactivated, ref, watchPostEffect } from "vue";
-import { matchSpToPinyin } from "../utils/keyboard";
 import { useStore } from "../store";
 import { computed } from "vue";
-import { getPinyinOf } from "../utils/hanzi";
 import { TypingSummary } from "../utils/summary";
 import { followKeys, leadKeys } from "../utils/pinyin";
-import { randInt, randomChoice } from "../utils/number";
+import { randInt } from "../utils/number";
+import { buildPracticePrompt, matchPracticeInput } from "../utils/practice";
 
 export interface SingleModeProps {
   nextChar?: () => string;
   hanziList?: string[];
   onValidInput?: (result: boolean) => void;
   mode?: "Lead" | "Follow";
+  scheme?: PracticeScheme;
 }
 
 function nextChar() {
@@ -96,37 +96,38 @@ onDeactivated(() => {
 });
 
 const answer = computed(() => {
-  const pys = getPinyinOf(hanziSeq.value.at(-1) ?? "");
-  return pys.at(0) ?? "";
+  return hanziSeq.value.at(-1) ?? "";
 });
 
-const hints = computed(() => {
-  return (store.mode().py2sp.get(answer.value) ?? "").split("");
-});
+const scheme = computed(() => props.scheme ?? "shuangpin");
+const practiceMode = computed(() => store.practiceMode(scheme.value));
 
-function onSeq([lead, follow]: [string?, string?]) {
-  const res = matchSpToPinyin(
-    store.mode(),
-    lead as Char,
-    follow as Char,
-    answer.value
+const practicePrompt = computed(() =>
+  buildPracticePrompt(answer.value, scheme.value, practiceMode.value)
+);
+
+const hints = computed(() => practicePrompt.value.hintKeys);
+
+function onSeq(seq: string[]) {
+  const result = matchPracticeInput(
+    seq,
+    practicePrompt.value,
+    practiceMode.value
   );
 
-  if (!!lead && !!follow) {
-    props.onValidInput?.(res.valid);
-    store.updateProgressOnValid(res.lead, res.follow, res.valid);
+  if (result.completed) {
+    props.onValidInput?.(result.valid);
+    summary.value.onValid(result.valid);
   }
 
-  const fullInput = !!lead && !!follow;
-  if (fullInput) {
-    summary.value.onValid(res.valid);
+  if (result.completed && result.progressKeys) {
+    store.updateProgressOnValid(result.progressKeys, result.valid);
   }
 
-  pinyin.value = [res.lead, res.follow].filter((v) => !!v) as string[];
+  pinyin.value = result.display;
+  isValid.value = result.valid;
 
-  isValid.value = res.valid;
-
-  return res.valid;
+  return result;
 }
 
 watchPostEffect(() => {
@@ -156,11 +157,19 @@ watchPostEffect(() => {
     </div>
 
     <div class="hanzi-list">
-      <Hanzi :hanzi-seq="[...hanziSeq]" />
+      <Hanzi
+        :hanzi-seq="[...hanziSeq]"
+        :hint-text="practicePrompt.detailHint"
+      />
     </div>
 
     <div class="single-keyboard">
-      <Keyboard :valid-seq="onSeq" :hints="hints" />
+      <Keyboard
+        :valid-seq="onSeq"
+        :hints="hints"
+        :input-length="practicePrompt.inputLength"
+        :mode-config="practiceMode"
+      />
     </div>
 
     <div class="summary">

@@ -48,8 +48,8 @@ export const useStore = defineStore("app", {
     updateProgress(name: string, progress: Progress) {
       this.progresses[name] = progress;
     },
-    updateProgressOnValid(lead: string, follow: string, isValid: boolean) {
-      for (const name of [lead, follow, lead + follow]) {
+    updateProgressOnValid(names: string[], isValid: boolean) {
+      for (const name of [...new Set(names)].filter((v) => v.length > 0)) {
         const progress = this.getProgress(name);
         progress.correctTry += Number(isValid);
         progress.totalTry += 1;
@@ -72,6 +72,12 @@ export const useStore = defineStore("app", {
         }
       }
       return cache[name];
+    },
+    practiceMode(scheme: PracticeScheme = "shuangpin") {
+      if (scheme === "xhyx") {
+        return this.loadConfig("小鹤双拼");
+      }
+      return this.mode();
     },
 
     // 配置文件
