@@ -515,7 +515,7 @@ describe("playFeedback 反馈音（Web Audio）", () => {
     // 音量峰值与衰减时长保持在调优后的水平。
     expect(correctGain.gain.schedule[1].args[0]).toBe(0.45);
     expect(correctGain.gain.schedule.at(-1)?.args).toEqual([0.0001, 0.22]);
-    expect(incorrectGain.gain.schedule[1].args[0]).toBe(0.35);
+    expect(incorrectGain.gain.schedule[1].args[0]).toBe(0.6);
     expect(incorrectGain.gain.schedule.at(-1)?.args).toEqual([0.0001, 0.45]);
   });
 
