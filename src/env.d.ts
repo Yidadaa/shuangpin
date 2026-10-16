@@ -75,6 +75,8 @@ interface Settings {
   enablePinyinHint: boolean; // 拼音提示
   enableAutoClear: boolean; // 自动清空
   shuangpinMode: ShuangpinType;
+  enablePronunciation: boolean; // 汉字朗读
+  enableSoundFeedback: boolean; // 正确/错误反馈音
 }
 
 type Theme = "auto" | "dark" | "light";

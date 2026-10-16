@@ -55,12 +55,16 @@ function send() {
 function releaseKey(key: string, shouldSend = true) {
   pressingKeys.value.delete(key);
 
+  if (!shouldSend) {
+    return;
+  }
+
   if (key === "Backspace") {
     keySeq.value.pop();
     return send();
   }
 
-  if (!shouldSend || !store.mode().groupByKey.has(key as Char)) {
+  if (!store.mode().groupByKey.has(key as Char)) {
     return;
   }
 
@@ -73,6 +77,7 @@ function releaseKey(key: string, shouldSend = true) {
       keySeq.value = [key];
     } else {
       keySeq.value.pop();
+      return;
     }
   }
 

@@ -5,8 +5,9 @@ import Pinyin from "../components/Pinyin.vue";
 import TypeSummary from "../components/TypeSummary.vue";
 import MenuList from "../components/MenuList.vue";
 
-import { onActivated, onDeactivated, ref, watchPostEffect } from "vue";
+import { onActivated, onDeactivated, ref, watch } from "vue";
 import { matchSpToPinyin } from "../utils/keyboard";
+import { playFeedback, speakHanzi, stopAudio } from "../utils/audio";
 import { useStore } from "../store";
 import { computed } from "vue";
 import { getPinyinOf } from "../utils/hanzi";
@@ -32,8 +33,18 @@ const pinyin = ref<string[]>([]);
 
 const store = useStore();
 const props = defineProps<SingleModeProps>();
-const hanziSeq = ref(new Array(4).fill(0).map(() => nextChar()));
+const hanziSeq = ref<string[]>([]);
 const isValid = ref(false);
+
+/** 当前组件是否处于 keep-alive 激活状态。 */
+const isActive = ref(false);
+
+/** 用当前来源重建队列（4 个预览字 + 末尾目标）。 */
+function rebuildQueue() {
+  hanziSeq.value = new Array(4).fill(0).map(() => nextChar());
+}
+
+rebuildQueue();
 
 const summary = ref(new TypingSummary());
 
@@ -76,49 +87,87 @@ function onMenuChange(i: number) {
   }
 }
 
-watchPostEffect(() => {
-  for (let i = 0; i < 4; ++i) {
-    hanziSeq.value.unshift(nextChar());
-    hanziSeq.value.pop();
+/**
+ * 只监听真正需要重建队列的来源：Lead/Follow 的字表（菜单切换导致
+ * hanziList 变化时重建并朗读一次）。Random 无字表，来源恒为 undefined，
+ * 不会触发；也不再监听 hanziSeq 自身，advance 的单次 unshift/pop 不会
+ * 被再次重洗。
+ */
+watch(
+  () => props.hanziList,
+  () => {
+    rebuildQueue();
+    if (isActive.value) {
+      speakCurrent();
+    }
   }
-});
+);
 
 function onKeyPressed() {
   summary.value.onKeyPressed();
 }
 
 onActivated(() => {
+  isActive.value = true;
   document.addEventListener("keypress", onKeyPressed);
+  speakCurrent();
 });
 
 onDeactivated(() => {
+  isActive.value = false;
   document.removeEventListener("keypress", onKeyPressed);
+  clearAdvanceTimer();
+  stopAudio();
 });
 
-const answer = computed(() => {
+/**
+ * 当前目标字的全部去重读音；完整提交时逐一匹配，任一命中即正确。
+ */
+const answers = computed(() => {
   const pys = getPinyinOf(hanziSeq.value.at(-1) ?? "");
-  return pys.at(0) ?? "";
+  return [...new Set(pys)];
 });
+
+const answer = computed(() => answers.value.at(0) ?? "");
 
 const hints = computed(() => {
   return (store.mode().py2sp.get(answer.value) ?? "").split("");
 });
 
-function onSeq([lead, follow]: [string?, string?]) {
-  const res = matchSpToPinyin(
-    store.mode(),
-    lead as Char,
-    follow as Char,
-    answer.value
-  );
+/**
+ * 对当前字全部去重读音逐一匹配；任一命中即返回该结果，
+ * 全部未命中时返回最后一次匹配结果（用于展示 lead/follow）。
+ */
+function matchAnswers(lead: string, follow: string) {
+  let last: ReturnType<typeof matchSpToPinyin> | null = null;
+  for (const py of answers.value) {
+    const res = matchSpToPinyin(store.mode(), lead as Char, follow as Char, py);
+    if (res.valid) {
+      return res;
+    }
+    last = res;
+  }
+  return last ?? { valid: false, lead, follow };
+}
 
-  if (!!lead && !!follow) {
-    props.onValidInput?.(res.valid);
-    store.updateProgressOnValid(res.lead, res.follow, res.valid);
+function onSeq([lead, follow]: [string?, string?]) {
+  const fullInput = !!lead && !!follow;
+
+  // CP-11：100ms 推进窗口内的任何输入（含单键）一律吞掉——return true
+  // 让 Keyboard 清空缓冲；不反馈、不统计、不改变 pinyin/推进，避免残留。
+  if (advanceTimer !== null) {
+    return true;
   }
 
-  const fullInput = !!lead && !!follow;
+  // 完整提交按全部读音逐一匹配（任一命中即正确）；单键输入沿用
+  // 第一个读音做提示性匹配（与 hints 一致）。
+  const res = fullInput
+    ? matchAnswers(lead ?? "", follow ?? "")
+    : matchSpToPinyin(store.mode(), lead as Char, follow as Char, answer.value);
+
   if (fullInput) {
+    props.onValidInput?.(res.valid);
+    store.updateProgressOnValid(res.lead, res.follow, res.valid);
     summary.value.onValid(res.valid);
   }
 
@@ -126,19 +175,63 @@ function onSeq([lead, follow]: [string?, string?]) {
 
   isValid.value = res.valid;
 
+  if (fullInput) {
+    if (store.settings.enableSoundFeedback) {
+      playFeedback(res.valid ? "correct" : "incorrect");
+    }
+
+    if (res.valid) {
+      scheduleAdvance();
+    }
+  }
+
   return res.valid;
 }
 
-watchPostEffect(() => {
-  if (isValid.value) {
-    setTimeout(() => {
-      hanziSeq.value.unshift(nextChar());
-      hanziSeq.value.pop();
-      pinyin.value = [];
-      isValid.value = false;
-    }, 100);
+/** 尚未执行的推进定时器；停用页面时清除，避免停用后仍切字/朗读。 */
+let advanceTimer: ReturnType<typeof setTimeout> | null = null;
+
+function clearAdvanceTimer() {
+  if (advanceTimer !== null) {
+    clearTimeout(advanceTimer);
+    advanceTimer = null;
   }
-});
+}
+
+/** 朗读指定字（遵守发音设置）；空字不读。 */
+function speakTarget(target: string) {
+  if (!store.settings.enablePronunciation) {
+    return;
+  }
+  if (target === "") {
+    return;
+  }
+  speakHanzi(target);
+}
+
+/** 朗读当前目标字（hanziSeq 末尾），不朗读预览队列。 */
+function speakCurrent() {
+  speakTarget(hanziSeq.value.at(-1) ?? "");
+}
+
+/** 正确输入后延迟 100ms 推进到新字，并朗读新目标一次。 */
+function advance() {
+  hanziSeq.value.unshift(nextChar());
+  hanziSeq.value.pop();
+  // 先取定新目标再朗读，保证朗读字与最终显示 at(-1) 一致。
+  const target = hanziSeq.value.at(-1) ?? "";
+  pinyin.value = [];
+  isValid.value = false;
+  speakTarget(target);
+}
+
+function scheduleAdvance() {
+  clearAdvanceTimer();
+  advanceTimer = setTimeout(() => {
+    advanceTimer = null;
+    advance();
+  }, 100);
+}
 </script>
 
 <template>
